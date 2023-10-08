@@ -1,0 +1,16 @@
+{
+  "name": "talking-heads",
+  "workspaces": [
+    "apps/frontend",
+    "apps/backend"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "start": "npm run start:prod --workspace=apps/backend",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.16"
+  }
+}
