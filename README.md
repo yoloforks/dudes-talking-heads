@@ -28,6 +28,10 @@ The preinstalled version can be used on your stream right now.
 
 Preview: http://dudes.mikedanagam.space/user/mikedanagam
 
+Open OBS or any streaming tool which supported browser overlay.
+
+Put URL to the browser source.
+
 ## Contributing
 
 If you'd like to contribute to this project, please feel free to create pull requests.
