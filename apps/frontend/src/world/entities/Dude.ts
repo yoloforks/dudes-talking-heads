@@ -64,6 +64,14 @@ export class Dude {
   private runIdleAnimationTime?: number;
   private maxRunIdleAnimdationTime?: number;
 
+  private maxLifeTime: number = 1000 * 60 * 5;
+  private currentLifeTime: number = this.maxLifeTime;
+
+  private maxOpacityTime: number = 5000;
+  private currentOpacityTime: number = this.maxOpacityTime;
+
+  public shouldBeDeleted: boolean = false;
+
   private isJumping = () =>
     this.animationState == AnimationState.Fall ||
     this.animationState == AnimationState.Jump;
@@ -219,6 +227,17 @@ export class Dude {
       this.currentMessageTime -= fixedDeltaTime;
     }
 
+    if (this.currentLifeTime > 0) {
+      this.currentLifeTime -= fixedDeltaTime;
+    } else {
+      if (this.currentOpacityTime > 0) {
+        this.currentOpacityTime -= fixedDeltaTime;
+        this.view.alpha = this.currentOpacityTime / this.maxOpacityTime;
+      } else {
+        this.shouldBeDeleted = true;
+      }
+    }
+
     this.sprite?.update((fixedDeltaTime / 1000) * 60);
   }
 
@@ -238,6 +257,8 @@ export class Dude {
 
     this.currentMessage = message.view;
     this.view.addChild(this.currentMessage);
+
+    this.currentLifeTime = this.maxLifeTime;
   }
 
   addMessage(message: string) {

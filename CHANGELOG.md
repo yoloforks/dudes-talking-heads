@@ -5,3 +5,4 @@
 ### Added
 
 - Dude color from message
+- Dude life time

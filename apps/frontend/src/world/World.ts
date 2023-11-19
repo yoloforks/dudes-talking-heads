@@ -20,6 +20,10 @@ export class World {
   public update() {
     for (const id in this.dudes) {
       this.dudes[id].update();
+
+      if (this.dudes[id].shouldBeDeleted) {
+        this.deleteDude(id, this.dudes[id]);
+      }
     }
   }
 
@@ -43,5 +47,10 @@ export class World {
   public addDude(id: string, dude: Dude) {
     this.dudes[id] = dude;
     this.stage.addChild(dude.view);
+  }
+
+  public deleteDude(id: string, dude: Dude) {
+    delete this.dudes[id];
+    this.stage.removeChild(dude.view);
   }
 }
