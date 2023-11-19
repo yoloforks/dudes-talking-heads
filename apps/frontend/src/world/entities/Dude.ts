@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import { appAssetsLoader } from '../../loader/appAssetsLoader';
 import { DudeMessage } from './DudeMessage';
 import { renderer } from '../../main';
+import { DudeSprite } from '../../loader/dudeSprite';
 
 export enum AnimationState {
   Idle = 'Idle',
@@ -38,7 +39,10 @@ export class Dude {
   private spriteSize: number = 32;
 
   private animationState?: AnimationState;
-  private animatedSprite?: PIXI.AnimatedSprite;
+
+  private sprite?: DudeSprite;
+
+  private color: string = '#0098db';
 
   private currentMessage?: PIXI.Container;
 
@@ -114,6 +118,14 @@ export class Dude {
     }
   }
 
+  tint(color: string) {
+    if (color) {
+      this.color = color;
+    }
+
+    this.sprite?.tint(color);
+  }
+
   update() {
     const now = performance.now();
     const fixedDeltaTime = 0.02 * 1000;
@@ -187,7 +199,7 @@ export class Dude {
       ) {
         this.direction = -this.direction;
         this.velocity.x = -this.velocity.x;
-        this.animatedSprite?.scale.set(this.direction * this.currentScale, this.currentScale);
+        this.sprite?.view.scale.set(this.direction * this.currentScale, this.currentScale);
       }
     }
 
@@ -207,9 +219,7 @@ export class Dude {
       this.currentMessageTime -= fixedDeltaTime;
     }
 
-    if (this.animatedSprite) {
-      this.animatedSprite.update((fixedDeltaTime / 1000) * 60);
-    }
+    this.sprite?.update((fixedDeltaTime / 1000) * 60);
   }
 
   hideMessage() {
@@ -241,15 +251,15 @@ export class Dude {
 
     this.animationState = state;
 
-    if (this.animatedSprite) {
-      this.view.removeChild(this.animatedSprite);
+    if (this.sprite) {
+      this.view.removeChild(this.sprite.view);
     }
 
-    this.animatedSprite = appAssetsLoader.getSprite(this.spriteName, state);
-    this.animatedSprite.scale.set(this.direction * this.currentScale, this.currentScale);
-    this.animatedSprite.anchor.set(0.5);
-    this.view.addChild(this.animatedSprite);
-    this.animatedSprite.autoUpdate = false;
-    this.animatedSprite.play();
+    const dudeSprite = appAssetsLoader.getSprite(this.spriteName, state);
+    this.sprite = new DudeSprite(dudeSprite.body, dudeSprite.eyes);
+    this.sprite.view.scale.set(this.direction * this.currentScale, this.currentScale);
+    this.sprite.tint(this.color);
+
+    this.view.addChild(this.sprite.view);
   }
 }

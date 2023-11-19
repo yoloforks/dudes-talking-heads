@@ -36,6 +36,8 @@ export class World {
     } else {
       this.dudes[data.userId].addMessage(data.message);
     }
+
+    this.dudes[data.userId].tint(data.color);
   }
 
   public addDude(id: string, dude: Dude) {

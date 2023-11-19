@@ -9,6 +9,11 @@ interface AsepriteData extends PIXI.ISpritesheetData {
   duration: number;
 }
 
+export type DudeSprite = {
+  body: PIXI.AnimatedSprite,
+  eyes: PIXI.AnimatedSprite,
+};
+
 const manifest = {
   bundles: [
     {
@@ -17,14 +22,6 @@ const manifest = {
         {
           alias: 'dude',
           src: '/user/sprites/dude/dude.json',
-        },
-        {
-          alias: 'sith',
-          src: '/user/sprites/sith/sith.json',
-        },
-        {
-          alias: 'agent',
-          src: '/user/sprites/agent/agent.json',
         },
       ],
     },
@@ -44,7 +41,7 @@ export class AppAssetsLoader {
     }
   }
 
-  public getSprite(sheetName: string, tagName: string): PIXI.AnimatedSprite {
+  public getSprite(sheetName: string, tagName: string): DudeSprite {
     if (!sheetName) {
       throw Error('Sheet is not defined');
     }
@@ -56,20 +53,32 @@ export class AppAssetsLoader {
     );
 
     if (frameTag) {
-      const textures = [];
+      const bodyTextures = [];
+      const eyesTextures = [];
 
       for (let i = frameTag.from; i <= frameTag.to; i++) {
         const framekey = i.toString();
-        const texture = sheet.textures[i];
-        const time = sheet.data.frames[framekey].duration;
 
-        textures.push({ texture, time });
+        const bodyTexture = sheet.textures['Body_' + i];
+        const eyesTexture = sheet.textures['Eyes_' + i];
+
+        const bodytime = sheet.data.frames['Body_' + framekey].duration;
+        const eyestime = sheet.data.frames['Eyes_' + framekey].duration;
+
+        bodyTextures.push({ texture: bodyTexture, time: bodytime });
+        eyesTextures.push({ texture: eyesTexture, time: eyestime });
       }
 
-      const sprite = new PIXI.AnimatedSprite(textures);
-      sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+      const bodySprite = new PIXI.AnimatedSprite(bodyTextures);
+      bodySprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+      
+      const eyesSprite = new PIXI.AnimatedSprite(eyesTextures);
+      eyesSprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
-      return sprite;
+      return {
+        body: bodySprite,
+        eyes: eyesSprite,
+      };
     }
 
     throw Error("Frame tag doesn't exist");

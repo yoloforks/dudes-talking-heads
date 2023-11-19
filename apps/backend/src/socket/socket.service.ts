@@ -73,6 +73,7 @@ export class SocketService {
           name: tags['display-name'],
           userId: tags['user-id'],
           message: message,
+          color: tags['color'],
         });
       });
 

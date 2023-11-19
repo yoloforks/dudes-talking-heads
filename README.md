@@ -43,3 +43,8 @@ Example can be found in aseprite folder.
 ## Contributing
 
 If you'd like to contribute to this project, please feel free to create pull requests.
+
+## Useful links
+
+- [https://0x72.itch.io/pixeldudesmaker](https://0x72.itch.io/pixeldudesmaker)
+- [https://masterpose.itch.io/pixelduuuuudesmaker](https://masterpose.itch.io/pixelduuuuudesmaker)

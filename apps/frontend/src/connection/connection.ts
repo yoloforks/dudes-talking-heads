@@ -4,6 +4,7 @@ export type Message = {
   name: string;
   userId: string;
   message: string;
+  color: string;
 };
 
 type ServerToClientsEvents = {
