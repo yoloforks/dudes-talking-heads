@@ -3,6 +3,7 @@ import { appAssetsLoader } from '../loader/appAssetsLoader';
 import { Connection, Message } from '../connection/connection';
 import { Dude } from './entities/Dude';
 import { config } from './config';
+import tinycolor from 'tinycolor2';
 
 export class World {
   private connection = new Connection();
@@ -35,13 +36,26 @@ export class World {
       this.addDude(data.userId, dude);
     }
 
-    if (data.message.trim() == '!jump') {
-      this.dudes[data.userId].jump();
+    const dude = this.dudes[data.userId];
+
+    const message = data.message.trim();
+    const array = message.split(' ').filter((item) => item != '');
+    const command = array[0];
+    const value = array[1];
+
+    if (command == '!jump') {
+      dude.jump();
+    } else if (command == '!color') {
+      const color = tinycolor(value);
+
+      if (color.isValid()) {
+        dude.tint(value, true);
+      }
     } else {
-      this.dudes[data.userId].addMessage(data.message);
+      dude.addMessage(data.message);
     }
 
-    this.dudes[data.userId].tint(data.color);
+    dude.tint(data.color);
   }
 
   public addDude(id: string, dude: Dude) {

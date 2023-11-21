@@ -43,6 +43,7 @@ export class Dude {
   private sprite?: DudeSprite;
 
   private color: string = '#969696';
+  private userColor?: string;
 
   private currentMessage?: PIXI.Container;
 
@@ -126,12 +127,16 @@ export class Dude {
     }
   }
 
-  tint(color: string) {
+  tint(color: string, save: boolean = false) {
     if (color) {
       this.color = color;
     }
 
-    this.sprite?.tint(color);
+    if (save) {
+      this.userColor = color;
+    }
+
+    this.sprite?.tint(this.userColor ?? this.color);
   }
 
   update() {
@@ -279,7 +284,7 @@ export class Dude {
     const dudeSprite = appAssetsLoader.getSprite(this.spriteName, state);
     this.sprite = new DudeSprite(dudeSprite.body, dudeSprite.eyes);
     this.sprite.view.scale.set(this.direction * this.currentScale, this.currentScale);
-    this.sprite.tint(this.color);
+    this.sprite.tint(this.userColor ?? this.color);
 
     this.view.addChild(this.sprite.view);
   }
