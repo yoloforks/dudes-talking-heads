@@ -42,7 +42,7 @@ export class Dude {
 
   private sprite?: DudeSprite;
 
-  private color: string = '#0098db';
+  private color: string = '#969696';
 
   private currentMessage?: PIXI.Container;
 
