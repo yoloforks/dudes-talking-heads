@@ -68,7 +68,7 @@ export class SocketService {
 
       tmiClient.connect();
 
-      tmiClient.on('message', (_channel, tags, message, self) => {
+      tmiClient.on('chat', (_channel, tags, message, self) => {
         this.emitToRoom(socket, roomId, 'message', {
           name: tags['display-name'],
           userId: tags['user-id'],
