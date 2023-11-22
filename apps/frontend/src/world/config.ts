@@ -11,10 +11,10 @@ export type Config = {
 export const config: Config = {
   chatters: {
     nets1l: {
-      sprite: 'dude',
+      sprite: 'sith',
     },
     St_zarus: {
-      sprite: 'dude',
+      sprite: 'agent',
     },
   },
 };

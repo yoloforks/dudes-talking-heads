@@ -264,6 +264,8 @@ export class Dude {
     this.view.addChild(this.currentMessage);
 
     this.currentLifeTime = this.maxLifeTime;
+    this.currentOpacityTime = this.maxOpacityTime;
+    this.view.alpha = 1;
   }
 
   addMessage(message: string) {
