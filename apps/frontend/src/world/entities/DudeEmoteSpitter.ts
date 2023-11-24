@@ -40,7 +40,7 @@ export class DudeEmoteSpitter {
       }
     }
 
-    this.currentTime += Constants.fixedDeltaTime;
+    this.currentTime += Constants.fixedDeltaTime / 1000;
 
     if (this.currentTime > this.maxDelay && this.emotes.length > 0) {
       const sprite = this.emotes.shift();

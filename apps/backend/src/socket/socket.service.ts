@@ -74,15 +74,21 @@ export class SocketService {
           let updatedMessage = message;
           const emotes = [];
 
-          for (const emote in tags.emotes) {
-            const start = Number(tags.emotes[emote][0].split('-')[0]);
-            const end = Number(tags.emotes[emote][0].split('-')[1]) + 1;
+          const emotesArray = Object.entries(tags.emotes).map((entity) => {
+            const start = Number(entity[1][0].split('-')[0]);
+            const end = Number(entity[1][0].split('-')[1]) + 1;
 
-            const substring = updatedMessage.substring(start, end);
-            updatedMessage = updatedMessage.replaceAll(substring, '');
+            return message.substring(start, end);
+          });
+
+          for (const emote in tags.emotes) {
             emotes.push(
               `https://static-cdn.jtvnw.net/emoticons/v1/${emote}/3.0`,
             );
+          }
+
+          for (const code of emotesArray ?? []) {
+            updatedMessage = updatedMessage.replaceAll(code, '');
           }
 
           this.emitToRoom(socket, roomId, 'message', {
