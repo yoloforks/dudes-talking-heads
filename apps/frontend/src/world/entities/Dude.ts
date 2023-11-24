@@ -3,6 +3,8 @@ import { appAssetsLoader } from '../../loader/appAssetsLoader';
 import { DudeMessage } from './DudeMessage';
 import { renderer } from '../../main';
 import { DudeSprite } from '../../loader/dudeSprite';
+import { DudeEmoteSpitter } from './DudeEmoteSpitter';
+import { Constants } from '../constants';
 
 export enum AnimationState {
   Idle = 'Idle',
@@ -73,6 +75,8 @@ export class Dude {
 
   public shouldBeDeleted: boolean = false;
 
+  private emoteSpitter: DudeEmoteSpitter = new DudeEmoteSpitter();
+
   private isJumping = () =>
     this.animationState == AnimationState.Fall ||
     this.animationState == AnimationState.Jump;
@@ -92,7 +96,11 @@ export class Dude {
 
     this.direction = Math.random() > 0.5 ? 1 : -1;
 
+    this.view.sortableChildren = true;
+    this.emoteSpitter.view.zIndex = 1;
+
     this.view.addChild(this.getNameText());
+    this.view.addChild(this.emoteSpitter.view);
 
     this.playAnimation(AnimationState.Idle);
 
@@ -141,7 +149,6 @@ export class Dude {
 
   update() {
     const now = performance.now();
-    const fixedDeltaTime = 0.02 * 1000;
 
     if (
       this.landAnimationTime &&
@@ -168,11 +175,16 @@ export class Dude {
       this.maxRunIdleAnimdationTime = Math.random() * 5000;
     }
 
-    this.velocity.y = this.velocity.y + (this.gravity * fixedDeltaTime) / 1000;
+    this.velocity.y =
+      this.velocity.y + (this.gravity * Constants.fixedDeltaTime) / 1000;
 
     const newPosition = {
-      x: this.view.position.x + (this.velocity.x * fixedDeltaTime) / 1000,
-      y: this.view.position.y + (this.velocity.y * fixedDeltaTime) / 1000,
+      x:
+        this.view.position.x +
+        (this.velocity.x * Constants.fixedDeltaTime) / 1000,
+      y:
+        this.view.position.y +
+        (this.velocity.y * Constants.fixedDeltaTime) / 1000,
     };
 
     if (
@@ -204,7 +216,8 @@ export class Dude {
     const width = renderer.width;
 
     if (this.animationState != AnimationState.Idle) {
-      this.view.position.x += (1 * this.direction * fixedDeltaTime * 60) / 1000;
+      this.view.position.x +=
+        (1 * this.direction * Constants.fixedDeltaTime * 60) / 1000;
 
       if (
         this.view.x + (this.collider.width / 2) * this.currentScale >= width ||
@@ -212,7 +225,10 @@ export class Dude {
       ) {
         this.direction = -this.direction;
         this.velocity.x = -this.velocity.x;
-        this.sprite?.view.scale.set(this.direction * this.currentScale, this.currentScale);
+        this.sprite?.view.scale.set(
+          this.direction * this.currentScale,
+          this.currentScale
+        );
       }
     }
 
@@ -229,21 +245,22 @@ export class Dude {
         this.hideMessage();
       }
     } else if (this.currentMessageTime > 0) {
-      this.currentMessageTime -= fixedDeltaTime;
+      this.currentMessageTime -= Constants.fixedDeltaTime;
     }
 
     if (this.currentLifeTime > 0) {
-      this.currentLifeTime -= fixedDeltaTime;
+      this.currentLifeTime -= Constants.fixedDeltaTime;
     } else {
       if (this.currentOpacityTime > 0) {
-        this.currentOpacityTime -= fixedDeltaTime;
+        this.currentOpacityTime -= Constants.fixedDeltaTime;
         this.view.alpha = this.currentOpacityTime / this.maxOpacityTime;
       } else {
         this.shouldBeDeleted = true;
       }
     }
 
-    this.sprite?.update((fixedDeltaTime / 1000) * 60);
+    this.sprite?.update((Constants.fixedDeltaTime / 1000) * 60);
+    this.emoteSpitter.update();
   }
 
   hideMessage() {
@@ -261,6 +278,7 @@ export class Dude {
     }
 
     this.currentMessage = message.view;
+    this.currentMessage.zIndex = 2;
     this.view.addChild(this.currentMessage);
 
     this.currentLifeTime = this.maxLifeTime;
@@ -270,6 +288,12 @@ export class Dude {
 
   addMessage(message: string) {
     this.messages.push(message);
+  }
+
+  spitEmotes(emotes: string[]) {
+    for (const emote of emotes) {
+      this.emoteSpitter.add(emote);
+    }
   }
 
   async playAnimation(state: AnimationState) {
@@ -285,7 +309,10 @@ export class Dude {
 
     const dudeSprite = appAssetsLoader.getSprite(this.spriteName, state);
     this.sprite = new DudeSprite(dudeSprite.body, dudeSprite.eyes);
-    this.sprite.view.scale.set(this.direction * this.currentScale, this.currentScale);
+    this.sprite.view.scale.set(
+      this.direction * this.currentScale,
+      this.currentScale
+    );
     this.sprite.tint(this.userColor ?? this.color);
 
     this.view.addChild(this.sprite.view);

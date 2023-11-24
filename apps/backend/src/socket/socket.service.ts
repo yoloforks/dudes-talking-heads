@@ -68,14 +68,32 @@ export class SocketService {
 
       tmiClient.connect();
 
-      tmiClient.on('chat', (_channel, tags, message, self) => {
-        this.emitToRoom(socket, roomId, 'message', {
-          name: tags['display-name'],
-          userId: tags['user-id'],
-          message: message,
-          color: tags['color'],
-        });
-      });
+      tmiClient.on(
+        'chat',
+        (_channel, tags: tmi.CommonUserstate, message, self) => {
+          let updatedMessage = message;
+          const emotes = [];
+
+          for (const emote in tags.emotes) {
+            const start = Number(tags.emotes[emote][0].split('-')[0]);
+            const end = Number(tags.emotes[emote][0].split('-')[1]) + 1;
+
+            const substring = updatedMessage.substring(start, end);
+            updatedMessage = updatedMessage.replaceAll(substring, '');
+            emotes.push(
+              `https://static-cdn.jtvnw.net/emoticons/v1/${emote}/3.0`,
+            );
+          }
+
+          this.emitToRoom(socket, roomId, 'message', {
+            name: tags['display-name'],
+            userId: tags['user-id'],
+            message: updatedMessage.trim(),
+            color: tags['color'],
+            emotes: emotes,
+          });
+        },
+      );
 
       const room = this.rooms.get(roomId);
 

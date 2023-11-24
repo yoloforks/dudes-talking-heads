@@ -52,7 +52,13 @@ export class World {
         dude.tint(value, true);
       }
     } else {
-      dude.addMessage(data.message);
+      if (data.message) {
+        dude.addMessage(data.message);
+      }
+      
+      if (data.emotes.length > 0) {
+        dude.spitEmotes(data.emotes);
+      }
     }
 
     dude.tint(data.color);

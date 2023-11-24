@@ -5,6 +5,7 @@ export type Message = {
   userId: string;
   message: string;
   color: string;
+  emotes: string[];
 };
 
 type ServerToClientsEvents = {
