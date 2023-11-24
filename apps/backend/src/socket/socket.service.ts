@@ -74,12 +74,14 @@ export class SocketService {
           let updatedMessage = message;
           const emotes = [];
 
-          const emotesArray = Object.entries(tags.emotes).map((entity) => {
-            const start = Number(entity[1][0].split('-')[0]);
-            const end = Number(entity[1][0].split('-')[1]) + 1;
+          const emotesArray = Object.entries(tags.emotes ?? {}).map(
+            (entity) => {
+              const start = Number(entity[1][0].split('-')[0]);
+              const end = Number(entity[1][0].split('-')[1]) + 1;
 
-            return message.substring(start, end);
-          });
+              return message.substring(start, end);
+            },
+          );
 
           for (const emote in tags.emotes) {
             emotes.push(
