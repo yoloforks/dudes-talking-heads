@@ -1,8 +1,8 @@
 import { Container, utils } from 'pixi.js';
-import { appAssetsLoader } from '../loader/appAssetsLoader';
+import { assetsLoader } from '../assets/assetsLoader';
 import { Connection, Message } from '../connection/connection';
 import { Dude } from './entities/Dude';
-import { config } from './config';
+import { config } from '../config/config';
 import tinycolor from 'tinycolor2';
 
 export class World {
@@ -12,7 +12,7 @@ export class World {
   public dudes: utils.Dict<Dude> = {};
 
   public async init() {
-    await appAssetsLoader.load();
+    await assetsLoader.load();
 
     this.connection.init();
     this.connection.onMessage((data) => this.handleMessage(data));

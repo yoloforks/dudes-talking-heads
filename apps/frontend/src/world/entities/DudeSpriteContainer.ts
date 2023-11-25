@@ -1,17 +1,12 @@
 import { AnimatedSprite, Container } from 'pixi.js';
 
-export type InitSettings = {
-  direction: number;
-  scale: number;
-}
-
-export class DudeSprite {
+export class DudeSpriteContainer {
   private body: AnimatedSprite;
   private eyes: AnimatedSprite;
 
   public view: Container;
 
-  constructor(body: AnimatedSprite, eyes: AnimatedSprite) {
+  constructor({ body, eyes }: { body: AnimatedSprite; eyes: AnimatedSprite }) {
     this.body = body;
     this.eyes = eyes;
 

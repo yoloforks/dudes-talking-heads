@@ -1,18 +1,14 @@
 import * as PIXI from 'pixi.js';
-import { appAssetsLoader } from '../../loader/appAssetsLoader';
-import { DudeMessage } from './DudeMessage';
+import { DudeMessageBox } from './DudeMessageBox';
 import { renderer } from '../../main';
-import { DudeSprite } from '../../loader/dudeSprite';
+import { DudeSpriteContainer } from './DudeSpriteContainer';
 import { DudeEmoteSpitter } from './DudeEmoteSpitter';
-import { Constants } from '../constants';
-
-export enum AnimationState {
-  Idle = 'Idle',
-  Run = 'Run',
-  Jump = 'Jump',
-  Land = 'Land',
-  Fall = 'Fall',
-}
+import { Constants } from '../../config/constants';
+import {
+  DudeSpriteLayers,
+  DudeSpriteTags,
+  spriteProvider,
+} from '../../sprite/spriteProvider';
 
 type Collider = {
   x: number;
@@ -22,9 +18,6 @@ type Collider = {
 };
 
 export class Dude {
-  private name: string;
-  private messages: string[] = [];
-
   private spriteName: string = 'dude';
 
   private currentScale: number = 4;
@@ -40,19 +33,18 @@ export class Dude {
 
   private spriteSize: number = 32;
 
-  private animationState?: AnimationState;
+  private animationState?: DudeSpriteTags;
 
-  private sprite?: DudeSprite;
+  private sprite?: DudeSpriteContainer;
+
+  private name: PIXI.Text;
 
   private color: string = '#969696';
   private userColor?: string;
 
-  private currentMessage?: PIXI.Container;
+  private message: DudeMessageBox = new DudeMessageBox();
 
   public view: PIXI.Container = new PIXI.Container();
-
-  private maxMessageTime: number = 10000;
-  private currentMessageTime: number = 0;
 
   private velocity: PIXI.IPointData = {
     x: 0,
@@ -78,11 +70,10 @@ export class Dude {
   private emoteSpitter: DudeEmoteSpitter = new DudeEmoteSpitter();
 
   private isJumping = () =>
-    this.animationState == AnimationState.Fall ||
-    this.animationState == AnimationState.Jump;
+    this.animationState == DudeSpriteTags.Fall ||
+    this.animationState == DudeSpriteTags.Jump;
 
   constructor(name: string, sprite?: string) {
-    this.name = name;
     this.spriteName = sprite ?? this.spriteName;
 
     const width = renderer.width;
@@ -96,20 +87,25 @@ export class Dude {
 
     this.direction = Math.random() > 0.5 ? 1 : -1;
 
+    this.name = this.getNameText(name);
+
     this.view.sortableChildren = true;
     this.emoteSpitter.view.zIndex = 1;
+    this.message.view.zIndex = 3;
+    this.message.view.position.y = this.name.position.y - this.name.height;
 
-    this.view.addChild(this.getNameText());
+    this.view.addChild(this.name);
     this.view.addChild(this.emoteSpitter.view);
+    this.view.addChild(this.message.view);
 
-    this.playAnimation(AnimationState.Idle);
+    this.playAnimation(DudeSpriteTags.Idle);
 
     this.runIdleAnimationTime = performance.now();
     this.maxRunIdleAnimdationTime = Math.random() * 5000;
   }
 
-  private getNameText(): PIXI.Text {
-    const text = new PIXI.Text(this.name, {
+  private getNameText(name: string): PIXI.Text {
+    const text = new PIXI.Text(name, {
       fontFamily: 'Arial',
       fontSize: 18,
       fill: 0xffffff,
@@ -119,8 +115,9 @@ export class Dude {
       stroke: 'black',
     });
 
-    text.anchor.set(0.5, 0.5);
-    text.position.y = (-this.spriteSize / 2 + 4) * this.currentScale;
+    text.anchor.set(0.5, 1);
+    text.position.y =
+      -(this.spriteSize / 2 - this.collider.y) * this.currentScale;
     text.zIndex = 100;
 
     return text;
@@ -131,7 +128,7 @@ export class Dude {
       this.velocity.x = this.direction * 100;
       this.velocity.y = -300;
 
-      this.playAnimation(AnimationState.Jump);
+      this.playAnimation(DudeSpriteTags.Jump);
     }
   }
 
@@ -154,7 +151,7 @@ export class Dude {
       this.landAnimationTime &&
       now - this.landAnimationTime > this.maxLandAnimationTime
     ) {
-      this.playAnimation(AnimationState.Idle);
+      this.playAnimation(DudeSpriteTags.Idle);
       this.landAnimationTime = undefined;
     }
 
@@ -162,13 +159,13 @@ export class Dude {
       this.runIdleAnimationTime &&
       this.maxRunIdleAnimdationTime &&
       now - this.runIdleAnimationTime > this.maxRunIdleAnimdationTime &&
-      (this.animationState == AnimationState.Run ||
-        this.animationState == AnimationState.Idle)
+      (this.animationState == DudeSpriteTags.Run ||
+        this.animationState == DudeSpriteTags.Idle)
     ) {
-      if (this.animationState == AnimationState.Idle) {
-        this.playAnimation(AnimationState.Run);
+      if (this.animationState == DudeSpriteTags.Idle) {
+        this.playAnimation(DudeSpriteTags.Run);
       } else {
-        this.playAnimation(AnimationState.Idle);
+        this.playAnimation(DudeSpriteTags.Idle);
       }
 
       this.runIdleAnimationTime = now;
@@ -201,8 +198,8 @@ export class Dude {
         (this.collider.y + this.collider.height - this.spriteSize / 2) *
           this.currentScale;
 
-      if (this.animationState == AnimationState.Fall) {
-        this.playAnimation(AnimationState.Land);
+      if (this.animationState == DudeSpriteTags.Fall) {
+        this.playAnimation(DudeSpriteTags.Land);
         this.landAnimationTime = now;
       }
     }
@@ -210,12 +207,12 @@ export class Dude {
     this.view.position.set(newPosition.x, newPosition.y);
 
     if (this.velocity.y > 0) {
-      this.playAnimation(AnimationState.Fall);
+      this.playAnimation(DudeSpriteTags.Fall);
     }
 
     const width = renderer.width;
 
-    if (this.animationState != AnimationState.Idle) {
+    if (this.animationState != DudeSpriteTags.Idle) {
       this.view.position.x +=
         (1 * this.direction * Constants.fixedDeltaTime * 60) / 1000;
 
@@ -232,22 +229,6 @@ export class Dude {
       }
     }
 
-    if (this.currentMessageTime <= 0) {
-      if (this.messages.length > 0) {
-        this.currentMessageTime = this.maxMessageTime;
-
-        const message = this.messages.shift();
-
-        if (message) {
-          this.showMessage(message);
-        }
-      } else {
-        this.hideMessage();
-      }
-    } else if (this.currentMessageTime > 0) {
-      this.currentMessageTime -= Constants.fixedDeltaTime;
-    }
-
     if (this.currentLifeTime > 0) {
       this.currentLifeTime -= Constants.fixedDeltaTime;
     } else {
@@ -261,33 +242,19 @@ export class Dude {
 
     this.sprite?.update((Constants.fixedDeltaTime / 1000) * 60);
     this.emoteSpitter.update();
+
+    this.emoteSpitter.view.position.y =
+      this.message.view.position.y - this.message.view.height;
+
+    this.message.update();
   }
 
-  hideMessage() {
-    if (this.currentMessage) {
-      this.view.removeChild(this.currentMessage);
-    }
-  }
-
-  showMessage(text: string) {
-    const message = new DudeMessage(text);
-    message.view.position.y = (-this.spriteSize / 2 - 4) * this.currentScale;
-
-    if (this.currentMessage) {
-      this.view.removeChild(this.currentMessage);
-    }
-
-    this.currentMessage = message.view;
-    this.currentMessage.zIndex = 2;
-    this.view.addChild(this.currentMessage);
+  addMessage(message: string) {
+    this.message.add(message);
 
     this.currentLifeTime = this.maxLifeTime;
     this.currentOpacityTime = this.maxOpacityTime;
     this.view.alpha = 1;
-  }
-
-  addMessage(message: string) {
-    this.messages.push(message);
   }
 
   spitEmotes(emotes: string[]) {
@@ -296,7 +263,7 @@ export class Dude {
     }
   }
 
-  async playAnimation(state: AnimationState) {
+  async playAnimation(state: DudeSpriteTags) {
     if (this.animationState == state) {
       return;
     }
@@ -307,8 +274,11 @@ export class Dude {
       this.view.removeChild(this.sprite.view);
     }
 
-    const dudeSprite = appAssetsLoader.getSprite(this.spriteName, state);
-    this.sprite = new DudeSprite(dudeSprite.body, dudeSprite.eyes);
+    const dudeSprite = spriteProvider.getSprite(this.spriteName, state);
+    this.sprite = new DudeSpriteContainer({
+      body: dudeSprite[DudeSpriteLayers.Body],
+      eyes: dudeSprite[DudeSpriteLayers.Eyes],
+    });
     this.sprite.view.scale.set(
       this.direction * this.currentScale,
       this.currentScale
