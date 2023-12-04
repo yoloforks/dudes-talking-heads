@@ -126,7 +126,10 @@ export class Dude {
 
   tint(twitchColor: string, userColor?: string) {
     this.twitchColor = twitchColor;
-    this.userColor = userColor;
+
+    if (userColor) {
+      this.userColor = userColor;
+    }
 
     this.sprite?.tint(this.color);
   }
