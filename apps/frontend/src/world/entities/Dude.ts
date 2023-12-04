@@ -9,6 +9,7 @@ import {
   DudeSpriteTags,
   spriteProvider,
 } from '../../sprite/spriteProvider';
+import { DudeName } from './DudeName';
 
 type Collider = {
   x: number;
@@ -37,9 +38,9 @@ export class Dude {
 
   private sprite?: DudeSpriteContainer;
 
-  private name: PIXI.Text;
+  private name: DudeName;
 
-  private color: string = '#969696';
+  private twitchColor: string = '#969696';
   private userColor?: string;
 
   private message: DudeMessageBox = new DudeMessageBox();
@@ -59,7 +60,7 @@ export class Dude {
   private runIdleAnimationTime?: number;
   private maxRunIdleAnimdationTime?: number;
 
-  private maxLifeTime: number = 1000 * 60 * 5;
+  private maxLifeTime: number = 1000 * 60 * 69;
   private currentLifeTime: number = this.maxLifeTime;
 
   private maxOpacityTime: number = 5000;
@@ -69,9 +70,16 @@ export class Dude {
 
   private emoteSpitter: DudeEmoteSpitter = new DudeEmoteSpitter();
 
-  private isJumping = () =>
-    this.animationState == DudeSpriteTags.Fall ||
-    this.animationState == DudeSpriteTags.Jump;
+  private get color() {
+    return this.userColor ?? this.twitchColor;
+  }
+
+  private get isJumping() {
+    return (
+      this.animationState == DudeSpriteTags.Fall ||
+      this.animationState == DudeSpriteTags.Jump
+    );
+  }
 
   constructor(name: string, sprite?: string) {
     this.spriteName = sprite ?? this.spriteName;
@@ -87,14 +95,17 @@ export class Dude {
 
     this.direction = Math.random() > 0.5 ? 1 : -1;
 
-    this.name = this.getNameText(name);
+    this.name = new DudeName(name);
+    this.name.view.position.y =
+      -(this.spriteSize / 2 - this.collider.y) * this.currentScale;
 
     this.view.sortableChildren = true;
     this.emoteSpitter.view.zIndex = 1;
     this.message.view.zIndex = 3;
-    this.message.view.position.y = this.name.position.y - this.name.height;
+    this.message.view.position.y =
+      this.name.view.position.y - this.name.view.height;
 
-    this.view.addChild(this.name);
+    this.view.addChild(this.name.view);
     this.view.addChild(this.emoteSpitter.view);
     this.view.addChild(this.message.view);
 
@@ -104,27 +115,8 @@ export class Dude {
     this.maxRunIdleAnimdationTime = Math.random() * 5000;
   }
 
-  private getNameText(name: string): PIXI.Text {
-    const text = new PIXI.Text(name, {
-      fontFamily: 'Arial',
-      fontSize: 18,
-      fill: 0xffffff,
-      align: 'center',
-      lineJoin: 'round',
-      strokeThickness: 4,
-      stroke: 'black',
-    });
-
-    text.anchor.set(0.5, 1);
-    text.position.y =
-      -(this.spriteSize / 2 - this.collider.y) * this.currentScale;
-    text.zIndex = 100;
-
-    return text;
-  }
-
   jump() {
-    if (!this.isJumping()) {
+    if (!this.isJumping) {
       this.velocity.x = this.direction * 100;
       this.velocity.y = -300;
 
@@ -132,16 +124,11 @@ export class Dude {
     }
   }
 
-  tint(color: string, save: boolean = false) {
-    if (color) {
-      this.color = color;
-    }
+  tint(twitchColor: string, userColor?: string) {
+    this.twitchColor = twitchColor;
+    this.userColor = userColor;
 
-    if (save) {
-      this.userColor = color;
-    }
-
-    this.sprite?.tint(this.userColor ?? this.color);
+    this.sprite?.tint(this.color);
   }
 
   update() {
@@ -283,7 +270,7 @@ export class Dude {
       this.direction * this.currentScale,
       this.currentScale
     );
-    this.sprite.tint(this.userColor ?? this.color);
+    this.sprite.tint(this.color);
 
     this.view.addChild(this.sprite.view);
   }

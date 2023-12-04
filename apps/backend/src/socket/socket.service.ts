@@ -76,8 +76,9 @@ export class SocketService {
 
           const emotesArray = Object.entries(tags.emotes ?? {}).map(
             (entity) => {
-              const start = Number(entity[1][0].split('-')[0]);
-              const end = Number(entity[1][0].split('-')[1]) + 1;
+              const range = entity[1][0].split('-');
+              const start = Number(range[0]);
+              const end = Number(range[1]) + 1;
 
               return message.substring(start, end);
             },
@@ -93,10 +94,12 @@ export class SocketService {
             updatedMessage = updatedMessage.replaceAll(code, '');
           }
 
+          updatedMessage = updatedMessage.replace(/\s+/g, ' ').trim();
+
           this.emitToRoom(socket, roomId, 'message', {
             name: tags['display-name'],
             userId: tags['user-id'],
-            message: updatedMessage.trim(),
+            message: updatedMessage,
             color: tags['color'],
             emotes: emotes,
           });

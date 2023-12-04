@@ -38,30 +38,35 @@ export class World {
 
     const dude = this.dudes[data.userId];
 
-    const message = data.message.trim();
+    const message = data.message;
     const array = message.split(' ').filter((item) => item != '');
     const command = array[0];
     const value = array[1];
 
-    if (command == '!jump') {
-      dude.jump();
-    } else if (command == '!color') {
-      const color = tinycolor(value);
+    switch (command) {
+      case '!jump':
+        dude.jump();
+        break;
+      case '!color':
+        const color = tinycolor(value);
 
-      if (color.isValid()) {
-        dude.tint(value, true);
-      }
-    } else {
-      if (data.message) {
-        dude.addMessage(data.message);
-      }
-      
-      if (data.emotes.length > 0) {
-        dude.spitEmotes(data.emotes);
-      }
+        if (color.isValid()) {
+          dude.tint(data.color, value);
+        }
+        break;
+      default:
+        if (data.message) {
+          dude.addMessage(data.message);
+        }
+  
+        if (data.emotes.length > 0) {
+          dude.spitEmotes(data.emotes);
+        }
     }
 
-    dude.tint(data.color);
+    if (data.color) {
+      dude.tint(data.color);
+    }
   }
 
   public addDude(id: string, dude: Dude) {
