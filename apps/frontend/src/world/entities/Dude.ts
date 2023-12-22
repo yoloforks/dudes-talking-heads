@@ -97,13 +97,13 @@ export class Dude {
 
     this.name = new DudeName(name);
     this.name.view.position.y =
-      -(this.spriteSize / 2 - this.collider.y) * this.currentScale;
+      -(this.spriteSize / 2 - this.collider.y + 2) * this.currentScale;
 
     this.view.sortableChildren = true;
     this.emoteSpitter.view.zIndex = 1;
     this.message.view.zIndex = 3;
     this.message.view.position.y =
-      this.name.view.position.y - this.name.view.height;
+      this.name.view.position.y - this.name.view.height - 2 * this.currentScale;
 
     this.view.addChild(this.name.view);
     this.view.addChild(this.emoteSpitter.view);

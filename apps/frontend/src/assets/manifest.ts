@@ -15,6 +15,14 @@ export const manifest = {
           alias: 'agent',
           src: '/user/sprites/agent/agent.json',
         },
+        {
+          alias: 'girl',
+          src: '/user/sprites/girl/girl.json',
+        },
+        {
+          alias: 'cat',
+          src: '/user/sprites/cat/cat.json',
+        },
       ],
     },
   ],
