@@ -2,7 +2,7 @@ import { Container, utils } from 'pixi.js';
 import { assetsLoader } from '../assets/assetsLoader';
 import { Connection, Message } from '../connection/connection';
 import { Dude } from './entities/Dude';
-import { config } from '../config/config';
+// import { config } from '../config/config';
 import tinycolor from 'tinycolor2';
 
 export class World {
@@ -30,8 +30,9 @@ export class World {
 
   private handleMessage(data: Message) {
     if (!this.dudes[data.userId]) {
-      const chatter = config.chatters[data.name];
-      const sprite = chatter ? chatter.sprite : 'dude';
+      // const chatter = config.chatters[data.name];
+      // const sprite = chatter ? chatter.sprite : 'dude';
+      const sprite = 'santa';
       const dude = new Dude(data.name, sprite);
       this.addDude(data.userId, dude);
     }

@@ -26,10 +26,10 @@ export class Dude {
   private direction: number = 1;
 
   private collider: Collider = {
-    x: 9,
-    y: 8,
-    width: 14,
-    height: 16,
+    x: 8,
+    y: 3,
+    width: 16,
+    height: 22,
   };
 
   private spriteSize: number = 32;

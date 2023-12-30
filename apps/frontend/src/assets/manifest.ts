@@ -23,6 +23,10 @@ export const manifest = {
           alias: 'cat',
           src: '/user/sprites/cat/cat.json',
         },
+        {
+          alias: 'santa',
+          src: '/user/sprites/santa/santa.json',
+        },
       ],
     },
   ],
