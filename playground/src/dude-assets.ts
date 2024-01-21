@@ -1,4 +1,4 @@
-import type { DudeAsset } from '@twir/dudes/types'
+import type { DudeAsset } from '@twirapp/dudes/types'
 
 export const dudeSprites = [
   'dude',

@@ -42,7 +42,7 @@ importers:
 
   playground:
     dependencies:
-      '@twir/dudes':
+      '@twirapp/dudes':
         specifier: workspace:*
         version: link:../packages/dudes
       '@zero-dependency/utils':

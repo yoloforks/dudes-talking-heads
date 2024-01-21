@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@twir/dudes": "workspace:*",
+    "@twirapp/dudes": "workspace:*",
     "@zero-dependency/utils": "1.7.4",
     "vue": "^3.3.11"
   },

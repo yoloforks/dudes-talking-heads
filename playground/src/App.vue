@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import DudesOverlay from '@twir/dudes'
-import { DudesOverlayMethods } from '@twir/dudes/types'
+import DudesOverlay from '@twirapp/dudes'
+import { DudesOverlayMethods } from '@twirapp/dudes/types'
 import { onMounted, ref } from 'vue';
 import { dudeAssets, dudeSprites, dudeNames } from './dude-assets.js'
 import { randomNum } from '@zero-dependency/utils'
