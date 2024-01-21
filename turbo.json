@@ -1,18 +1,19 @@
 {
-  "$schema": "https://turbo.build/schema.json",
+  "$schema": "https://turborepo.org/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
     },
-    "deploy": {
-      "dependsOn": ["build", "test", "lint"]
-    },
-    "test": {},
-    "lint": {},
     "dev": {
-      "cache": false,
-      "persistent": true
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": false
     }
   }
 }
