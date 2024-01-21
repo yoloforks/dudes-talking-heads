@@ -1,0 +1,60 @@
+<script setup lang="ts">
+import DudesOverlay from '@twir/dudes'
+import { DudesOverlayMethods } from '@twir/dudes/types'
+import { onMounted, ref } from 'vue';
+import { dudeAssets, dudeSprites, dudeNames } from './dude-assets.js'
+import { randomNum } from '@zero-dependency/utils'
+
+function randomRgbColor(): string {
+  return `rgb(${randomNum(0, 255)}, ${randomNum(0, 255)}, ${randomNum(0, 255)})`
+}
+
+type Sprites = typeof dudeSprites[number]
+
+const dudesRef = ref<DudesOverlayMethods<Sprites> | null>(null)
+
+onMounted(async () => {
+  if (!dudesRef.value) return
+  await dudesRef.value.initDudes(dudeAssets)
+})
+
+function spawnDude() {
+  if (!dudesRef.value) return
+
+  const randomName = dudeNames[randomNum(0, dudeNames.length - 1)]
+  const randomSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
+  const dude = dudesRef.value.createDude(randomName, randomSprite)
+
+  const randomColor = randomRgbColor()
+  dude.tint(randomColor)
+}
+
+function clearDudes() {
+  if (!dudesRef.value) return
+  dudesRef.value.clearDudes()
+}
+</script>
+
+<template>
+  <div class="controls">
+    <button @click="spawnDude">Spawn</button>
+    <button @click="clearDudes">Clear</button>
+  </div>
+  <dudes-overlay ref="dudesRef" />
+</template>
+
+<style>
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow: hidden;
+  background: #000;
+}
+
+.controls {
+  position: absolute;
+}
+</style>

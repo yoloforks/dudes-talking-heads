@@ -1,16 +1,16 @@
 {
-  "name": "talking-heads",
-  "workspaces": [
-    "apps/frontend",
-    "apps/backend"
-  ],
+  "name": "dudes-workspace",
+  "type": "module",
+  "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
-    "start": "npm run start:prod --workspace=apps/backend",
-    "lint": "turbo run lint"
+    "dev": "turbo dev --filter=./packages/*",
+    "build": "turbo build --filter=./packages/*",
+    "playground": "turbo dev --filter=./playground",
+    "build:playground": "turbo build --filter=./playground",
+    "format": "prettier --write \"**/*.{js,ts,json}\""
   },
   "devDependencies": {
-    "turbo": "^1.10.16"
+    "@crashmax/prettier-config": "5.0.1",
+    "turbo": "1.11.3"
   }
 }
