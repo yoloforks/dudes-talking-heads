@@ -1,36 +1,57 @@
-# Talking Heads (Dudes, Челы)
+# Dudes
 
-Animated characters for chatters in your stream.
+> Animated characters for chatters in your stream.
+
+## Install
+
+```bash
+pnpm add @twirapp/dudes
+```
 
 ## Features
 
-When a chatter send a meassage, the dude appears with the message box.
-
-Dude has simple type of animations: idle, run, jump, fall, land.
+- When a chatter send a meassage, the dude appears with the message box.
+- Dude has simple type of animations: idle, run, jump, fall, land.
 
 ## Usage
 
-The preinstalled version can be used on your stream right now.
+```vue
+<script setup lang="ts">
+import DudesOverlay from '@twirapp/dudes'
+import { DudesOverlayMethods } from '@twirapp/dudes/types'
+import { onMounted, ref } from 'vue'
 
-Preview: http://dudes.mikedanagam.space/user/mikedanagam
+const dudesRef = ref<DudesOverlayMethods<string> | null>(null)
 
-Open OBS or any streaming tool which supported browser overlay.
+onMounted(async () => {
+  if (!dudesRef.value) return
+  await dudesRef.value.initDudes(dudeAssets)
+})
 
-Put URL to the browser source.
+function spawnDude() {
+  if (!dudesRef.value) return
+  const dude = dudesRef.value.createDude('VS_Code', 'santa')
+  dude.addMessage('Hello')
+  dude.tint('red')
+}
+</script>
 
-## Development
+<template>
+  <dudes-overlay ref="dudesRef" />
+</template>
 
-This is mono repo which contains frontend and backend.
-Frontend uses PIXI JS for rendering dudes.
+<style>
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
 
+body {
+  overflow: hidden;
+  background: #000;
+}
+</style>
 ```
-npm install
-npm run dev
-```
-
-Then open: http://localhost:5173/user/{your_twitch_user_channel}
-
-Send a message in your channel.
 
 ## Creating new sprites
 
