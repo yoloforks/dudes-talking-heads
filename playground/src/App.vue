@@ -2,7 +2,7 @@
 import DudesOverlay from '@twirapp/dudes'
 import { DudesOverlayMethods } from '@twirapp/dudes/types'
 import { onMounted, ref } from 'vue';
-import { dudeAssets, dudeSprites, dudeNames } from './dude-assets.js'
+import { dudeAssets, dudeSprites, dudeNames, dudeEmotes } from './dude-assets.js'
 import { randomNum } from '@zero-dependency/utils'
 
 function randomRgbColor(): string {
@@ -24,9 +24,21 @@ function spawnDude() {
   const randomName = dudeNames[randomNum(0, dudeNames.length - 1)]
   const randomSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
   const dude = dudesRef.value.createDude(randomName, randomSprite)
-
   const randomColor = randomRgbColor()
   dude.tint(randomColor)
+
+  setTimeout(() => {
+    if (dude.shouldBeDeleted) return
+    const randomEmote = dudeEmotes[randomNum(0, dudeEmotes.length - 1)]
+    dude.spitEmotes([`emotes/${randomEmote}.webp`])
+  }, 2000)
+}
+
+function jumpAllDudes() {
+  if (!dudesRef.value) return
+  for (const dude of dudesRef.value.dudes.values()) {
+    dude.jump()
+  }
 }
 
 function clearDudes() {
@@ -38,6 +50,7 @@ function clearDudes() {
 <template>
   <div class="controls">
     <button @click="spawnDude">Spawn</button>
+    <button @click="jumpAllDudes">Jump</button>
     <button @click="clearDudes">Clear</button>
   </div>
   <dudes-overlay ref="dudesRef" />

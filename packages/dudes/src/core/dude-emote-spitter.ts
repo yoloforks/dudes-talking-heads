@@ -41,7 +41,8 @@ export class DudeEmoteSpitter {
     } else {
       if (this.emotes.length > 0) {
         const sprite = this.emotes.shift()
-        this.view.addChild(sprite!)
+        if (!sprite) return
+        this.view.addChild(sprite)
         this.currentGapTime = this.gapTime
       }
     }

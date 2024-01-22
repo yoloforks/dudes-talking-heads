@@ -44,3 +44,12 @@ export const dudeAssets: DudeAsset[] = [
     src: './sprites/santa/santa.json'
   }
 ]
+
+export const dudeEmotes: string[] = [
+  'gandon',
+  'hii',
+  'pupsik',
+  'uuh',
+  'vahui',
+  'xdd'
+]

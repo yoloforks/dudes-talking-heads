@@ -10,6 +10,7 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 
 const { renderer, initRenderer } = useRenderer()
 const {
+  dudes,
   dudesContainer,
   updateDudes,
   createDude,
@@ -36,6 +37,7 @@ async function initDudes(dudeAssets: DudeAsset[]) {
 }
 
 defineExpose<DudesOverlayMethods<string>>({
+  dudes,
   initDudes,
   getDude,
   createDude,

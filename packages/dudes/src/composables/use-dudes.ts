@@ -1,5 +1,4 @@
 import { Container } from 'pixi.js'
-import { ref } from 'vue'
 
 import { Dude } from '../core/dude.js'
 
@@ -47,6 +46,7 @@ export const useDudes = () => {
   }
 
   return {
+    dudes,
     dudesContainer,
     getDude,
     createDude,

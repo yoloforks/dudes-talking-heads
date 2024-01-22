@@ -32,7 +32,7 @@ export class DudeSpriteContainer {
     this.eyes.update(delta)
   }
 
-  public tint(color: string) {
+  public color(color: string) {
     this.body.tint = color
   }
 }

@@ -21,7 +21,9 @@ type Collider = {
 }
 
 export class Dude {
-  private spriteName: string = 'dude'
+  public dudeName: string
+
+  private spriteName: string
 
   private currentScale: number = 4
 
@@ -42,8 +44,7 @@ export class Dude {
 
   private name: DudeName
 
-  private twitchColor: string = '#969696'
-  private userColor?: string
+  private spriteColor: string = '#969696'
 
   private message: DudeMessageBox = new DudeMessageBox()
 
@@ -73,7 +74,7 @@ export class Dude {
   private emoteSpitter: DudeEmoteSpitter = new DudeEmoteSpitter()
 
   private get color() {
-    return this.userColor ?? this.twitchColor
+    return this.spriteColor
   }
 
   private get isJumping() {
@@ -83,8 +84,9 @@ export class Dude {
     )
   }
 
-  constructor(name: string, sprite?: string) {
-    this.spriteName = sprite ?? this.spriteName
+  constructor(name: string, sprite = 'dude') {
+    this.dudeName = name
+    this.spriteName = sprite
 
     const width = window.innerWidth
 
@@ -126,14 +128,16 @@ export class Dude {
     }
   }
 
-  tint(twitchColor: string, userColor?: string) {
-    this.twitchColor = twitchColor
+  tint(spriteColor: string) {
+    // validate color
+    const option = new Option()
+    option.style.color = spriteColor
 
-    if (userColor) {
-      this.userColor = userColor
-    }
+    if (option.style.color !== spriteColor || spriteColor === 'transparent')
+      return
 
-    this.sprite?.tint(this.color)
+    this.spriteColor = spriteColor
+    this.sprite?.color(this.color)
   }
 
   update() {
@@ -269,7 +273,7 @@ export class Dude {
       this.direction * this.currentScale,
       this.currentScale
     )
-    this.sprite.tint(this.color)
+    this.sprite.color(this.color)
 
     this.view.addChild(this.sprite.view)
   }
