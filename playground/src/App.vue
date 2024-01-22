@@ -1,21 +1,28 @@
 <script setup lang="ts">
 import DudesOverlay from '@twirapp/dudes'
-import { DudesOverlayMethods } from '@twirapp/dudes/types'
-import { onMounted, ref } from 'vue';
-import { dudeAssets, dudeSprites, dudeNames, dudeEmotes } from './dude-assets.js'
+import type { DudesOverlayMethods } from '@twirapp/dudes/types'
+import { onMounted, onUnmounted, ref } from 'vue'
+import { dudeAssets, dudeSprites, dudeNames, dudeEmotes, type DudesSprites } from './dude-assets.js'
 import { randomNum } from '@zero-dependency/utils'
+import { randomRgbColor } from './utils.js'
 
-function randomRgbColor(): string {
-  return `rgb(${randomNum(0, 255)}, ${randomNum(0, 255)}, ${randomNum(0, 255)})`
-}
-
-type Sprites = typeof dudeSprites[number]
-
-const dudesRef = ref<DudesOverlayMethods<Sprites> | null>(null)
+const dudesRef = ref<DudesOverlayMethods<DudesSprites> | null>(null)
 
 onMounted(async () => {
   if (!dudesRef.value) return
   await dudesRef.value.initDudes(dudeAssets)
+
+  for (const dudeName of dudeNames) {
+    const dudeSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
+    const dudeColor = randomRgbColor()
+    const dude = dudesRef.value.createDude(dudeName, dudeSprite)
+    dude.tint(dudeColor)
+  }
+})
+
+onUnmounted(() => {
+  if (!dudesRef.value) return
+  dudesRef.value.disposeDudes()
 })
 
 function spawnDude() {

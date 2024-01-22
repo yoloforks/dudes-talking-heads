@@ -7,6 +7,7 @@ export class DudeMessageBox {
 
   private container: Container = new Container()
   private box?: Graphics
+  private text?: Text
 
   private padding: number = 10
   private borderRadius: number = 10
@@ -49,7 +50,7 @@ export class DudeMessageBox {
 
     if (this.currentShowTime <= 0) {
       if (this.container.children.length > 0) {
-        this.container.removeChildren()
+        this.removeMessage()
       }
 
       if (this.messageQueue.length > 0) {
@@ -81,7 +82,7 @@ export class DudeMessageBox {
   }
 
   private show(message: string) {
-    const text = new Text(message, {
+    this.text = new Text(message, {
       fontFamily: this.fontFamily,
       fontSize: this.fontSize,
       fill: this.textColor,
@@ -91,17 +92,17 @@ export class DudeMessageBox {
       wordWrapWidth: 200
     })
 
-    text.anchor.set(0.5, 1)
-    text.position.set(0, -this.padding)
-    text.text = this.trim(text)
+    this.text.anchor.set(0.5, 1)
+    this.text.position.set(0, -this.padding)
+    this.text.text = this.trim(this.text)
 
     this.box = new Graphics()
     this.box.beginFill(this.boxColor)
     this.box.drawRoundedRect(
-      text.x - this.padding - text.width * text.anchor.x,
-      text.y - this.padding - text.height * text.anchor.y,
-      text.width + this.padding * 2,
-      text.height + this.padding * 2,
+      this.text.x - this.padding - this.text.width * this.text.anchor.x,
+      this.text.y - this.padding - this.text.height * this.text.anchor.y,
+      this.text.width + this.padding * 2,
+      this.text.height + this.padding * 2,
       this.borderRadius
     )
     this.box.endFill()
@@ -109,6 +110,23 @@ export class DudeMessageBox {
     this.container.alpha = 0
     this.container.position.y = this.shift
 
-    this.container.addChild(this.box, text)
+    this.container.addChild(this.box, this.text)
+  }
+
+  private removeMessage() {
+    const intervalId = setInterval(() => {
+      if (!this.box || !this.text) {
+        clearInterval(intervalId)
+        return
+      }
+
+      this.box.alpha -= 0.1
+      this.text.alpha -= 0.1
+
+      if (this.box.alpha <= 0) {
+        clearInterval(intervalId)
+        this.container.removeChildren()
+      }
+    }, 100)
   }
 }

@@ -9,6 +9,8 @@ export const dudeSprites = [
   'santa'
 ] as const
 
+export type DudesSprites = (typeof dudeSprites)[number]
+
 export const dudeNames = [
   'Dude',
   'Sith',
