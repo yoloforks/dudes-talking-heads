@@ -41,6 +41,13 @@ function jumpAllDudes() {
   }
 }
 
+function showMessageAllDudes() {
+  if (!dudesRef.value) return
+  for (const dude of dudesRef.value.dudes.values()) {
+    dude.addMessage("И для юзеров полезно, и для нас, что мы по айди скина сможет всё по нему достать. И для юзеров полезно, и для нас, что мы по айди скина сможет всё по нему достать.")
+  }
+}
+
 function clearDudes() {
   if (!dudesRef.value) return
   dudesRef.value.clearDudes()
@@ -50,6 +57,7 @@ function clearDudes() {
 <template>
   <div class="controls">
     <button @click="spawnDude">Spawn</button>
+    <button @click="showMessageAllDudes">Message</button>
     <button @click="jumpAllDudes">Jump</button>
     <button @click="clearDudes">Clear</button>
   </div>
