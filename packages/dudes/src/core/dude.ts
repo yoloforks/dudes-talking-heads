@@ -132,9 +132,7 @@ export class Dude {
     // validate color
     const option = new Option()
     option.style.color = spriteColor
-
-    if (option.style.color !== spriteColor || spriteColor === 'transparent')
-      return
+    if (option.style.color === '' || spriteColor === 'transparent') return
 
     this.spriteColor = spriteColor
     this.sprite?.color(this.color)
