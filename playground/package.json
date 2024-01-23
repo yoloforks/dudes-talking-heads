@@ -9,8 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tweakpane/core": "2.0.3",
+    "@tweakpane/plugin-essentials": "0.2.1",
     "@twirapp/dudes": "workspace:*",
     "@zero-dependency/utils": "1.7.4",
+    "tweakpane": "4.0.3",
+    "v-tweakpane": "0.2.0",
     "vue": "^3.3.11"
   },
   "devDependencies": {

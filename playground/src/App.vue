@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import DudesOverlay from '@twirapp/dudes'
+import { VTweakpane } from 'v-tweakpane'
 import type { DudesOverlayMethods, DudesSettings } from '@twirapp/dudes/types'
 import { onMounted, reactive, ref, watch } from 'vue'
-import { dudeAssets, dudeSprites, dudeNames, dudeEmotes, type DudesSprites } from './dude-assets.js'
+import { dudeAssets, dudeSprites, dudeNames, dudeEmotes, type DudesSprites } from './constants.js'
 import { randomNum } from '@zero-dependency/utils'
 import { randomRgbColor } from './utils.js'
+import type { Pane } from 'tweakpane'
 
 const settings = reactive<DudesSettings>({
   dude: {
@@ -20,7 +22,7 @@ const settings = reactive<DudesSettings>({
     fontSize: 12,
     padding: 5,
     showTime: 5 * 1000,
-    fill: '#000000'
+    fill: '#333333'
   },
   nameBox: {
     fontFamily: 'Arial',
@@ -28,7 +30,7 @@ const settings = reactive<DudesSettings>({
     fill: '#ffffff',
     lineJoin: 'round',
     strokeThickness: 4,
-    stroke: '#000000',
+    stroke: '#333333',
     fillGradientStops: [0],
     fillGradientType: 0,
     fontStyle: 'normal',
@@ -67,7 +69,7 @@ function spawnDude() {
 
   const randomName = dudeNames[randomNum(0, dudeNames.length - 1)]
   const randomSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
-  const dude = dudesRef.value.createDude(randomName, randomSprite, {
+  const dude = dudesRef.value.createDude(`${randomName}-${randomNum(0, 100)}`, randomSprite, {
     messageBox: {
       boxColor: 'lightgreen',
       fill: '#000000'
@@ -80,8 +82,7 @@ function spawnDude() {
       strokeThickness: 4
     }
   })
-  const randomColor = randomRgbColor()
-  dude.tint(randomColor)
+  dude.tint(settings.dude.color)
 
   setTimeout(() => {
     if (dude.shouldBeDeleted) return
@@ -108,31 +109,118 @@ function clearDudes() {
   if (!dudesRef.value) return
   dudesRef.value.clearDudes()
 }
+
+function onPaneCreated(pane: Pane) {
+  const fonts = {
+    'Arial': 'Arial',
+    'Times New Roman': 'Times New Roman',
+    'Courier New': 'Courier New',
+    'Verdana': 'Verdana'
+  }
+
+  const dudeFolder = pane.addFolder({ title: 'Dude' })
+  dudeFolder.addBinding(settings.dude, 'color')
+  dudeFolder.addBinding(settings.dude, 'gravity', {
+    min: 10,
+    max: 1000
+  })
+  dudeFolder.addBinding(settings.dude, 'maxLifeTime', {
+    min: 1000 * 1,
+    max: 1000 * 60 * 60
+  })
+  dudeFolder.addBinding(settings.dude, 'scale', {
+    min: 1,
+    max: 10
+  })
+
+  const messageBoxFolder = pane.addFolder({ title: 'Message' })
+  messageBoxFolder.addBinding(settings.messageBox, 'fill')
+  messageBoxFolder.addBinding(settings.messageBox, 'boxColor')
+  messageBoxFolder.addBinding(settings.messageBox, 'fontSize', {
+    min: 10,
+    max: 64
+  })
+  messageBoxFolder.addBinding(settings.messageBox, 'borderRadius', {
+    min: 0,
+    max: 64
+  })
+  messageBoxFolder.addBinding(settings.messageBox, 'padding', {
+    min: 0,
+    max: 64
+  })
+  messageBoxFolder.addBinding(settings.messageBox, 'showTime', {
+    min: 1000,
+    max: 1000 * 10
+  })
+  messageBoxFolder.addBinding(settings.messageBox, 'fontFamily', {
+    options: fonts
+  })
+
+  const nameBoxFolder = pane.addFolder({ title: 'Name' })
+  nameBoxFolder.addBinding(settings.nameBox, 'fill')
+  nameBoxFolder.addBinding(settings.nameBox, 'fontFamily', {
+    options: fonts
+  })
+  nameBoxFolder.addBinding(settings.nameBox, 'fontSize', {
+    min: 10,
+    max: 64
+  })
+  nameBoxFolder.addBinding(settings.nameBox, 'fontStyle', {
+    options: {
+      normal: 'normal',
+      italic: 'italic'
+    }
+  })
+  nameBoxFolder.addBinding(settings.nameBox, 'fontVariant', {
+    options: {
+      normal: 'normal',
+      'small-caps': 'small-caps'
+    }
+  })
+  nameBoxFolder.addBinding(settings.nameBox, 'fontWeight', {
+    options: {
+      normal: 'normal',
+      bold: 'bold',
+      lighter: 'lighter'
+    }
+  })
+  nameBoxFolder.addBinding(settings.nameBox, 'stroke')
+  nameBoxFolder.addBinding(settings.nameBox, 'strokeThickness', {
+    min: 0,
+    max: 10
+  })
+  nameBoxFolder.addBinding(settings.nameBox, 'dropShadow')
+  nameBoxFolder.addBinding(settings.nameBox, 'dropShadowColor')
+  nameBoxFolder.addBinding(settings.nameBox, 'dropShadowDistance', {
+    min: 0,
+    max: 32,
+    step: 0.1
+  })
+  nameBoxFolder.addBinding(settings.nameBox, 'dropShadowAlpha', {
+    min: 0,
+    max: 1,
+    step: 0.01
+  })
+  nameBoxFolder.addBinding(settings.nameBox, 'dropShadowBlur', {
+    min: 0,
+    max: 1,
+    step: 0.01
+  })
+  nameBoxFolder.addBinding(settings.nameBox, 'dropShadowAngle', {
+    min: 0,
+    max: Math.PI * 2
+  })
+
+  pane.addBlade({ view: 'separator' })
+
+  pane.addButton({ title: 'Spawn dude' }).on('click', spawnDude)
+  pane.addButton({ title: 'Jump all dudes' }).on('click', jumpAllDudes)
+  pane.addButton({ title: 'Show message all dudes' }).on('click', showMessageAllDudes)
+  pane.addButton({ title: 'Clear dudes' }).on('click', clearDudes)
+}
 </script>
 
 <template>
-  <div class="controls">
-    <button @click="spawnDude">Spawn</button>
-    <button @click="showMessageAllDudes">Message</button>
-    <button @click="jumpAllDudes">Jump</button>
-    <button @click="clearDudes">Clear</button>
-    <input v-model="settings.messageBox.boxColor" type="color">
-  </div>
+  <v-tweakpane :pane="{ title: 'Dudes Playground' }" @on-pane-created="onPaneCreated" />
   <dudes-overlay ref="dudesRef" :assets="dudeAssets" :settings="settings" />
 </template>
-
-<style>
-* {
-  margin: 0;
-  box-sizing: border-box;
-}
-
-body {
-  overflow: hidden;
-  background: #000;
-}
-
-.controls {
-  position: absolute;
-}
-</style>

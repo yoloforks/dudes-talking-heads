@@ -12,5 +12,10 @@
   "devDependencies": {
     "@crashmax/prettier-config": "5.0.1",
     "turbo": "1.11.3"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "v-tweakpane@0.2.0": "patches/v-tweakpane@0.2.0.patch"
+    }
   }
 }
