@@ -6,7 +6,49 @@ import { dudeAssets, dudeSprites, dudeNames, dudeEmotes, type DudesSprites } fro
 import { randomNum } from '@zero-dependency/utils'
 import { randomRgbColor } from './utils.js'
 
+const settings = reactive<DudesSettings>({
+  dude: {
+    color: '#969696',
+    maxLifeTime: 1000 * 60 * 30,
+    gravity: 400,
+    scale: 4
+  },
+  messageBox: {
+    borderRadius: 5,
+    boxColor: '#e6ac0c',
+    fontFamily: 'Courier New',
+    fontSize: 12,
+    padding: 5,
+    showTime: 5 * 1000,
+    fill: '#000000'
+  },
+  nameBox: {
+    fontFamily: 'Arial',
+    fontSize: 18,
+    fill: '#ffffff',
+    lineJoin: 'round',
+    strokeThickness: 4,
+    stroke: '#000000',
+    fillGradientStops: [0],
+    fillGradientType: 0,
+    fontStyle: 'normal',
+    fontVariant: 'normal',
+    fontWeight: 'normal',
+    dropShadow: false,
+    dropShadowAlpha: 1,
+    dropShadowAngle: 0,
+    dropShadowBlur: 0.1,
+    dropShadowDistance: 10,
+    dropShadowColor: '#3ac7d9'
+  }
+})
+
 const dudesRef = ref<DudesOverlayMethods<DudesSprites> | null>(null)
+
+watch(settings, (settings) => {
+  if (!dudesRef.value) return
+  dudesRef.value.updateSettings(settings)
+})
 
 onMounted(async () => {
   if (!dudesRef.value) return
@@ -28,13 +70,13 @@ function spawnDude() {
   const dude = dudesRef.value.createDude(randomName, randomSprite, {
     messageBox: {
       boxColor: 'lightgreen',
-      fill: '#000'
+      fill: '#000000'
     },
     nameBox: {
       fill: ['red', 'blue', 'green'],
       fillGradientType: 1,
       fillGradientStops: [0.3, 0.5, 1],
-      stroke: '#fff',
+      stroke: '#ffffff',
       strokeThickness: 4
     }
   })
@@ -66,42 +108,6 @@ function clearDudes() {
   if (!dudesRef.value) return
   dudesRef.value.clearDudes()
 }
-
-const settings = reactive<DudesSettings>({
-  messageBox: {
-    borderRadius: 5,
-    boxColor: 'tomato',
-    fontFamily: 'Courier New',
-    fontSize: 12,
-    padding: 5,
-    showTime: 10 * 1000,
-    fill: '#000'
-  },
-  nameBox: {
-    fontFamily: 'Arial',
-    fontSize: 18,
-    fill: '#fff',
-    lineJoin: 'round',
-    strokeThickness: 4,
-    stroke: '#000',
-    fillGradientStops: [0],
-    fillGradientType: 0,
-    fontStyle: 'normal',
-    fontVariant: 'normal',
-    fontWeight: 'normal',
-    dropShadow: false,
-    dropShadowAlpha: 1,
-    dropShadowAngle: 0,
-    dropShadowBlur: 0.1,
-    dropShadowDistance: 10,
-    dropShadowColor: '#3ac7d9'
-  }
-})
-
-watch(settings, (settings) => {
-  if (!dudesRef.value) return
-  dudesRef.value.updateSettings(settings)
-})
 </script>
 
 <template>

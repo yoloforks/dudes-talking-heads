@@ -9,7 +9,7 @@ import type {
 } from './core/dude-name-box.js'
 import type { Dude } from './core/dude.js'
 
-export type DudesOverlayMethods<T extends string> = {
+export interface DudesOverlayMethods<T extends string> {
   dudes: Map<string, Dude>
   initDudes: () => Promise<void>
   getDude: (name: string) => Dude | undefined
@@ -24,7 +24,28 @@ export type DudePersonalStyles = Partial<{
   nameBox: DudePersonalNameBoxStyles
 }>
 
-export type DudesSettings = {
+export interface DudeParams {
+  /**
+   * @default 1800000 // 1000 * 60 * 30 - 30 minutes
+   */
+  maxLifeTime: number
+  /**
+   * @default 400
+   */
+  gravity: number
+  /**
+   * Color fallback for dudes
+   * @default '#969696'
+   */
+  color: string
+  /**
+   * @default 4
+   */
+  scale: number
+}
+
+export interface DudesSettings {
+  dude: DudeParams
   messageBox: DudeMessageBoxStyles
   nameBox: DudeNameBoxStyles
 }

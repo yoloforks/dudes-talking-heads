@@ -112,21 +112,25 @@ export class DudeMessageBox {
 
     if (this.currentShowTime <= 0) {
       if (this.container.children.length > 0) {
-        this.removeMessage()
+        this.container.removeChildren()
       }
 
-      if (this.messageQueue.length > 0) {
-        const message = this.messageQueue.shift()
-
-        if (message) {
-          this.show(message)
-        }
-
-        this.currentShowTime = this.styles.showTime
-        this.currentAnimationTime = this.animationTime
-      }
+      this.nextMessage()
     } else {
       this.currentShowTime -= FIXED_DELTA_TIME
+    }
+  }
+
+  private nextMessage(): void {
+    if (this.messageQueue.length > 0) {
+      const message = this.messageQueue.shift()
+
+      if (message) {
+        this.show(message)
+      }
+
+      this.currentShowTime = this.styles.showTime
+      this.currentAnimationTime = this.animationTime
     }
   }
 
@@ -172,23 +176,5 @@ export class DudeMessageBox {
     this.container.position.y = this.shift
 
     this.container.addChild(this.box, this.text)
-  }
-
-  private removeMessage(): void {
-    const intervalId = setInterval(() => {
-      if (!this.box || !this.text) {
-        clearInterval(intervalId)
-        return
-      }
-
-      this.box.alpha -= 0.1
-      this.text.alpha -= 0.1
-
-      if (this.box.alpha <= 0) {
-        clearInterval(intervalId)
-        this.container.removeChildren()
-        this.text = null
-      }
-    }, 100)
   }
 }
