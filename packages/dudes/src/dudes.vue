@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, unref, watch } from 'vue'
 import { useRenderer } from './composables/use-renderer.js';
 import { useDudes } from './composables/use-dudes.js';
 import { useRaf } from './composables/use-raf.js';
 import { assetsLoader, type DudeAsset } from './core/assets-loader.js';
+import { dudesSettings, useDudesSettings } from './composables/use-settings.js';
+import { deepMerge } from './deep-merge.js';
 import type { DudesOverlayMethods, DudesSettings } from './types.js';
-import { useDudesSettings } from './composables/use-settings.js';
 
 const props = defineProps<{
   assets: DudeAsset[],
@@ -25,6 +26,12 @@ const {
   clearDudes
 } = useDudes();
 const { startRaf } = useRaf(onRender)
+
+watch(() => props.settings, (settings) => {
+  if (!settings) return
+  const mergedEmoteConfig = deepMerge(unref(dudesSettings.value), settings)
+  dudesSettings.value = mergedEmoteConfig
+}, { deep: true })
 
 function onRender() {
   updateDudes();

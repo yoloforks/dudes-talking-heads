@@ -4,7 +4,7 @@ import type { IPointData } from 'pixi.js'
 import { FIXED_DELTA_TIME } from '../constants.js'
 import { DudeEmoteSpitter } from './dude-emote-spitter.js'
 import { DudeMessageBox } from './dude-message-box.js'
-import { DudeName } from './dude-name.js'
+import { DudeNameBox } from './dude-name-box.js'
 import { DudeSpriteContainer } from './dude-sprite-container.js'
 import {
   DudeSpriteLayers,
@@ -12,6 +12,7 @@ import {
   getSprite
 } from './sprite-provider.js'
 import type { DudeSpriteTagType } from './sprite-provider.js'
+import type { DudePersonalStyles } from '../types.js'
 
 type Collider = {
   x: number
@@ -42,11 +43,11 @@ export class Dude {
 
   private sprite?: DudeSpriteContainer
 
-  private name: DudeName
+  private name: DudeNameBox
+
+  private message: DudeMessageBox
 
   public color: string = '#969696'
-
-  private message: DudeMessageBox = new DudeMessageBox()
 
   public view: Container = new Container()
 
@@ -80,9 +81,11 @@ export class Dude {
     )
   }
 
-  constructor(name: string, sprite = 'dude') {
+  constructor(name: string, sprite = 'dude', settings?: DudePersonalStyles) {
     this.dudeName = name
     this.spriteName = sprite
+
+    this.message = new DudeMessageBox(settings?.messageBox)
 
     const width = window.innerWidth
 
@@ -95,7 +98,7 @@ export class Dude {
 
     this.direction = Math.random() > 0.5 ? 1 : -1
 
-    this.name = new DudeName(name)
+    this.name = new DudeNameBox(name, settings?.nameBox)
     this.name.view.position.y =
       -(this.spriteSize / 2 - this.collider.y + 2) * this.currentScale
 
@@ -116,7 +119,8 @@ export class Dude {
   }
 
   cleanUp(): void {
-    this.message.watchStopSettings()
+    this.message.stopWatchGlobalStyles?.()
+    this.name.stopWatchGlobalStyles?.()
   }
 
   jump(): void {

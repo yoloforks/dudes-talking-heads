@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DudesOverlay from '@twirapp/dudes'
-import type { DudesOverlayMethods } from '@twirapp/dudes/types'
-import { onMounted, ref } from 'vue'
+import type { DudesOverlayMethods, DudesSettings } from '@twirapp/dudes/types'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { dudeAssets, dudeSprites, dudeNames, dudeEmotes, type DudesSprites } from './dude-assets.js'
 import { randomNum } from '@zero-dependency/utils'
 import { randomRgbColor } from './utils.js'
@@ -25,7 +25,19 @@ function spawnDude() {
 
   const randomName = dudeNames[randomNum(0, dudeNames.length - 1)]
   const randomSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
-  const dude = dudesRef.value.createDude(randomName, randomSprite)
+  const dude = dudesRef.value.createDude(randomName, randomSprite, {
+    messageBox: {
+      boxColor: 'lightgreen',
+      fill: '#000'
+    },
+    nameBox: {
+      fill: ['red', 'blue', 'green'],
+      fillGradientType: 1,
+      fillGradientStops: [0.3, 0.5, 1],
+      stroke: '#fff',
+      strokeThickness: 4
+    }
+  })
   const randomColor = randomRgbColor()
   dude.tint(randomColor)
 
@@ -54,6 +66,42 @@ function clearDudes() {
   if (!dudesRef.value) return
   dudesRef.value.clearDudes()
 }
+
+const settings = reactive<DudesSettings>({
+  messageBox: {
+    borderRadius: 5,
+    boxColor: 'tomato',
+    fontFamily: 'Courier New',
+    fontSize: 12,
+    padding: 5,
+    showTime: 10 * 1000,
+    fill: '#000'
+  },
+  nameBox: {
+    fontFamily: 'Arial',
+    fontSize: 18,
+    fill: '#fff',
+    lineJoin: 'round',
+    strokeThickness: 4,
+    stroke: '#000',
+    fillGradientStops: [0],
+    fillGradientType: 0,
+    fontStyle: 'normal',
+    fontVariant: 'normal',
+    fontWeight: 'normal',
+    dropShadow: false,
+    dropShadowAlpha: 1,
+    dropShadowAngle: 0,
+    dropShadowBlur: 0.1,
+    dropShadowDistance: 10,
+    dropShadowColor: '#3ac7d9'
+  }
+})
+
+watch(settings, (settings) => {
+  if (!dudesRef.value) return
+  dudesRef.value.updateSettings(settings)
+})
 </script>
 
 <template>
@@ -62,22 +110,9 @@ function clearDudes() {
     <button @click="showMessageAllDudes">Message</button>
     <button @click="jumpAllDudes">Jump</button>
     <button @click="clearDudes">Clear</button>
+    <input v-model="settings.messageBox.boxColor" type="color">
   </div>
-  <dudes-overlay
-    ref="dudesRef"
-    :assets="dudeAssets"
-    :settings="{
-      messageBox: {
-        borderRadius: 5,
-        boxColor: 'tomato',
-        fontFamily: 'Courier New',
-        fontSize: 12,
-        padding: 5,
-        showTime: 1000,
-        textColor: '#000'
-      }
-    }"
-  />
+  <dudes-overlay ref="dudesRef" :assets="dudeAssets" :settings="settings" />
 </template>
 
 <style>
