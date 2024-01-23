@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DudesOverlay from '@twirapp/dudes'
 import { VTweakpane } from 'v-tweakpane'
-import type { DudesOverlayMethods, DudesSettings } from '@twirapp/dudes/types'
+import type { Dude, DudesOverlayMethods, DudesSettings } from '@twirapp/dudes/types'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { dudeAssets, dudeSprites, dudeNames, dudeEmotes, type DudesSprites } from './constants.js'
 import { randomNum } from '@zero-dependency/utils'
@@ -93,8 +93,7 @@ function spawnDude() {
 
   setTimeout(() => {
     if (dude.shouldBeDeleted) return
-    const emoteName = dudeEmotes[randomNum(0, dudeEmotes.length - 1)]
-    dude.spitEmotes([`emotes/${emoteName}.webp`])
+    spitEmote(dude)
   }, 2000)
 }
 
@@ -110,6 +109,18 @@ function showMessageAllDudes() {
   for (const dude of dudesRef.value.dudes.values()) {
     dude.addMessage('Lorem Ipsum - это текст-"рыба", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века.')
   }
+}
+
+function spitEmotesAllDudes() {
+  if (!dudesRef.value) return
+  for (const dude of dudesRef.value.dudes.values()) {
+    spitEmote(dude as Dude)
+  }
+}
+
+function spitEmote(dude: Dude) {
+  const emoteName = dudeEmotes[randomNum(0, dudeEmotes.length - 1)]
+  dude.spitEmotes([`emotes/${emoteName}.webp`])
 }
 
 function clearDudes() {
@@ -140,7 +151,7 @@ function onPaneCreated(pane: Pane) {
   })
   dudeFolder.addBinding(settings.dude, 'scale', {
     min: 1,
-    max: 10
+    max: 24
   })
 
   const messageBoxFolder = pane.addFolder({ title: 'Message' })
@@ -226,6 +237,7 @@ function onPaneCreated(pane: Pane) {
   pane.addButton({ title: 'Spawn dude' }).on('click', spawnDude)
   pane.addButton({ title: 'Jump all dudes' }).on('click', jumpAllDudes)
   pane.addButton({ title: 'Show message all dudes' }).on('click', showMessageAllDudes)
+  pane.addButton({ title: 'Spit emote all dudes' }).on('click', spitEmotesAllDudes)
   pane.addButton({ title: 'Clear dudes' }).on('click', clearDudes)
 }
 </script>

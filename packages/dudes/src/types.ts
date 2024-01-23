@@ -50,4 +50,4 @@ export interface DudesSettings {
   nameBox: DudeNameBoxStyles
 }
 
-export type { DudeAsset, DudeMessageBoxStyles, DudeNameBoxStyles }
+export type { Dude, DudeAsset, DudeMessageBoxStyles, DudeNameBoxStyles }
