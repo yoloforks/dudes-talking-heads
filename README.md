@@ -21,23 +21,39 @@ import DudesOverlay from '@twirapp/dudes'
 import { DudesOverlayMethods } from '@twirapp/dudes/types'
 import { onMounted, ref } from 'vue'
 
-const dudesRef = ref<DudesOverlayMethods<string> | null>(null)
+const dudesSprites = ['dude', 'santa']
+const dudesAssets: DudeAsset[] = [
+  {
+    alias: 'dude',
+    src: './sprites/dude/dude.json'
+  },
+  {
+    alias: 'santa',
+    src: './sprites/santa/santa.json'
+  }
+]
+
+const dudesRef = ref<DudesOverlayMethods<typeof dudesSprites[number]> | null>(null)
 
 onMounted(async () => {
   if (!dudesRef.value) return
-  await dudesRef.value.initDudes(dudeAssets)
+  await dudesRef.value.initDudes()
 })
 
 function spawnDude() {
   if (!dudesRef.value) return
-  const dude = dudesRef.value.createDude('VS_Code', 'santa')
+  const dude = dudesRef.value.createDude('Santa Claus', 'santa', {
+    nameBox: {
+      fill: 'red'
+    }
+  })
   dude.addMessage('Hello')
   dude.tint('red')
 }
 </script>
 
 <template>
-  <dudes-overlay ref="dudesRef" />
+  <dudes-overlay ref="dudesRef" :assets="dudesAssets" />
 </template>
 
 <style>

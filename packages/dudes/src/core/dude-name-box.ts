@@ -89,13 +89,15 @@ export interface DudeNameBoxStyles {
   dropShadowDistance: ITextStyle['dropShadowDistance']
 }
 
-export type DudePersonalNameBoxStyles = Pick<
-  DudeNameBoxStyles,
-  | 'stroke'
-  | 'strokeThickness'
-  | 'fill'
-  | 'fillGradientType'
-  | 'fillGradientStops'
+export type DudePersonalNameBoxStyles = Partial<
+  Pick<
+    DudeNameBoxStyles,
+    | 'stroke'
+    | 'strokeThickness'
+    | 'fill'
+    | 'fillGradientType'
+    | 'fillGradientStops'
+  >
 >
 
 export class DudeNameBox {

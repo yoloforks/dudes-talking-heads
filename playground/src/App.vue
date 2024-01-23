@@ -79,9 +79,9 @@ function spawnDude() {
       fill: '#000000'
     },
     nameBox: {
-      fill: ['red', 'blue', 'green'],
+      fill: ['rgb(131, 58, 180)', 'rgb(253, 29, 29)', 'rgb(252, 176, 69)'],
       fillGradientType: 1,
-      fillGradientStops: [0.2, 0.4, 1],
+      fillGradientStops: [0.3, 0.6, 1],
       stroke: '#ffffff',
       strokeThickness: 4
     }

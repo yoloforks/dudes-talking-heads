@@ -42,9 +42,8 @@ export interface DudeMessageBoxStyles {
   showTime: number
 }
 
-export type DudePersonalMessageBoxStyles = Pick<
-  DudeMessageBoxStyles,
-  'boxColor' | 'fill'
+export type DudePersonalMessageBoxStyles = Partial<
+  Pick<DudeMessageBoxStyles, 'boxColor' | 'fill'>
 >
 
 interface Bound {
