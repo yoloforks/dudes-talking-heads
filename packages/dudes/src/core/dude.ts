@@ -44,7 +44,7 @@ export class Dude {
 
   private name: DudeName
 
-  private spriteColor: string = '#969696'
+  public color: string = '#969696'
 
   private message: DudeMessageBox = new DudeMessageBox()
 
@@ -72,10 +72,6 @@ export class Dude {
   public shouldBeDeleted: boolean = false
 
   private emoteSpitter: DudeEmoteSpitter = new DudeEmoteSpitter()
-
-  private get color() {
-    return this.spriteColor
-  }
 
   private get isJumping() {
     return (
@@ -119,7 +115,11 @@ export class Dude {
     this.maxRunIdleAnimdationTime = Math.random() * 5000
   }
 
-  jump() {
+  cleanUp(): void {
+    this.message.watchStopSettings()
+  }
+
+  jump(): void {
     if (!this.isJumping) {
       this.velocity.x = this.direction * 100
       this.velocity.y = -300
@@ -128,17 +128,17 @@ export class Dude {
     }
   }
 
-  tint(spriteColor: string) {
+  tint(spriteColor: string): void {
     // validate color
     const option = new Option()
     option.style.color = spriteColor
     if (option.style.color === '' || spriteColor === 'transparent') return
 
-    this.spriteColor = spriteColor
+    this.color = spriteColor
     this.sprite?.color(this.color)
   }
 
-  update() {
+  update(): void {
     const now = performance.now()
 
     if (
@@ -238,7 +238,7 @@ export class Dude {
     this.message.update()
   }
 
-  addMessage(message: string) {
+  addMessage(message: string): void {
     this.message.add(message)
 
     this.currentLifeTime = this.maxLifeTime
@@ -246,13 +246,13 @@ export class Dude {
     this.view.alpha = 1
   }
 
-  spitEmotes(emotes: string[]) {
+  spitEmotes(emotes: string[]): void {
     for (const emote of emotes) {
       this.emoteSpitter.add(emote)
     }
   }
 
-  async playAnimation(state: DudeSpriteTagType) {
+  async playAnimation(state: DudeSpriteTagType): Promise<void> {
     const dudeSprite = getSprite(this.spriteName, state)
     if (!dudeSprite) return
 

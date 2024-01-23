@@ -1,32 +1,70 @@
 import { Container, Graphics, Text, TextMetrics } from 'pixi.js'
+import { watch } from 'vue'
+import type { WatchStopHandle } from 'vue'
 
+import { dudesSettings } from '../composables/use-settings.js'
 import { FIXED_DELTA_TIME } from '../constants.js'
+
+export interface DudeMessageBoxSettings {
+  /**
+   * @default '#eeeeee'
+   */
+  boxColor: string
+
+  /**
+   * @default '#333333'
+   */
+  textColor: string
+
+  /**
+   * @default 20
+   */
+  fontSize: number
+
+  /**
+   * @default 'Arial'
+   */
+  fontFamily: string
+
+  /**
+   * @default 10
+   */
+  borderRadius: number
+
+  /**
+   * @default 10
+   */
+  padding: number
+
+  /**
+   * @default 10_000
+   */
+  showTime: number
+}
 
 export class DudeMessageBox {
   public view: Container = new Container()
-
   private container: Container = new Container()
   private box?: Graphics
   private text?: Text
 
-  private padding: number = 10
-  private borderRadius: number = 10
-  private boxColor: number = 0xeeeeee
-  private textColor: number = 0x333333
-  private fontFamily: string = 'Arial'
-  private fontSize: number = 20
-
   private animationTime = 500
   private currentAnimationTime = 0
   private shift = 30
-
-  private showTime = 10000
   private currentShowTime = 0
-
   private messageQueue: string[] = []
+
+  public watchStopSettings: WatchStopHandle
+  private settings!: DudeMessageBoxSettings
 
   constructor() {
     this.view.addChild(this.container)
+
+    this.watchStopSettings = watch(
+      () => dudesSettings.value.messageBox,
+      (value) => (this.settings = value),
+      { immediate: true }
+    )
   }
 
   private trim(text: Text): string {
@@ -60,7 +98,7 @@ export class DudeMessageBox {
           this.show(message)
         }
 
-        this.currentShowTime = this.showTime
+        this.currentShowTime = this.settings.showTime
         this.currentAnimationTime = this.animationTime
       }
     } else {
@@ -81,11 +119,14 @@ export class DudeMessageBox {
     this.messageQueue.push(message)
   }
 
-  private show(message: string) {
+  private show(message: string): void {
+    const { fontFamily, fontSize, textColor, boxColor, padding, borderRadius } =
+      this.settings
+
     this.text = new Text(message, {
-      fontFamily: this.fontFamily,
-      fontSize: this.fontSize,
-      fill: this.textColor,
+      fontFamily,
+      fontSize,
+      fill: textColor,
       align: 'left',
       breakWords: true,
       wordWrap: true,
@@ -93,17 +134,17 @@ export class DudeMessageBox {
     })
 
     this.text.anchor.set(0.5, 1)
-    this.text.position.set(0, -this.padding)
+    this.text.position.set(0, -padding)
     this.text.text = this.trim(this.text)
 
     this.box = new Graphics()
-    this.box.beginFill(this.boxColor)
+    this.box.beginFill(boxColor)
     this.box.drawRoundedRect(
-      this.text.x - this.padding - this.text.width * this.text.anchor.x,
-      this.text.y - this.padding - this.text.height * this.text.anchor.y,
-      this.text.width + this.padding * 2,
-      this.text.height + this.padding * 2,
-      this.borderRadius
+      this.text.x - padding - this.text.width * this.text.anchor.x,
+      this.text.y - padding - this.text.height * this.text.anchor.y,
+      this.text.width + padding * 2,
+      this.text.height + padding * 2,
+      borderRadius
     )
     this.box.endFill()
 
@@ -113,7 +154,7 @@ export class DudeMessageBox {
     this.container.addChild(this.box, this.text)
   }
 
-  private removeMessage() {
+  private removeMessage(): void {
     const intervalId = setInterval(() => {
       if (!this.box || !this.text) {
         clearInterval(intervalId)

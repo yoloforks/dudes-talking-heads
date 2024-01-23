@@ -35,6 +35,7 @@ export const useDudes = () => {
   function removeDude(name: string) {
     const dude = dudes.get(name) as Dude | undefined
     if (!dude) return
+    dude.cleanUp()
     dudes.delete(name)
     dudesContainer.removeChild(dude.view)
   }

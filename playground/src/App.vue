@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DudesOverlay from '@twirapp/dudes'
 import type { DudesOverlayMethods } from '@twirapp/dudes/types'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { dudeAssets, dudeSprites, dudeNames, dudeEmotes, type DudesSprites } from './dude-assets.js'
 import { randomNum } from '@zero-dependency/utils'
 import { randomRgbColor } from './utils.js'
@@ -10,7 +10,7 @@ const dudesRef = ref<DudesOverlayMethods<DudesSprites> | null>(null)
 
 onMounted(async () => {
   if (!dudesRef.value) return
-  await dudesRef.value.initDudes(dudeAssets)
+  await dudesRef.value.initDudes()
 
   for (const dudeName of dudeNames) {
     const dudeSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
@@ -18,11 +18,6 @@ onMounted(async () => {
     const dude = dudesRef.value.createDude(dudeName, dudeSprite)
     dude.tint(dudeColor)
   }
-})
-
-onUnmounted(() => {
-  if (!dudesRef.value) return
-  dudesRef.value.disposeDudes()
 })
 
 function spawnDude() {
@@ -68,7 +63,21 @@ function clearDudes() {
     <button @click="jumpAllDudes">Jump</button>
     <button @click="clearDudes">Clear</button>
   </div>
-  <dudes-overlay ref="dudesRef" />
+  <dudes-overlay
+    ref="dudesRef"
+    :assets="dudeAssets"
+    :settings="{
+      messageBox: {
+        borderRadius: 5,
+        boxColor: 'tomato',
+        fontFamily: 'Courier New',
+        fontSize: 12,
+        padding: 5,
+        showTime: 1000,
+        textColor: '#000'
+      }
+    }"
+  />
 </template>
 
 <style>

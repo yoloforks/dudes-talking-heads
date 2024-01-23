@@ -4,10 +4,16 @@ import { useRenderer } from './composables/use-renderer.js';
 import { useDudes } from './composables/use-dudes.js';
 import { useRaf } from './composables/use-raf.js';
 import { assetsLoader, type DudeAsset } from './core/assets-loader.js';
-import type { DudesOverlayMethods } from './types.js';
+import type { DudesOverlayMethods, DudesSettings } from './types.js';
+import { useDudesSettings } from './composables/use-settings.js';
+
+const props = defineProps<{
+  assets: DudeAsset[],
+  settings?: DudesSettings
+}>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
-
+const { setSettings } = useDudesSettings()
 const { renderer, initRenderer } = useRenderer()
 const {
   dudes,
@@ -29,8 +35,12 @@ function onResize() {
   renderer.value?.resize(window.innerWidth, window.innerHeight);
 }
 
-async function initDudes(dudeAssets: DudeAsset[]) {
-  await assetsLoader.load(dudeAssets)
+async function initDudes() {
+  if (props.settings) {
+    setSettings(props.settings)
+  }
+
+  await assetsLoader.load(props.assets)
   initRenderer(canvasRef)
   window.addEventListener('resize', onResize)
   startRaf()
@@ -42,7 +52,8 @@ defineExpose<DudesOverlayMethods<string>>({
   getDude,
   createDude,
   removeDude,
-  clearDudes
+  clearDudes,
+  updateSettings: setSettings
 })
 </script>
 
