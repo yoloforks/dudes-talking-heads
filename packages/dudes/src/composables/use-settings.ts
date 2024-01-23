@@ -6,7 +6,7 @@ import type { DudesSettings } from '../types.js'
 export const dudesSettings = ref({} as DudesSettings)
 
 export function useDudesSettings() {
-  function setSettings(newSettings: DudesSettings) {
+  function setSettings(newSettings: DudesSettings): void {
     dudesSettings.value = deepMerge(unref(dudesSettings), newSettings)
   }
 

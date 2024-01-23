@@ -1,34 +1,32 @@
 import { Container, Sprite } from 'pixi.js'
 
-import { FIXED_DELTA_TIME } from '../constants.js'
+import { FIXED_DELTA_TIME, FIXED_ROUND } from '../constants.js'
 
 export class DudeEmoteSpitter {
-  public view: Container = new Container()
+  view = new Container()
 
   private emotes: Sprite[] = []
-
-  private gapTime = 1000
+  private gapTime = FIXED_ROUND
   private currentGapTime = 0
-
   private moveSpeed = 50
   private alphaSpeed = 1
   private scaleSpeed = 0.5
 
-  public add(url: string) {
+  add(url: string): void {
     const sprite = Sprite.from(url)
     sprite.anchor.set(0.5, 0.5)
     sprite.scale.set(0, 0)
     this.emotes.push(sprite)
   }
 
-  public update() {
+  update(): void {
     for (const child of this.view.children) {
-      child.position.y -= (FIXED_DELTA_TIME * this.moveSpeed) / 1000
-      child.scale.x += (FIXED_DELTA_TIME * this.scaleSpeed) / 1000
-      child.scale.y += (FIXED_DELTA_TIME * this.scaleSpeed) / 1000
+      child.position.y -= (FIXED_DELTA_TIME * this.moveSpeed) / FIXED_ROUND
+      child.scale.x += (FIXED_DELTA_TIME * this.scaleSpeed) / FIXED_ROUND
+      child.scale.y += (FIXED_DELTA_TIME * this.scaleSpeed) / FIXED_ROUND
 
       if (child.scale.x > 1) {
-        child.alpha -= (FIXED_DELTA_TIME * this.alphaSpeed) / 1000
+        child.alpha -= (FIXED_DELTA_TIME * this.alphaSpeed) / FIXED_ROUND
       }
 
       if (child.alpha <= 0) {

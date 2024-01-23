@@ -20,11 +20,11 @@ export interface DudeAsset {
 }
 
 export class AssetsLoader {
+  sheets: utils.Dict<Spritesheet<AsepriteData>> = {}
+
   private isLoaded = false
 
-  public sheets: utils.Dict<Spritesheet<AsepriteData>> = {}
-
-  async load(assets: DudeAsset[]) {
+  async load(assets: DudeAsset[]): Promise<void> {
     if (this.isLoaded) return
 
     await Assets.init({

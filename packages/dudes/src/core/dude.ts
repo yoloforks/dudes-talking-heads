@@ -4,7 +4,7 @@ import type { IPointData } from 'pixi.js'
 import type { WatchStopHandle } from 'vue'
 
 import { dudesSettings } from '../composables/use-settings.js'
-import { FIXED_DELTA_TIME } from '../constants.js'
+import { FIXED_DELTA_TIME, FIXED_ROUND } from '../constants.js'
 import { DudeEmoteSpitter } from './dude-emote-spitter.js'
 import { DudeMessageBox } from './dude-message-box.js'
 import { DudeNameBox } from './dude-name-box.js'
@@ -25,7 +25,10 @@ type Collider = {
 }
 
 export class Dude {
-  public dudeName: string
+  dudeName: string
+  shouldBeDeleted = false
+  view = new Container()
+
   private spriteName: string
   private spriteSize = 32
   private direction: number
@@ -42,7 +45,6 @@ export class Dude {
   private message: DudeMessageBox
   private sprite?: DudeSpriteContainer
   private emoteSpitter = new DudeEmoteSpitter()
-  public view = new Container()
 
   private velocity: IPointData = {
     x: 0,
@@ -58,7 +60,6 @@ export class Dude {
   private currentLifeTime: number
   private maxOpacityTime = 5000
   private currentOpacityTime = this.maxOpacityTime
-  public shouldBeDeleted = false
 
   private color: string
   private params!: DudeParams
@@ -66,8 +67,8 @@ export class Dude {
 
   private get isJumping() {
     return (
-      this.animationState == DudeSpriteTags.Fall ||
-      this.animationState == DudeSpriteTags.Jump
+      this.animationState === DudeSpriteTags.Fall ||
+      this.animationState === DudeSpriteTags.Jump
     )
   }
 
@@ -156,10 +157,10 @@ export class Dude {
       this.runIdleAnimationTime &&
       this.maxRunIdleAnimationTime &&
       now - this.runIdleAnimationTime > this.maxRunIdleAnimationTime &&
-      (this.animationState == DudeSpriteTags.Run ||
-        this.animationState == DudeSpriteTags.Idle)
+      (this.animationState === DudeSpriteTags.Run ||
+        this.animationState === DudeSpriteTags.Idle)
     ) {
-      if (this.animationState == DudeSpriteTags.Idle) {
+      if (this.animationState === DudeSpriteTags.Idle) {
         this.playAnimation(DudeSpriteTags.Run)
       } else {
         this.playAnimation(DudeSpriteTags.Idle)
@@ -170,11 +171,15 @@ export class Dude {
     }
 
     this.velocity.y =
-      this.velocity.y + (this.params.gravity * FIXED_DELTA_TIME) / 1000
+      this.velocity.y + (this.params.gravity * FIXED_DELTA_TIME) / FIXED_ROUND
 
     const newPosition = {
-      x: this.view.position.x + (this.velocity.x * FIXED_DELTA_TIME) / 1000,
-      y: this.view.position.y + (this.velocity.y * FIXED_DELTA_TIME) / 1000
+      x:
+        this.view.position.x +
+        (this.velocity.x * FIXED_DELTA_TIME) / FIXED_ROUND,
+      y:
+        this.view.position.y +
+        (this.velocity.y * FIXED_DELTA_TIME) / FIXED_ROUND
     }
 
     if (
@@ -191,7 +196,7 @@ export class Dude {
         (this.collider.y + this.collider.height - this.spriteSize / 2) *
           this.params.scale
 
-      if (this.animationState == DudeSpriteTags.Fall) {
+      if (this.animationState === DudeSpriteTags.Fall) {
         this.playAnimation(DudeSpriteTags.Land)
         this.landAnimationTime = now
       }
@@ -207,7 +212,7 @@ export class Dude {
 
     if (this.animationState != DudeSpriteTags.Idle) {
       this.view.position.x +=
-        (1 * this.direction * FIXED_DELTA_TIME * 60) / 1000
+        (1 * this.direction * FIXED_DELTA_TIME * 60) / FIXED_ROUND
 
       if (
         this.view.x + (this.collider.width / 2) * this.params.scale >= width ||
@@ -233,7 +238,7 @@ export class Dude {
       }
     }
 
-    this.sprite?.update((FIXED_DELTA_TIME / 1000) * 60)
+    this.sprite?.update((FIXED_DELTA_TIME / FIXED_ROUND) * 60)
     this.emoteSpitter.update()
 
     this.emoteSpitter.view.position.y =

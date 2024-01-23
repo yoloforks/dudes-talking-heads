@@ -40,7 +40,7 @@ export function getSprite(
 
   const sheet = assetsLoader.sheets[sheetName]
   const frameTag = sheet.data.meta.frameTags?.find(
-    (tag) => tag.name == spriteTag
+    (tag) => tag.name === spriteTag
   )
   const layers = sheet.data.meta.layers
 

@@ -1,19 +1,23 @@
 import { AnimatedSprite, Container } from 'pixi.js'
 
+interface DudeSpriteContainerParams {
+  body: AnimatedSprite
+  eyes: AnimatedSprite
+}
+
 export class DudeSpriteContainer {
+  view = new Container()
+
   private body: AnimatedSprite
   private eyes: AnimatedSprite
 
-  public view: Container
-
-  constructor({ body, eyes }: { body: AnimatedSprite; eyes: AnimatedSprite }) {
+  constructor({ body, eyes }: DudeSpriteContainerParams) {
     this.body = body
     this.eyes = eyes
 
     this.body.zIndex = 1
     this.eyes.zIndex = 2
 
-    this.view = new Container()
     this.view.addChild(body, eyes)
     this.view.sortableChildren = true
 
@@ -27,12 +31,12 @@ export class DudeSpriteContainer {
     this.eyes.play()
   }
 
-  public update(delta: number) {
+  update(delta: number): void {
     this.body.update(delta)
     this.eyes.update(delta)
   }
 
-  public color(color: string) {
+  color(color: string): void {
     this.body.tint = color
   }
 }

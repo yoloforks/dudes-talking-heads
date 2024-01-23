@@ -37,7 +37,7 @@ export const useDudes = () => {
     return dude
   }
 
-  function removeDude(name: string) {
+  function removeDude(name: string): void {
     const dude = dudes.get(name) as Dude | undefined
     if (!dude) return
     dude.cleanUp()

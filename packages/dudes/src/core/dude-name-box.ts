@@ -99,8 +99,8 @@ export type DudePersonalNameBoxStyles = Pick<
 >
 
 export class DudeNameBox {
-  public view: Text
-  public stopWatchGlobalStyles: WatchStopHandle | undefined
+  view: Text
+  stopWatchGlobalStyles?: WatchStopHandle
 
   constructor(name: string, personalStyle?: DudePersonalNameBoxStyles) {
     this.view = new Text(name)

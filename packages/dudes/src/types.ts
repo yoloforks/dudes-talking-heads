@@ -26,7 +26,7 @@ export type DudePersonalStyles = Partial<{
 
 export interface DudeParams {
   /**
-   * @default 1800000 // 1000 * 60 * 30 - 30 minutes
+   * @default 1800000 // FIXED_ROUND * 60 * 30 - 30 minutes
    */
   maxLifeTime: number
   /**

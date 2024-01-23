@@ -55,19 +55,19 @@ interface Bound {
 }
 
 export class DudeMessageBox {
-  public view: Container = new Container()
-  private container: Container = new Container()
+  view = new Container()
+  stopWatchGlobalStyles?: WatchStopHandle
+
+  private container = new Container()
   private box: Graphics | null = null
   private text: Text | null = null
+  private styles: DudeMessageBoxStyles
 
   private animationTime = 500
   private currentAnimationTime = 0
   private shift = 30
   private currentShowTime = 0
   private messageQueue: string[] = []
-
-  public stopWatchGlobalStyles: WatchStopHandle | undefined
-  private styles!: DudeMessageBoxStyles
 
   constructor(personalStyles?: DudePersonalMessageBoxStyles) {
     this.view.addChild(this.container)
@@ -87,19 +87,7 @@ export class DudeMessageBox {
     )
   }
 
-  private updateStyle(styles: DudeMessageBoxStyles): void {
-    this.styles = styles
-  }
-
-  private trim(text: Text): string {
-    const metrics = TextMetrics.measureText(text.text, text.style)
-
-    return metrics.lines.length > 4
-      ? metrics.lines.slice(0, 4).join(' ').slice(0, -3) + '...'
-      : text.text
-  }
-
-  public update(): void {
+  update(): void {
     if (this.currentAnimationTime >= 0) {
       this.currentAnimationTime -= FIXED_DELTA_TIME
 
@@ -121,6 +109,31 @@ export class DudeMessageBox {
     }
   }
 
+  bounds(): Partial<Bound> {
+    return {
+      x: this.box?.x,
+      y: this.box?.y,
+      width: this.box?.width,
+      height: this.box?.height
+    }
+  }
+
+  add(message: string): void {
+    this.messageQueue.push(message)
+  }
+
+  private updateStyle(styles: DudeMessageBoxStyles): void {
+    this.styles = styles
+  }
+
+  private trim(text: Text): string {
+    const metrics = TextMetrics.measureText(text.text, text.style)
+
+    return metrics.lines.length > 4
+      ? metrics.lines.slice(0, 4).join(' ').slice(0, -3) + '...'
+      : text.text
+  }
+
   private nextMessage(): void {
     if (this.messageQueue.length > 0) {
       const message = this.messageQueue.shift()
@@ -132,19 +145,6 @@ export class DudeMessageBox {
       this.currentShowTime = this.styles.showTime
       this.currentAnimationTime = this.animationTime
     }
-  }
-
-  public bounds(): Partial<Bound> {
-    return {
-      x: this.box?.x,
-      y: this.box?.y,
-      width: this.box?.width,
-      height: this.box?.height
-    }
-  }
-
-  public add(message: string): void {
-    this.messageQueue.push(message)
   }
 
   private show(message: string): void {

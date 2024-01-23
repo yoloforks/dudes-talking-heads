@@ -1,12 +1,14 @@
+import { FIXED_ROUND } from '../constants.js'
+
 export const useRaf = (callback: () => void) => {
   let lastTime = performance.now()
   let lastFrame = -1
 
   const maxFps = 60
-  const minElapsedMS = 1000 / maxFps
+  const minElapsedMS = FIXED_ROUND / maxFps
   const maxElapsedMS = 100
 
-  function startRaf(currentTime = performance.now()) {
+  function startRaf(currentTime = performance.now()): void {
     let elapsedMS = currentTime - lastTime
 
     if (elapsedMS > maxElapsedMS) {
