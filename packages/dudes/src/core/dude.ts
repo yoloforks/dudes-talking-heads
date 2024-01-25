@@ -15,7 +15,7 @@ import {
   DudeSpriteTags,
   getSprite
 } from './sprite-provider.js'
-import type { DudeParams, DudePersonalStyles } from '../types.js'
+import type { DudeParams, DudePersonalSettings } from '../types.js'
 import type { DudeSpriteTagType } from './sprite-provider.js'
 
 type Collider = {
@@ -30,6 +30,7 @@ export class Dude {
   shouldBeDeleted = false
   view = new Container()
 
+  private sprite?: DudeSpriteContainer
   private spriteName: string
   private spriteSize = 32
   private direction: number
@@ -44,7 +45,6 @@ export class Dude {
 
   private name: DudeNameBox
   private message: DudeMessageBox
-  private sprite?: DudeSpriteContainer
   private emoteSpitter = new DudeEmoteSpitter()
 
   private velocity: IPointData = {
@@ -73,9 +73,9 @@ export class Dude {
     )
   }
 
-  constructor(name: string, sprite = 'dude', settings?: DudePersonalStyles) {
+  constructor(name: string, sprite = 'dude', settings?: DudePersonalSettings) {
     this.dudeName = name
-    this.spriteName = sprite
+    this.spriteName = settings?.dude?.sprite ?? sprite
     this.color = unref(dudesSettings.value.dude.color)
 
     this.stopWatchDudeParams = watch(

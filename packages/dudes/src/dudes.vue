@@ -49,7 +49,7 @@ async function initDudes() {
   startRaf()
 }
 
-defineExpose<DudesOverlayMethods<string>>({
+defineExpose<DudesOverlayMethods>({
   dudes,
   initDudes,
   getDude,

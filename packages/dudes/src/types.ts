@@ -10,17 +10,28 @@ import type {
 import type { Dude } from './core/dude.js'
 import type { SoundAsset, SoundType } from './core/sounds-loader.js'
 
-export interface DudesOverlayMethods<T extends string> {
+export interface DudesOverlayMethods {
   dudes: Map<string, Dude>
   initDudes: () => Promise<void>
   getDude: (name: string) => Dude | undefined
-  createDude: (name: string, sprite: T, settings?: DudePersonalStyles) => Dude
+  createDude: (
+    name: string,
+    sprite: string,
+    settings?: DudePersonalSettings
+  ) => Dude
   removeDude: (name: string) => void
   clearDudes: () => void
   updateSettings: (settings: DudesSettings) => void
 }
 
-export type DudePersonalStyles = Partial<{
+export type DudePersonalParams = Partial<
+  Pick<DudeParams, 'color' | 'scale'> & {
+    sprite: string
+  }
+>
+
+export type DudePersonalSettings = Partial<{
+  dude: DudePersonalParams
   messageBox: DudePersonalMessageBoxStyles
   nameBox: DudePersonalNameBoxStyles
 }>

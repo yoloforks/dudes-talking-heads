@@ -4,12 +4,16 @@ import { VTweakpane } from 'v-tweakpane'
 import type { Dude, DudesOverlayMethods, DudesSettings } from '@twirapp/dudes/types'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { dudeAssets, dudeSprites, dudeSounds, dudeNames, dudeEmotes, type DudesSprites } from './constants.js'
-import { randomNum } from '@zero-dependency/utils'
+import { randomNum, capitalize } from '@zero-dependency/utils'
 import { randomRgbColor } from './utils.js'
 import type { Pane } from 'tweakpane'
 
-const playgroundParams = ref({
-  isRandomColor: false
+const playgroundParams = ref<{
+  isRandomColor: boolean,
+  selectedSprite: DudesSprites
+}>({
+  isRandomColor: false,
+  selectedSprite: dudeSprites[0]
 })
 
 const settings = reactive<DudesSettings>({
@@ -53,7 +57,7 @@ const settings = reactive<DudesSettings>({
   }
 })
 
-const dudesRef = ref<DudesOverlayMethods<DudesSprites> | null>(null)
+const dudesRef = ref<DudesOverlayMethods | null>(null)
 
 watch(settings, (settings) => {
   if (!dudesRef.value) return
@@ -78,6 +82,9 @@ function spawnDude() {
   const name = dudeNames[randomNum(0, dudeNames.length - 1)]
   const sprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
   const dude = dudesRef.value.createDude(`Super ${name} #${randomNum(0, 100)}`, sprite, {
+    dude: {
+      sprite: playgroundParams.value.selectedSprite
+    },
     messageBox: {
       boxColor: 'lightgreen',
       fill: '#000000'
@@ -141,27 +148,41 @@ function onPaneCreated(pane: Pane) {
   }
 
   const dudeFolder = pane.addFolder({ title: 'Dude' })
-  dudeFolder.addBinding(playgroundParams.value, 'isRandomColor', {
-    label: 'Random color'
+  dudeFolder.addBinding(playgroundParams.value, 'selectedSprite', {
+    label: 'Sprite',
+    options: dudeSprites.map(sprite => ({
+      text: capitalize(sprite),
+      value: sprite
+    })),
   })
   dudeFolder.addBinding(settings.dude.sounds, 'enabled', {
     label: 'Sounds'
   })
   dudeFolder.addBinding(settings.dude.sounds, 'volume', {
+    label: 'Sounds volume',
     min: 0.01,
     max: 1,
     step: 0.01
   })
-  dudeFolder.addBinding(settings.dude, 'color')
+  dudeFolder.addBinding(playgroundParams.value, 'isRandomColor', {
+    label: 'Random sprite color'
+  }).on('change', ({ value }) => color.disabled = value)
+
+  const color = dudeFolder.addBinding(settings.dude, 'color', {
+    label: 'Sprite color'
+  })
   dudeFolder.addBinding(settings.dude, 'gravity', {
+    label: 'Gravity',
     min: 10,
     max: 1000
   })
   dudeFolder.addBinding(settings.dude, 'maxLifeTime', {
+    label: 'Max life time on screen',
     min: 1000 * 1,
     max: 1000 * 60 * 60
   })
   dudeFolder.addBinding(settings.dude, 'scale', {
+    label: 'Scale',
     min: 1,
     max: 24
   })
@@ -169,24 +190,27 @@ function onPaneCreated(pane: Pane) {
   const messageBoxFolder = pane.addFolder({ title: 'Message' })
   messageBoxFolder.addBinding(settings.messageBox, 'fill')
   messageBoxFolder.addBinding(settings.messageBox, 'boxColor')
+  messageBoxFolder.addBinding(settings.messageBox, 'fontFamily', {
+    options: fonts
+  })
   messageBoxFolder.addBinding(settings.messageBox, 'fontSize', {
     min: 10,
-    max: 64
+    max: 64,
+    step: 1
   })
   messageBoxFolder.addBinding(settings.messageBox, 'borderRadius', {
     min: 0,
-    max: 64
+    max: 64,
+    step: 1
   })
   messageBoxFolder.addBinding(settings.messageBox, 'padding', {
     min: 0,
-    max: 64
+    max: 64,
+    step: 1
   })
   messageBoxFolder.addBinding(settings.messageBox, 'showTime', {
     min: 1000,
     max: 1000 * 10
-  })
-  messageBoxFolder.addBinding(settings.messageBox, 'fontFamily', {
-    options: fonts
   })
 
   const nameBoxFolder = pane.addFolder({ title: 'Name' })
@@ -196,7 +220,8 @@ function onPaneCreated(pane: Pane) {
   })
   nameBoxFolder.addBinding(settings.nameBox, 'fontSize', {
     min: 10,
-    max: 64
+    max: 64,
+    step: 1
   })
   nameBoxFolder.addBinding(settings.nameBox, 'fontStyle', {
     options: {
@@ -220,7 +245,8 @@ function onPaneCreated(pane: Pane) {
   nameBoxFolder.addBinding(settings.nameBox, 'stroke')
   nameBoxFolder.addBinding(settings.nameBox, 'strokeThickness', {
     min: 0,
-    max: 10
+    max: 10,
+    step: 1
   })
   nameBoxFolder.addBinding(settings.nameBox, 'dropShadow')
   nameBoxFolder.addBinding(settings.nameBox, 'dropShadowColor')

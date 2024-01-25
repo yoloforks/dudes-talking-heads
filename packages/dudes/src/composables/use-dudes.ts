@@ -1,7 +1,7 @@
 import { Container } from 'pixi.js'
 
 import { Dude } from '../core/dude.js'
-import type { DudePersonalStyles } from '../types.js'
+import type { DudePersonalSettings } from '../types.js'
 
 const dudes = new Map<string, Dude>()
 const dudesContainer = new Container()
@@ -24,7 +24,7 @@ export const useDudes = () => {
   function createDude(
     name: string,
     sprite: string,
-    settings?: DudePersonalStyles
+    settings?: DudePersonalSettings
   ): Dude {
     const hasExistingDude = getDude(name)
     if (hasExistingDude) {
