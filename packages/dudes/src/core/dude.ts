@@ -85,7 +85,7 @@ export class Dude {
     const { color, gravity, scale } = unref(dudesSettings.value.dude)
 
     this.dudeName = name
-    this.spriteName = settings?.dude?.sprite ?? sprite
+    this.spriteName = sprite
     this.spriteColor = settings?.dude?.color ?? color
     this.spriteScale = settings?.dude?.scale ?? scale
     this.spriteGravity = settings?.dude?.gravity ?? gravity
@@ -120,6 +120,10 @@ export class Dude {
     this.runIdleAnimationTime = performance.now()
     this.maxRunIdleAnimationTime = Math.random() * 5000
     this.currentLifeTime = dudesSettings.value.dude.maxLifeTime
+  }
+
+  get color() {
+    return this.spriteColor
   }
 
   cleanUp(): void {
