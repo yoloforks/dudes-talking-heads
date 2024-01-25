@@ -80,26 +80,29 @@ function spawnDude() {
   if (!dudesRef.value) return
 
   const name = dudeNames[randomNum(0, dudeNames.length - 1)]
-  const sprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
-  const dude = dudesRef.value.createDude(`Super ${name} #${randomNum(0, 100)}`, sprite, {
-    dude: {
-      sprite: playgroundParams.value.selectedSprite,
-      gravity: settings.dude.gravity,
-      color: settings.dude.color,
-      scale: settings.dude.scale
-    },
-    messageBox: {
-      boxColor: 'lightgreen',
-      fill: '#000000'
-    },
-    nameBox: {
-      fill: ['rgb(131, 58, 180)', 'rgb(253, 29, 29)', 'rgb(252, 176, 69)'],
-      fillGradientType: 1,
-      fillGradientStops: [0.3, 0.6, 1],
-      stroke: '#ffffff',
-      strokeThickness: 4
+  const dude = dudesRef.value.createDude(
+    `Super ${name} #${randomNum(0, 100)}`,
+    playgroundParams.value.selectedSprite,
+    {
+      dude: {
+        gravity: settings.dude.gravity,
+        color: settings.dude.color,
+        scale: settings.dude.scale
+      },
+      messageBox: {
+        boxColor: 'lightgreen',
+        fill: '#000000'
+      },
+      nameBox: {
+        fill: ['rgb(131, 58, 180)', 'rgb(253, 29, 29)', 'rgb(252, 176, 69)'],
+        fillGradientType: 1,
+        fillGradientStops: [0.3, 0.6, 1],
+        stroke: '#ffffff',
+        strokeThickness: 4
+      }
     }
-  })
+  )
+
   const color = playgroundParams.value.isRandomColor
     ? randomRgbColor()
     : settings.dude.color
