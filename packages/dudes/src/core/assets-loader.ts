@@ -20,7 +20,7 @@ export interface DudeAsset {
 }
 
 export class AssetsLoader {
-  sheets: utils.Dict<Spritesheet<AsepriteData>> = {}
+  assets: utils.Dict<Spritesheet<AsepriteData>> = {}
 
   private isLoaded = false
 
@@ -37,7 +37,7 @@ export class AssetsLoader {
         ]
       }
     })
-    this.sheets = await Assets.loadBundle('main')
+    this.assets = await Assets.loadBundle('main')
     this.isLoaded = true
   }
 }

@@ -8,6 +8,7 @@ import type {
   DudePersonalNameBoxStyles
 } from './core/dude-name-box.js'
 import type { Dude } from './core/dude.js'
+import type { SoundAsset, SoundType } from './core/sounds-loader.js'
 
 export interface DudesOverlayMethods<T extends string> {
   dudes: Map<string, Dude>
@@ -42,6 +43,17 @@ export interface DudeParams {
    * @default 4
    */
   scale: number
+
+  sounds: {
+    /**
+     * @default true
+     */
+    enabled: boolean
+    /**
+     * @default 0.01 // 1%
+     */
+    volume: number
+  }
 }
 
 export interface DudesSettings {
@@ -50,4 +62,11 @@ export interface DudesSettings {
   nameBox: DudeNameBoxStyles
 }
 
-export type { Dude, DudeAsset, DudeMessageBoxStyles, DudeNameBoxStyles }
+export type {
+  Dude,
+  DudeAsset,
+  DudeMessageBoxStyles,
+  DudeNameBoxStyles,
+  SoundAsset,
+  SoundType
+}

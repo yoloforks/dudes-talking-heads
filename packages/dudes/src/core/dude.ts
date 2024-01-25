@@ -9,6 +9,7 @@ import { DudeEmoteSpitter } from './dude-emote-spitter.js'
 import { DudeMessageBox } from './dude-message-box.js'
 import { DudeNameBox } from './dude-name-box.js'
 import { DudeSpriteContainer } from './dude-sprite-container.js'
+import { soundsLoader } from './sounds-loader.js'
 import {
   DudeSpriteLayers,
   DudeSpriteTags,
@@ -270,6 +271,11 @@ export class Dude {
 
     if (this.sprite) {
       this.view.removeChild(this.sprite.view)
+    }
+
+    const { enabled: soundEnabled, volume } = dudesSettings.value.dude.sounds
+    if (soundEnabled && state === 'Jump') {
+      soundsLoader.play('jump', volume)
     }
 
     this.sprite = new DudeSpriteContainer({

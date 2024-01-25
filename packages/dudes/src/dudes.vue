@@ -5,9 +5,11 @@ import { useDudes } from './composables/use-dudes.js'
 import { useRaf } from './composables/use-raf.js'
 import { assetsLoader, type DudeAsset } from './core/assets-loader.js'
 import { useDudesSettings } from './composables/use-settings.js'
-import type { DudesOverlayMethods, DudesSettings } from './types.js'
+import type { DudesOverlayMethods, DudesSettings, SoundAsset } from './types.js'
+import { soundsLoader } from './core/sounds-loader'
 
 const props = defineProps<{
+  sounds: SoundAsset[]
   assets: DudeAsset[]
   settings: DudesSettings
 }>()
@@ -40,6 +42,7 @@ function onResize() {
 }
 
 async function initDudes() {
+  await soundsLoader.load(props.sounds)
   await assetsLoader.load(props.assets)
   initRenderer(canvasRef)
   window.addEventListener('resize', onResize)

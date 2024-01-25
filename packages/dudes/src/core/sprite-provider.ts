@@ -38,11 +38,11 @@ export function getSprite(
     return null
   }
 
-  const sheet = assetsLoader.sheets[sheetName]
-  const frameTag = sheet.data.meta.frameTags?.find(
+  const asset = assetsLoader.assets[sheetName]
+  const layers = asset.data.meta.layers
+  const frameTag = asset.data.meta.frameTags?.find(
     (tag) => tag.name === spriteTag
   )
-  const layers = sheet.data.meta.layers
 
   if (frameTag && layers) {
     const textures = Object.fromEntries<FrameObject[]>(
@@ -53,8 +53,8 @@ export function getSprite(
       const framekey = i.toString()
 
       for (const layer in textures) {
-        const texture = sheet.textures[layer + '_' + i]
-        const time = sheet.data.frames[layer + '_' + framekey].duration
+        const texture = asset.textures[layer + '_' + i]
+        const time = asset.data.frames[layer + '_' + framekey].duration
 
         textures[layer].push({ texture: texture, time: time })
       }

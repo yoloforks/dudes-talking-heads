@@ -1,4 +1,4 @@
-import type { DudeAsset } from '@twirapp/dudes/types'
+import type { DudeAsset, SoundAsset } from '@twirapp/dudes/types'
 
 export const dudeSprites = [
   'dude',
@@ -18,6 +18,13 @@ export const dudeNames = [
   'Girl',
   'Cat',
   'Santa'
+]
+
+export const dudeSounds: SoundAsset[] = [
+  {
+    alias: 'jump',
+    src: './sounds/jump.mp3'
+  }
 ]
 
 export const dudeAssets: DudeAsset[] = [

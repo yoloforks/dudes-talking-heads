@@ -3,7 +3,7 @@ import DudesOverlay from '@twirapp/dudes'
 import { VTweakpane } from 'v-tweakpane'
 import type { Dude, DudesOverlayMethods, DudesSettings } from '@twirapp/dudes/types'
 import { onMounted, reactive, ref, watch } from 'vue'
-import { dudeAssets, dudeSprites, dudeNames, dudeEmotes, type DudesSprites } from './constants.js'
+import { dudeAssets, dudeSprites, dudeSounds, dudeNames, dudeEmotes, type DudesSprites } from './constants.js'
 import { randomNum } from '@zero-dependency/utils'
 import { randomRgbColor } from './utils.js'
 import type { Pane } from 'tweakpane'
@@ -17,7 +17,11 @@ const settings = reactive<DudesSettings>({
     color: '#969696',
     maxLifeTime: 1000 * 60 * 30,
     gravity: 400,
-    scale: 4
+    scale: 4,
+    sounds: {
+      enabled: true,
+      volume: 0.01
+    }
   },
   messageBox: {
     borderRadius: 5,
@@ -140,6 +144,14 @@ function onPaneCreated(pane: Pane) {
   dudeFolder.addBinding(playgroundParams.value, 'isRandomColor', {
     label: 'Random color'
   })
+  dudeFolder.addBinding(settings.dude.sounds, 'enabled', {
+    label: 'Sounds'
+  })
+  dudeFolder.addBinding(settings.dude.sounds, 'volume', {
+    min: 0.01,
+    max: 1,
+    step: 0.01
+  })
   dudeFolder.addBinding(settings.dude, 'color')
   dudeFolder.addBinding(settings.dude, 'gravity', {
     min: 10,
@@ -244,5 +256,5 @@ function onPaneCreated(pane: Pane) {
 
 <template>
   <v-tweakpane :pane="{ title: 'Dudes Playground' }" @on-pane-created="onPaneCreated" />
-  <dudes-overlay ref="dudesRef" :assets="dudeAssets" :settings="settings" />
+  <dudes-overlay ref="dudesRef" :assets="dudeAssets" :sounds="dudeSounds" :settings="settings" />
 </template>
