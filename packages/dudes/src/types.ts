@@ -25,7 +25,7 @@ export interface DudesOverlayMethods {
 }
 
 export type DudePersonalParams = Partial<
-  Pick<DudeParams, 'color' | 'scale'> & {
+  Pick<DudeParams, 'color' | 'scale' | 'gravity'> & {
     sprite: string
   }
 >

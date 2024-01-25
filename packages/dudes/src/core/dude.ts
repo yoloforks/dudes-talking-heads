@@ -32,6 +32,9 @@ export class Dude {
 
   private sprite?: DudeSpriteContainer
   private spriteName: string
+  private spriteScale: number
+  private spriteGravity: number
+  private spriteColor: string
   private spriteSize = 32
   private direction: number
   private animationState?: DudeSpriteTagType
@@ -62,8 +65,7 @@ export class Dude {
   private maxOpacityTime = 5000
   private currentOpacityTime = this.maxOpacityTime
 
-  private color: string
-  private params!: DudeParams
+  private params: DudeParams
   private stopWatchDudeParams: WatchStopHandle | undefined
 
   private get isJumping() {
@@ -74,38 +76,40 @@ export class Dude {
   }
 
   constructor(name: string, sprite = 'dude', settings?: DudePersonalSettings) {
-    this.dudeName = name
-    this.spriteName = settings?.dude?.sprite ?? sprite
-    this.color = unref(dudesSettings.value.dude.color)
-
     this.stopWatchDudeParams = watch(
       () => dudesSettings.value.dude,
       (params) => (this.params = params),
       { immediate: true }
     )
 
-    this.message = new DudeMessageBox(settings?.messageBox)
+    const { color, gravity, scale } = unref(dudesSettings.value.dude)
 
-    const width = window.innerWidth
+    this.dudeName = name
+    this.spriteName = settings?.dude?.sprite ?? sprite
+    this.spriteColor = settings?.dude?.color ?? color
+    this.spriteScale = settings?.dude?.scale ?? scale
+    this.spriteGravity = settings?.dude?.gravity ?? gravity
+
+    this.message = new DudeMessageBox(settings?.messageBox)
 
     this.view.y =
       -(this.collider.y + this.collider.height - this.spriteSize / 2) *
-      this.params.scale
+      this.spriteScale
     this.view.x =
-      Math.random() * (width - this.spriteSize * this.params.scale) +
-      (this.spriteSize / 2) * this.params.scale
+      Math.random() * (window.innerWidth - this.spriteSize * this.spriteScale) +
+      (this.spriteSize / 2) * this.spriteScale
 
     this.direction = Math.random() > 0.5 ? 1 : -1
 
     this.name = new DudeNameBox(name, settings?.nameBox)
     this.name.view.position.y =
-      -(this.spriteSize / 2 - this.collider.y + 2) * this.params.scale
+      -(this.spriteSize / 2 - this.collider.y + 2) * this.spriteScale
 
     this.view.sortableChildren = true
     this.emoteSpitter.view.zIndex = 1
     this.message.view.zIndex = 3
     this.message.view.position.y =
-      this.name.view.position.y - this.name.view.height - 2 * this.params.scale
+      this.name.view.position.y - this.name.view.height - 2 * this.spriteScale
 
     this.view.addChild(this.name.view)
     this.view.addChild(this.emoteSpitter.view)
@@ -133,14 +137,14 @@ export class Dude {
     }
   }
 
-  tint(spriteColor: string): void {
+  tint(color: string): void {
     // validate color
     const option = new Option()
-    option.style.color = spriteColor
-    if (option.style.color === '' || spriteColor === 'transparent') return
+    option.style.color = color
+    if (option.style.color === '' || color === 'transparent') return
 
-    this.color = spriteColor
-    this.sprite?.color(this.color)
+    this.spriteColor = color
+    this.sprite?.color(this.spriteColor)
   }
 
   update(): void {
@@ -172,7 +176,7 @@ export class Dude {
     }
 
     this.velocity.y =
-      this.velocity.y + (this.params.gravity * FIXED_DELTA_TIME) / FIXED_ROUND
+      this.velocity.y + (this.spriteGravity * FIXED_DELTA_TIME) / FIXED_ROUND
 
     const newPosition = {
       x:
@@ -186,7 +190,7 @@ export class Dude {
     if (
       newPosition.y +
         (this.collider.y + this.collider.height - this.spriteSize / 2) *
-          this.params.scale >
+          this.spriteScale >
       window.innerHeight
     ) {
       this.velocity.y = 0
@@ -195,7 +199,7 @@ export class Dude {
       newPosition.y =
         window.innerHeight -
         (this.collider.y + this.collider.height - this.spriteSize / 2) *
-          this.params.scale
+          this.spriteScale
 
       if (this.animationState === DudeSpriteTags.Fall) {
         this.playAnimation(DudeSpriteTags.Land)
@@ -216,14 +220,14 @@ export class Dude {
         (1 * this.direction * FIXED_DELTA_TIME * 60) / FIXED_ROUND
 
       if (
-        this.view.x + (this.collider.width / 2) * this.params.scale >= width ||
-        this.view.x - (this.collider.width / 2) * this.params.scale <= 0
+        this.view.x + (this.collider.width / 2) * this.spriteScale >= width ||
+        this.view.x - (this.collider.width / 2) * this.spriteScale <= 0
       ) {
         this.direction = -this.direction
         this.velocity.x = -this.velocity.x
         this.sprite?.view.scale.set(
-          this.direction * this.params.scale,
-          this.params.scale
+          this.direction * this.spriteScale,
+          this.spriteScale
         )
       }
     }
@@ -283,10 +287,10 @@ export class Dude {
       eyes: dudeSprite[DudeSpriteLayers.Eyes]
     })
     this.sprite.view.scale.set(
-      this.direction * this.params.scale,
-      this.params.scale
+      this.direction * this.spriteScale,
+      this.spriteScale
     )
-    this.sprite.color(this.color)
+    this.sprite.color(this.spriteColor)
 
     this.view.addChild(this.sprite.view)
   }

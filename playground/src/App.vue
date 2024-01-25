@@ -83,7 +83,10 @@ function spawnDude() {
   const sprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
   const dude = dudesRef.value.createDude(`Super ${name} #${randomNum(0, 100)}`, sprite, {
     dude: {
-      sprite: playgroundParams.value.selectedSprite
+      sprite: playgroundParams.value.selectedSprite,
+      gravity: settings.dude.gravity,
+      color: settings.dude.color,
+      scale: settings.dude.scale
     },
     messageBox: {
       boxColor: 'lightgreen',
@@ -174,7 +177,8 @@ function onPaneCreated(pane: Pane) {
   dudeFolder.addBinding(settings.dude, 'gravity', {
     label: 'Gravity',
     min: 10,
-    max: 1000
+    max: 10000,
+    step: 1
   })
   dudeFolder.addBinding(settings.dude, 'maxLifeTime', {
     label: 'Max life time on screen',
@@ -184,10 +188,18 @@ function onPaneCreated(pane: Pane) {
   dudeFolder.addBinding(settings.dude, 'scale', {
     label: 'Scale',
     min: 1,
-    max: 24
+    max: 24,
+    step: 0.1
   })
 
-  const messageBoxFolder = pane.addFolder({ title: 'Message' })
+  dudeFolder.addBlade({ view: 'separator' })
+  dudeFolder.addButton({ title: 'Spawn' }).on('click', spawnDude)
+  dudeFolder.addButton({ title: 'Jump' }).on('click', jumpAllDudes)
+  dudeFolder.addButton({ title: 'Show message' }).on('click', showMessageAllDudes)
+  dudeFolder.addButton({ title: 'Spit emote' }).on('click', spitEmotesAllDudes)
+  dudeFolder.addButton({ title: 'Clear' }).on('click', clearDudes)
+
+  const messageBoxFolder = pane.addFolder({ title: 'Message', expanded: false })
   messageBoxFolder.addBinding(settings.messageBox, 'fill')
   messageBoxFolder.addBinding(settings.messageBox, 'boxColor')
   messageBoxFolder.addBinding(settings.messageBox, 'fontFamily', {
@@ -213,7 +225,7 @@ function onPaneCreated(pane: Pane) {
     max: 1000 * 10
   })
 
-  const nameBoxFolder = pane.addFolder({ title: 'Name' })
+  const nameBoxFolder = pane.addFolder({ title: 'Name', expanded: false })
   nameBoxFolder.addBinding(settings.nameBox, 'fill')
   nameBoxFolder.addBinding(settings.nameBox, 'fontFamily', {
     options: fonts
@@ -269,14 +281,6 @@ function onPaneCreated(pane: Pane) {
     min: 0,
     max: Math.PI * 2
   })
-
-  pane.addBlade({ view: 'separator' })
-
-  pane.addButton({ title: 'Spawn dude' }).on('click', spawnDude)
-  pane.addButton({ title: 'Jump all dudes' }).on('click', jumpAllDudes)
-  pane.addButton({ title: 'Show message all dudes' }).on('click', showMessageAllDudes)
-  pane.addButton({ title: 'Spit emote all dudes' }).on('click', spitEmotesAllDudes)
-  pane.addButton({ title: 'Clear dudes' }).on('click', clearDudes)
 }
 </script>
 
