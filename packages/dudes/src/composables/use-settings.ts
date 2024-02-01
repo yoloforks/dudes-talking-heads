@@ -1,4 +1,4 @@
-import { ref, unref } from 'vue'
+import { ref, unref, watch } from 'vue'
 
 import { deepMerge } from '../deep-merge.js'
 import type { DudesSettings } from '../types.js'
@@ -9,6 +9,12 @@ export function useDudesSettings() {
   function setSettings(newSettings: DudesSettings): void {
     dudesSettings.value = deepMerge(unref(dudesSettings), newSettings)
   }
+
+  watch(() => dudesSettings.value, (settings) => {
+    if (settings.nameBox.strokeThickness === 0) {
+      delete settings.nameBox.strokeThickness
+    }
+  })
 
   return {
     dudesSettings,

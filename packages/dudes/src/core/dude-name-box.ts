@@ -54,7 +54,7 @@ export interface DudeNameBoxStyles {
   /**
    * @default 4
    */
-  strokeThickness: ITextStyle['strokeThickness']
+  strokeThickness?: ITextStyle['strokeThickness']
   /**
    * Available values: 'round', 'bevel', 'miter'
    * @default 'round'
@@ -110,6 +110,10 @@ export class DudeNameBox {
     this.view.zIndex = 100
 
     if (personalStyle) {
+      if (personalStyle.strokeThickness === 0) {
+        delete personalStyle.strokeThickness
+      }
+
       this.updateStyle({
         ...dudesSettings.value.nameBox,
         ...personalStyle
