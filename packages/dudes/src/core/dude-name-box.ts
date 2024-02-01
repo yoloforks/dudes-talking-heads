@@ -65,7 +65,7 @@ export interface DudeNameBoxStyles {
   /**
    * @default false
    */
-  dropShadow: ITextStyle['dropShadow']
+  dropShadow?: ITextStyle['dropShadow']
   /**
    * @default 1
    */

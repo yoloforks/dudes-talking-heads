@@ -18,6 +18,10 @@ export function useDudesSettings() {
     if (settings.nameBox.dropShadowBlur === 0) {
       delete settings.nameBox.dropShadowBlur
     }
+
+    if (settings.nameBox.dropShadow === false) {
+      delete settings.nameBox.dropShadow
+    }
   })
 
   return {
