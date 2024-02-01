@@ -33,7 +33,7 @@ export interface DudeNameBoxStyles {
 
   // fill
   /**
-   * @default '#fff'
+   * @default '#FFF'
    */
   fill: ITextStyle['fill']
   /**
@@ -43,6 +43,7 @@ export interface DudeNameBoxStyles {
   fillGradientType: ITextStyle['fillGradientType']
   /**
    * Minimum value is 0, maximum value is 1
+   * @default [0]
    */
   fillGradientStops: ITextStyle['fillGradientStops']
 
@@ -71,20 +72,21 @@ export interface DudeNameBoxStyles {
    */
   dropShadowAlpha: ITextStyle['dropShadowAlpha']
   /**
+   * Recommended range value is 0 to Math.PI * 2
    * @default 0
    */
   dropShadowAngle: ITextStyle['dropShadowAngle']
   /**
-   * @default 1
+   * @default 0.1
    */
   dropShadowBlur: ITextStyle['dropShadowBlur']
   /**
-   * @default '#3ac7d9'
+   * @default '#3EC7d9'
    */
   dropShadowColor: ITextStyle['dropShadowColor']
 
   /**
-   * @default 1
+   * @default 10
    */
   dropShadowDistance: ITextStyle['dropShadowDistance']
 }

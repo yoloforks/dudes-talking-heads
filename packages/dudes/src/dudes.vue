@@ -11,11 +11,11 @@ import { soundsLoader } from './core/sounds-loader'
 const props = defineProps<{
   sounds: SoundAsset[]
   assets: DudeAsset[]
-  settings: DudesSettings
+  settings?: DudesSettings
 }>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
-const { setSettings } = useDudesSettings()
+const { updateSettings } = useDudesSettings()
 const { renderer, initRenderer } = useRenderer()
 const {
   dudes,
@@ -29,7 +29,8 @@ const {
 const { startRaf } = useRaf(onRender)
 
 watch(() => props.settings, (settings) => {
-  setSettings(settings)
+  if (!settings) return
+  updateSettings(settings)
 }, { deep: true, immediate: true })
 
 function onRender() {
@@ -56,7 +57,7 @@ defineExpose<DudesOverlayMethods>({
   createDude,
   removeDude,
   clearDudes,
-  updateSettings: setSettings
+  updateSettings,
 })
 </script>
 

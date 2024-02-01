@@ -12,12 +12,12 @@ export interface DudeMessageBoxStyles {
   enabled: boolean
 
   /**
-   * @default '#eeeeee'
+   * @default '#EEE'
    */
   boxColor: string
 
   /**
-   * @default '#333333'
+   * @default '#333'
    */
   fill: string
 
@@ -42,7 +42,7 @@ export interface DudeMessageBoxStyles {
   padding: number
 
   /**
-   * @default 10_000
+   * @default 5_000
    */
   showTime: number
 }
