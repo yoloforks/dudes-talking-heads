@@ -54,7 +54,7 @@ export interface DudeNameBoxStyles {
   /**
    * @default 4
    */
-  strokeThickness?: ITextStyle['strokeThickness']
+  strokeThickness: ITextStyle['strokeThickness']
   /**
    * Available values: 'round', 'bevel', 'miter'
    * @default 'round'
@@ -65,7 +65,7 @@ export interface DudeNameBoxStyles {
   /**
    * @default false
    */
-  dropShadow?: ITextStyle['dropShadow']
+  dropShadow: ITextStyle['dropShadow']
   /**
    * @default 1
    */
@@ -77,7 +77,7 @@ export interface DudeNameBoxStyles {
   /**
    * @default 1
    */
-  dropShadowBlur?: ITextStyle['dropShadowBlur']
+  dropShadowBlur: ITextStyle['dropShadowBlur']
   /**
    * @default '#3ac7d9'
    */
@@ -110,10 +110,6 @@ export class DudeNameBox {
     this.view.zIndex = 100
 
     if (personalStyle) {
-      if (personalStyle.strokeThickness === 0) {
-        delete personalStyle.strokeThickness
-      }
-
       this.updateStyle({
         ...dudesSettings.value.nameBox,
         ...personalStyle
