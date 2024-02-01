@@ -77,7 +77,7 @@ export interface DudeNameBoxStyles {
   /**
    * @default 1
    */
-  dropShadowBlur: ITextStyle['dropShadowBlur']
+  dropShadowBlur?: ITextStyle['dropShadowBlur']
   /**
    * @default '#3ac7d9'
    */

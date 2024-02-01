@@ -14,6 +14,10 @@ export function useDudesSettings() {
     if (settings.nameBox.strokeThickness === 0) {
       delete settings.nameBox.strokeThickness
     }
+
+    if (settings.nameBox.dropShadowBlur === 0) {
+      delete settings.nameBox.dropShadowBlur
+    }
   })
 
   return {
