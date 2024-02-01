@@ -28,6 +28,7 @@ const settings = reactive<DudesSettings>({
     }
   },
   messageBox: {
+    enabled: true,
     borderRadius: 5,
     boxColor: '#e6ac0c',
     fontFamily: 'Courier New',
@@ -203,6 +204,7 @@ function onPaneCreated(pane: Pane) {
   dudeFolder.addButton({ title: 'Clear' }).on('click', clearDudes)
 
   const messageBoxFolder = pane.addFolder({ title: 'Message', expanded: false })
+  messageBoxFolder.addBinding(settings.messageBox, 'enabled')
   messageBoxFolder.addBinding(settings.messageBox, 'fill')
   messageBoxFolder.addBinding(settings.messageBox, 'boxColor')
   messageBoxFolder.addBinding(settings.messageBox, 'fontFamily', {

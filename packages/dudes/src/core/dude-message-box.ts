@@ -7,6 +7,11 @@ import { FIXED_DELTA_TIME } from '../constants.js'
 
 export interface DudeMessageBoxStyles {
   /**
+   * @default true
+   */
+  enabled: boolean
+
+  /**
    * @default '#eeeeee'
    */
   boxColor: string
@@ -118,7 +123,9 @@ export class DudeMessageBox {
   }
 
   add(message: string): void {
-    this.messageQueue.push(message)
+    if (dudesSettings.value.messageBox.enabled) {
+      this.messageQueue.push(message)
+    }
   }
 
   private updateStyle(styles: DudeMessageBoxStyles): void {
