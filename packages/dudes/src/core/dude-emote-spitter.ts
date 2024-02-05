@@ -1,5 +1,5 @@
 import { AnimatedGIF } from '@pixi/gif'
-import { Container } from 'pixi.js'
+import { Sprite, Container } from 'pixi.js'
 
 import { dudesSettings } from '../composables/use-settings.js'
 import { DELTA_TIME, ROUND } from '../constants.js'
@@ -13,7 +13,7 @@ const emotesCache = new Map<string, ArrayBuffer>()
 export class DudeEmoteSpitter {
   view = new Container()
 
-  private emotes: AnimatedGIF[] = []
+  private emotes: Sprite[] = []
   private gapTime = ROUND
   private currentGapTime = 0
   private moveSpeed = 50
@@ -24,21 +24,29 @@ export class DudeEmoteSpitter {
     if (!dudesSettings.value.spitter.enabled) return
     this.view.zIndex = 1
 
-    const buffer = await this.loadEmote(url)
-    const sprite = AnimatedGIF.fromBuffer(buffer)
+    const sprite = await this.loadSprite(url)
     sprite.anchor.set(0.5, 0.5)
     sprite.scale.set(0, 0)
     this.emotes.push(sprite)
   }
 
-  private async loadEmote(url: string) {
+  private async loadSprite(url: string): Promise<Sprite> {
+    if (url.endsWith('.gif')) {
+      const sprite = Sprite.from(url)
+      return sprite
+    }
+
     const cachedEmote = emotesCache.get(url)
-    if (cachedEmote) return cachedEmote
+    if (cachedEmote) return this.bufferToSprite(cachedEmote)
 
     const response = await fetch(url)
     const buffer = await response.arrayBuffer()
     emotesCache.set(url, buffer)
-    return buffer
+    return this.bufferToSprite(buffer)
+  }
+
+  private bufferToSprite(buffer: ArrayBuffer): Sprite {
+    return AnimatedGIF.fromBuffer(buffer)
   }
 
   update(): void {
