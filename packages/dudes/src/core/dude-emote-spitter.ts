@@ -1,31 +1,44 @@
-import { Container, Sprite } from 'pixi.js'
+import { AnimatedGIF } from '@pixi/gif'
+import { Container } from 'pixi.js'
 
-import { DELTA_TIME, ROUND } from '../constants.js'
 import { dudesSettings } from '../composables/use-settings.js'
+import { DELTA_TIME, ROUND } from '../constants.js'
 
 export interface DudeEmoteSpitterParams {
   enabled: boolean
 }
 
+const emotesCache = new Map<string, ArrayBuffer>()
+
 export class DudeEmoteSpitter {
   view = new Container()
 
-  private emotes: Sprite[] = []
+  private emotes: AnimatedGIF[] = []
   private gapTime = ROUND
   private currentGapTime = 0
   private moveSpeed = 50
   private alphaSpeed = 1
   private scaleSpeed = 0.5
 
-  add(url: string): void {
+  async add(url: string): Promise<void> {
     if (!dudesSettings.value.spitter.enabled) return
     this.view.zIndex = 1
 
-    const sprite = Sprite.from(url)
+    const buffer = await this.loadEmote(url)
+    const sprite = AnimatedGIF.fromBuffer(buffer)
     sprite.anchor.set(0.5, 0.5)
     sprite.scale.set(0, 0)
-
     this.emotes.push(sprite)
+  }
+
+  private async loadEmote(url: string) {
+    const cachedEmote = emotesCache.get(url)
+    if (cachedEmote) return cachedEmote
+
+    const response = await fetch(url)
+    const buffer = await response.arrayBuffer()
+    emotesCache.set(url, buffer)
+    return buffer
   }
 
   update(): void {

@@ -55,10 +55,6 @@ export const dudeAssets: DudeAsset[] = [
 ]
 
 export const dudeEmotes: string[] = [
-  'gandon',
-  'hii',
-  'pupsik',
-  'uuh',
-  'vahui',
-  'xdd'
+  'pepegaGun',
+  'lexot'
 ]
