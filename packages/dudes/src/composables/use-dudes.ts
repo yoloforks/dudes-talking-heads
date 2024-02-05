@@ -6,14 +6,16 @@ import type { DudePersonalSettings } from '../types.js'
 const dudes = new Map<string, Dude>()
 const dudesContainer = new Container()
 
+export function removeInternalDude(dude: Dude) {
+  dude.cleanUp()
+  dudes.delete(dude.dudeName)
+  dudesContainer.removeChild(dude.view)
+}
+
 export const useDudes = () => {
   function updateDudes(): void {
-    for (const [name, dude] of dudes.entries()) {
+    for (const dude of dudes.values()) {
       dude.update()
-
-      if (dude.shouldBeDeleted) {
-        removeDude(name)
-      }
     }
   }
 
@@ -26,11 +28,7 @@ export const useDudes = () => {
     sprite: string,
     settings?: DudePersonalSettings
   ): Dude {
-    const hasExistingDude = getDude(name)
-    if (hasExistingDude) {
-      removeDude(name)
-    }
-
+    removeDude(name)
     const dude = new Dude(name, sprite, settings)
     dudes.set(name, dude)
     dudesContainer.addChild(dude.view)
@@ -38,11 +36,9 @@ export const useDudes = () => {
   }
 
   function removeDude(name: string): void {
-    const dude = dudes.get(name) as Dude | undefined
+    const dude = dudes.get(name)
     if (!dude) return
-    dude.cleanUp()
-    dudes.delete(name)
-    dudesContainer.removeChild(dude.view)
+    removeInternalDude(dude)
   }
 
   function clearDudes(): void {

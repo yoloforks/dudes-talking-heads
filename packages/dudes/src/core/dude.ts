@@ -3,6 +3,7 @@ import { unref, watch } from 'vue'
 import type { IPointData } from 'pixi.js'
 import type { WatchStopHandle } from 'vue'
 
+import { removeInternalDude } from '../composables/use-dudes.js'
 import { dudesSettings } from '../composables/use-settings.js'
 import { FIXED_DELTA_TIME, FIXED_ROUND } from '../constants.js'
 import { DudeEmoteSpitter } from './dude-emote-spitter.js'
@@ -27,9 +28,9 @@ type Collider = {
 
 export class Dude {
   dudeName: string
-  shouldBeDeleted = false
   view = new Container()
 
+  /** @internal */
   private sprite?: DudeSpriteContainer
   private spriteName: string
   private spriteScale: number
@@ -243,7 +244,7 @@ export class Dude {
         this.currentOpacityTime -= FIXED_DELTA_TIME
         this.view.alpha = this.currentOpacityTime / this.maxOpacityTime
       } else {
-        this.shouldBeDeleted = true
+        removeInternalDude(this)
       }
     }
 

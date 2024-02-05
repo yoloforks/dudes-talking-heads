@@ -10,8 +10,8 @@
     "format": "prettier --write \"**/*.{js,ts,json}\""
   },
   "devDependencies": {
-    "@crashmax/prettier-config": "5.0.1",
-    "turbo": "1.11.3"
+    "@crashmax/prettier-config": "5.0.2",
+    "turbo": "1.12.2"
   },
   "pnpm": {
     "patchedDependencies": {
