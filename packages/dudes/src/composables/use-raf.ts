@@ -1,11 +1,11 @@
-import { FIXED_ROUND } from '../constants.js'
+import { ROUND } from '../constants.js'
 
 export const useRaf = (callback: () => void) => {
   let lastTime = performance.now()
   let lastFrame = -1
 
   const maxFps = 60
-  const minElapsedMS = FIXED_ROUND / maxFps
+  const minElapsedMS = ROUND / maxFps
   const maxElapsedMS = 100
 
   function startRaf(currentTime = performance.now()): void {

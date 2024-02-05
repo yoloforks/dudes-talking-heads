@@ -1,11 +1,12 @@
 import type { DudeAsset } from './core/assets-loader.js'
+import type { DudeEmoteSpitterParams } from './core/dude-emote-spitter.js'
 import type {
-  DudeMessageBoxStyles,
-  DudePersonalMessageBoxStyles
+  DudeMessageBoxParams,
+  DudePersonalMessageBoxParams
 } from './core/dude-message-box.js'
 import type {
-  DudeNameBoxStyles,
-  DudePersonalNameBoxStyles
+  DudeNameBoxParams,
+  DudePersonalNameBoxParams
 } from './core/dude-name-box.js'
 import type { Dude } from './core/dude.js'
 import type { SoundAsset, SoundType } from './core/sounds-loader.js'
@@ -24,14 +25,11 @@ export interface DudesOverlayMethods {
   updateSettings: (settings: DudesSettings) => void
 }
 
-export type DudePersonalParams = Partial<
-  Pick<DudeParams, 'color' | 'scale' | 'gravity'>
->
+export type DudePersonalParams = Partial<Pick<DudeParams, 'color'>>
 
 export type DudePersonalSettings = Partial<{
-  dude: DudePersonalParams
-  messageBox: DudePersonalMessageBoxStyles
-  nameBox: DudePersonalNameBoxStyles
+  message: DudePersonalMessageBoxParams
+  name: DudePersonalNameBoxParams
 }>
 
 export interface DudeParams {
@@ -67,15 +65,16 @@ export interface DudeParams {
 
 export interface DudesSettings {
   dude: DudeParams
-  messageBox: DudeMessageBoxStyles
-  nameBox: DudeNameBoxStyles
+  message: DudeMessageBoxParams
+  name: DudeNameBoxParams
+  spitter: DudeEmoteSpitterParams
 }
 
 export type {
   Dude,
   DudeAsset,
-  DudeMessageBoxStyles,
-  DudeNameBoxStyles,
+  DudeMessageBoxParams,
+  DudeNameBoxParams,
   SoundAsset,
   SoundType
 }

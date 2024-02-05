@@ -1,11 +1,9 @@
 import { Container } from 'pixi.js'
-import { unref, watch } from 'vue'
 import type { IPointData } from 'pixi.js'
-import type { WatchStopHandle } from 'vue'
 
 import { removeInternalDude } from '../composables/use-dudes.js'
 import { dudesSettings } from '../composables/use-settings.js'
-import { FIXED_DELTA_TIME, FIXED_ROUND } from '../constants.js'
+import { COLLIDER, DELTA_TIME, ROUND, SPRITE_SIZE } from '../constants.js'
 import { DudeEmoteSpitter } from './dude-emote-spitter.js'
 import { DudeMessageBox } from './dude-message-box.js'
 import { DudeNameBox } from './dude-name-box.js'
@@ -16,40 +14,24 @@ import {
   DudeSpriteTags,
   getSprite
 } from './sprite-provider.js'
-import type { DudeParams, DudePersonalSettings } from '../types.js'
+import type { DudePersonalSettings } from '../types.js'
 import type { DudeSpriteTagType } from './sprite-provider.js'
 
-type Collider = {
-  x: number
-  y: number
-  width: number
-  height: number
-}
-
 export class Dude {
-  dudeName: string
+  name: string
   view = new Container()
 
-  /** @internal */
   private sprite?: DudeSpriteContainer
   private spriteName: string
-  private spriteScale: number
   private spriteGravity: number
   private spriteColor: string
-  private spriteSize = 32
+
   private direction: number
   private animationState?: DudeSpriteTagType
 
-  private collider: Collider = {
-    x: 8,
-    y: 3,
-    width: 16,
-    height: 22
-  }
-
-  private name: DudeNameBox
-  private message: DudeMessageBox
-  private emoteSpitter = new DudeEmoteSpitter()
+  private nameBox: DudeNameBox
+  private messageBox: DudeMessageBox
+  private emoteSpitter: DudeEmoteSpitter
 
   private velocity: IPointData = {
     x: 0,
@@ -66,9 +48,6 @@ export class Dude {
   private maxOpacityTime = 5000
   private currentOpacityTime = this.maxOpacityTime
 
-  private params: DudeParams
-  private stopWatchDudeParams: WatchStopHandle | undefined
-
   private get isJumping() {
     return (
       this.animationState === DudeSpriteTags.Fall ||
@@ -76,61 +55,41 @@ export class Dude {
     )
   }
 
-  constructor(name: string, sprite = 'dude', settings?: DudePersonalSettings) {
-    this.stopWatchDudeParams = watch(
-      () => dudesSettings.value.dude,
-      (params) => (this.params = params),
-      { immediate: true }
-    )
-
-    const { color, gravity, scale } = unref(dudesSettings.value.dude)
-
-    this.dudeName = name
-    this.spriteName = sprite
-    this.spriteColor = settings?.dude?.color ?? color
-    this.spriteScale = settings?.dude?.scale ?? scale
-    this.spriteGravity = settings?.dude?.gravity ?? gravity
-
-    this.message = new DudeMessageBox(settings?.messageBox)
+  constructor(
+    name: string,
+    spriteName = 'dude',
+    settings?: DudePersonalSettings
+  ) {
+    this.name = name
+    this.spriteName = spriteName
+    this.spriteGravity = dudesSettings.value.dude.gravity
+    this.spriteColor = dudesSettings.value.dude.color
 
     this.view.y =
-      -(this.collider.y + this.collider.height - this.spriteSize / 2) *
-      this.spriteScale
+      -(COLLIDER.y + COLLIDER.height - SPRITE_SIZE / 2) *
+      dudesSettings.value.dude.scale
+
     this.view.x =
-      Math.random() * (window.innerWidth - this.spriteSize * this.spriteScale) +
-      (this.spriteSize / 2) * this.spriteScale
+      Math.random() *
+        (window.innerWidth - SPRITE_SIZE * dudesSettings.value.dude.scale) +
+      (SPRITE_SIZE / 2) * dudesSettings.value.dude.scale
 
     this.direction = Math.random() > 0.5 ? 1 : -1
 
-    this.name = new DudeNameBox(name, settings?.nameBox)
-    this.name.view.position.y =
-      -(this.spriteSize / 2 - this.collider.y + 2) * this.spriteScale
+    this.nameBox = new DudeNameBox(name, settings?.name)
+    this.emoteSpitter = new DudeEmoteSpitter()
+    this.messageBox = new DudeMessageBox(settings?.message)
 
     this.view.sortableChildren = true
-    this.emoteSpitter.view.zIndex = 1
-    this.message.view.zIndex = 3
-    this.message.view.position.y =
-      this.name.view.position.y - this.name.view.height - 2 * this.spriteScale
-
-    this.view.addChild(this.name.view)
+    this.view.addChild(this.nameBox.view)
     this.view.addChild(this.emoteSpitter.view)
-    this.view.addChild(this.message.view)
+    this.view.addChild(this.messageBox.view)
 
     this.playAnimation(DudeSpriteTags.Idle)
 
     this.runIdleAnimationTime = performance.now()
     this.maxRunIdleAnimationTime = Math.random() * 5000
     this.currentLifeTime = dudesSettings.value.dude.maxLifeTime
-  }
-
-  get color() {
-    return this.spriteColor
-  }
-
-  cleanUp(): void {
-    this.stopWatchDudeParams?.()
-    this.message.stopWatchGlobalStyles?.()
-    this.name.stopWatchGlobalStyles?.()
   }
 
   jump(): void {
@@ -181,21 +140,17 @@ export class Dude {
     }
 
     this.velocity.y =
-      this.velocity.y + (this.spriteGravity * FIXED_DELTA_TIME) / FIXED_ROUND
+      this.velocity.y + (this.spriteGravity * DELTA_TIME) / ROUND
 
     const newPosition = {
-      x:
-        this.view.position.x +
-        (this.velocity.x * FIXED_DELTA_TIME) / FIXED_ROUND,
-      y:
-        this.view.position.y +
-        (this.velocity.y * FIXED_DELTA_TIME) / FIXED_ROUND
+      x: this.view.position.x + (this.velocity.x * DELTA_TIME) / ROUND,
+      y: this.view.position.y + (this.velocity.y * DELTA_TIME) / ROUND
     }
 
     if (
       newPosition.y +
-        (this.collider.y + this.collider.height - this.spriteSize / 2) *
-          this.spriteScale >
+        (COLLIDER.y + COLLIDER.height - SPRITE_SIZE / 2) *
+          dudesSettings.value.dude.scale >
       window.innerHeight
     ) {
       this.velocity.y = 0
@@ -203,8 +158,8 @@ export class Dude {
 
       newPosition.y =
         window.innerHeight -
-        (this.collider.y + this.collider.height - this.spriteSize / 2) *
-          this.spriteScale
+        (COLLIDER.y + COLLIDER.height - SPRITE_SIZE / 2) *
+          dudesSettings.value.dude.scale
 
       if (this.animationState === DudeSpriteTags.Fall) {
         this.playAnimation(DudeSpriteTags.Land)
@@ -221,51 +176,58 @@ export class Dude {
     const width = window.innerWidth
 
     if (this.animationState != DudeSpriteTags.Idle) {
-      this.view.position.x +=
-        (1 * this.direction * FIXED_DELTA_TIME * 60) / FIXED_ROUND
+      this.view.position.x += (1 * this.direction * DELTA_TIME * 60) / ROUND
 
       if (
-        this.view.x + (this.collider.width / 2) * this.spriteScale >= width ||
-        this.view.x - (this.collider.width / 2) * this.spriteScale <= 0
+        this.view.x + (COLLIDER.width / 2) * dudesSettings.value.dude.scale >=
+          width ||
+        this.view.x - (COLLIDER.width / 2) * dudesSettings.value.dude.scale <= 0
       ) {
         this.direction = -this.direction
         this.velocity.x = -this.velocity.x
         this.sprite?.view.scale.set(
-          this.direction * this.spriteScale,
-          this.spriteScale
+          this.direction * dudesSettings.value.dude.scale,
+          dudesSettings.value.dude.scale
         )
       }
     }
 
     if (this.currentLifeTime > 0) {
-      this.currentLifeTime -= FIXED_DELTA_TIME
+      this.currentLifeTime -= DELTA_TIME
     } else {
       if (this.currentOpacityTime > 0) {
-        this.currentOpacityTime -= FIXED_DELTA_TIME
+        this.currentOpacityTime -= DELTA_TIME
         this.view.alpha = this.currentOpacityTime / this.maxOpacityTime
       } else {
         removeInternalDude(this)
       }
     }
 
-    this.sprite?.update((FIXED_DELTA_TIME / FIXED_ROUND) * 60)
+    this.sprite?.update((DELTA_TIME / ROUND) * 60)
     this.emoteSpitter.update()
 
     this.emoteSpitter.view.position.y =
-      this.message.view.position.y - this.message.view.height
+      this.messageBox.view.position.y - this.messageBox.view.height
 
-    this.message.update()
+    this.messageBox.update()
+    this.messageBox.view.position.y =
+      this.nameBox.view.position.y -
+      this.nameBox.view.height -
+      2 * dudesSettings.value.dude.scale
+
+    this.nameBox.update()
   }
 
   addMessage(message: string): void {
-    this.message.add(message)
+    this.messageBox.add(message)
 
-    this.currentLifeTime = this.params.maxLifeTime
+    this.currentLifeTime = dudesSettings.value.dude.maxLifeTime
     this.currentOpacityTime = this.maxOpacityTime
     this.view.alpha = 1
   }
 
   spitEmotes(emotes: string[]): void {
+    if (!dudesSettings.value.spitter.enabled) return
     for (const emote of emotes) {
       this.emoteSpitter.add(emote)
     }
@@ -292,8 +254,8 @@ export class Dude {
       eyes: dudeSprite[DudeSpriteLayers.Eyes]
     })
     this.sprite.view.scale.set(
-      this.direction * this.spriteScale,
-      this.spriteScale
+      this.direction * dudesSettings.value.dude.scale,
+      dudesSettings.value.dude.scale
     )
     this.sprite.color(this.spriteColor)
 

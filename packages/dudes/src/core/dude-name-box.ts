@@ -1,11 +1,10 @@
 import { Text } from 'pixi.js'
-import { watch } from 'vue'
 import type { ITextStyle } from 'pixi.js'
-import type { WatchStopHandle } from 'vue'
 
 import { dudesSettings } from '../composables/use-settings.js'
+import { COLLIDER, SPRITE_SIZE } from '../constants.js'
 
-export interface DudeNameBoxStyles {
+export interface DudeNameBoxParams {
   // font
   /**
    * @default 'Arial'
@@ -91,9 +90,9 @@ export interface DudeNameBoxStyles {
   dropShadowDistance: ITextStyle['dropShadowDistance']
 }
 
-export type DudePersonalNameBoxStyles = Partial<
+export type DudePersonalNameBoxParams = Partial<
   Pick<
-    DudeNameBoxStyles,
+    DudeNameBoxParams,
     | 'stroke'
     | 'strokeThickness'
     | 'fill'
@@ -104,29 +103,28 @@ export type DudePersonalNameBoxStyles = Partial<
 
 export class DudeNameBox {
   view: Text
-  stopWatchGlobalStyles?: WatchStopHandle
 
-  constructor(name: string, personalStyle?: DudePersonalNameBoxStyles) {
+  constructor(
+    name: string,
+    private settings?: DudePersonalNameBoxParams
+  ) {
     this.view = new Text(name)
     this.view.anchor.set(0.5, 1)
     this.view.zIndex = 100
-
-    if (personalStyle) {
-      this.updateStyle({
-        ...dudesSettings.value.nameBox,
-        ...personalStyle
-      })
-      return
-    }
-
-    this.stopWatchGlobalStyles = watch(
-      () => dudesSettings.value.nameBox,
-      (value) => this.updateStyle(value),
-      { immediate: true }
-    )
   }
 
-  private updateStyle(settings: Partial<DudeNameBoxStyles>): void {
+  update(): void {
+    this.view.position.y =
+      -(SPRITE_SIZE / 2 - COLLIDER.y + 2) * dudesSettings.value.dude.scale
+
+    const params = this.settings
+      ? { ...dudesSettings.value.name, ...this.settings }
+      : dudesSettings.value.name
+
+    this.updateStyle(params)
+  }
+
+  private updateStyle(settings: Partial<DudeNameBoxParams>): void {
     this.view.style = {
       ...settings,
       align: 'center'

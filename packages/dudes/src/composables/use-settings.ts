@@ -14,7 +14,7 @@ export const dudesSettings = ref<DudesSettings>({
       volume: 0.01
     }
   },
-  messageBox: {
+  message: {
     enabled: true,
     borderRadius: 5,
     boxColor: '#EEE',
@@ -24,7 +24,7 @@ export const dudesSettings = ref<DudesSettings>({
     showTime: 5 * 1000,
     fill: '#333'
   },
-  nameBox: {
+  name: {
     fontFamily: 'Arial',
     fontSize: 18,
     fill: '#FFF',
@@ -42,6 +42,10 @@ export const dudesSettings = ref<DudesSettings>({
     dropShadowBlur: 0.1,
     dropShadowDistance: 10,
     dropShadowColor: '#3EC7d9'
+  },
+  spitter: {
+    enabled: true,
+    scale: 0
   }
 })
 

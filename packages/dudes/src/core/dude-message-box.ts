@@ -1,11 +1,9 @@
 import { Container, Graphics, Text, TextMetrics } from 'pixi.js'
-import { watch } from 'vue'
-import type { WatchStopHandle } from 'vue'
 
 import { dudesSettings } from '../composables/use-settings.js'
-import { FIXED_DELTA_TIME } from '../constants.js'
+import { DELTA_TIME } from '../constants.js'
 
-export interface DudeMessageBoxStyles {
+export interface DudeMessageBoxParams {
   /**
    * @default true
    */
@@ -47,8 +45,8 @@ export interface DudeMessageBoxStyles {
   showTime: number
 }
 
-export type DudePersonalMessageBoxStyles = Partial<
-  Pick<DudeMessageBoxStyles, 'boxColor' | 'fill'>
+export type DudePersonalMessageBoxParams = Partial<
+  Pick<DudeMessageBoxParams, 'boxColor' | 'fill'>
 >
 
 interface Bound {
@@ -60,12 +58,10 @@ interface Bound {
 
 export class DudeMessageBox {
   view = new Container()
-  stopWatchGlobalStyles?: WatchStopHandle
 
   private container = new Container()
   private box: Graphics | null = null
   private text: Text | null = null
-  private styles: DudeMessageBoxStyles
 
   private animationTime = 500
   private currentAnimationTime = 0
@@ -73,31 +69,24 @@ export class DudeMessageBox {
   private currentShowTime = 0
   private messageQueue: string[] = []
 
-  constructor(personalStyles?: DudePersonalMessageBoxStyles) {
+  constructor(private settings?: DudePersonalMessageBoxParams) {
+    this.view.zIndex = 3
     this.view.addChild(this.container)
+  }
 
-    if (personalStyles) {
-      this.updateStyle({
-        ...dudesSettings.value.messageBox,
-        ...personalStyles
-      })
-      return
-    }
-
-    this.stopWatchGlobalStyles = watch(
-      () => dudesSettings.value.messageBox,
-      (value) => this.updateStyle(value),
-      { immediate: true }
-    )
+  get params(): DudeMessageBoxParams {
+    return this.settings
+      ? { ...dudesSettings.value.message, ...this.settings }
+      : dudesSettings.value.message
   }
 
   update(): void {
     if (this.currentAnimationTime >= 0) {
-      this.currentAnimationTime -= FIXED_DELTA_TIME
+      this.currentAnimationTime -= DELTA_TIME
 
-      this.container.alpha += FIXED_DELTA_TIME / this.animationTime
+      this.container.alpha += DELTA_TIME / this.animationTime
       this.container.position.y -=
-        (this.shift * FIXED_DELTA_TIME) / this.animationTime
+        (this.shift * DELTA_TIME) / this.animationTime
     } else {
       this.container.alpha = 1
     }
@@ -109,7 +98,7 @@ export class DudeMessageBox {
 
       this.nextMessage()
     } else {
-      this.currentShowTime -= FIXED_DELTA_TIME
+      this.currentShowTime -= DELTA_TIME
     }
   }
 
@@ -123,13 +112,9 @@ export class DudeMessageBox {
   }
 
   add(message: string): void {
-    if (dudesSettings.value.messageBox.enabled) {
+    if (dudesSettings.value.message.enabled) {
       this.messageQueue.push(message)
     }
-  }
-
-  private updateStyle(styles: DudeMessageBoxStyles): void {
-    this.styles = styles
   }
 
   private trim(text: Text): string {
@@ -148,33 +133,33 @@ export class DudeMessageBox {
         this.show(message)
       }
 
-      this.currentShowTime = this.styles.showTime
+      this.currentShowTime = dudesSettings.value.message.showTime
       this.currentAnimationTime = this.animationTime
     }
   }
 
   private show(message: string): void {
     this.text = new Text(message, {
-      ...this.styles,
+      ...this.params,
       align: 'left',
       breakWords: true,
       wordWrap: true,
       wordWrapWidth: 200
     })
 
-    const { padding } = this.styles
+    const { padding, boxColor, borderRadius } = this.params
     this.text.anchor.set(0.5, 1)
     this.text.position.set(0, -padding)
     this.text.text = this.trim(this.text)
 
     this.box = new Graphics()
-    this.box.beginFill(this.styles.boxColor)
+    this.box.beginFill(boxColor)
     this.box.drawRoundedRect(
       this.text.x - padding - this.text.width * this.text.anchor.x,
       this.text.y - padding - this.text.height * this.text.anchor.y,
       this.text.width + padding * 2,
       this.text.height + padding * 2,
-      this.styles.borderRadius
+      borderRadius
     )
     this.box.endFill()
 

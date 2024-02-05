@@ -7,8 +7,7 @@ const dudes = new Map<string, Dude>()
 const dudesContainer = new Container()
 
 export function removeInternalDude(dude: Dude) {
-  dude.cleanUp()
-  dudes.delete(dude.dudeName)
+  dudes.delete(dude.name)
   dudesContainer.removeChild(dude.view)
 }
 

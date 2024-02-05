@@ -1,18 +1,24 @@
 import { Container, Sprite } from 'pixi.js'
 
-import { FIXED_DELTA_TIME, FIXED_ROUND } from '../constants.js'
+import { DELTA_TIME, ROUND } from '../constants.js'
+
+export interface DudeEmoteSpitterParams {
+  enabled: boolean
+  scale: number
+}
 
 export class DudeEmoteSpitter {
   view = new Container()
 
   private emotes: Sprite[] = []
-  private gapTime = FIXED_ROUND
+  private gapTime = ROUND
   private currentGapTime = 0
   private moveSpeed = 50
   private alphaSpeed = 1
   private scaleSpeed = 0.5
 
   add(url: string): void {
+    this.view.zIndex = 1
     const sprite = Sprite.from(url)
     sprite.anchor.set(0.5, 0.5)
     sprite.scale.set(0, 0)
@@ -21,12 +27,12 @@ export class DudeEmoteSpitter {
 
   update(): void {
     for (const child of this.view.children) {
-      child.position.y -= (FIXED_DELTA_TIME * this.moveSpeed) / FIXED_ROUND
-      child.scale.x += (FIXED_DELTA_TIME * this.scaleSpeed) / FIXED_ROUND
-      child.scale.y += (FIXED_DELTA_TIME * this.scaleSpeed) / FIXED_ROUND
+      child.position.y -= (DELTA_TIME * this.moveSpeed) / ROUND
+      child.scale.x += (DELTA_TIME * this.scaleSpeed) / ROUND
+      child.scale.y += (DELTA_TIME * this.scaleSpeed) / ROUND
 
       if (child.scale.x > 1) {
-        child.alpha -= (FIXED_DELTA_TIME * this.alphaSpeed) / FIXED_ROUND
+        child.alpha -= (DELTA_TIME * this.alphaSpeed) / ROUND
       }
 
       if (child.alpha <= 0) {
@@ -35,7 +41,7 @@ export class DudeEmoteSpitter {
     }
 
     if (this.currentGapTime >= 0) {
-      this.currentGapTime -= FIXED_DELTA_TIME
+      this.currentGapTime -= DELTA_TIME
     } else {
       if (this.emotes.length > 0) {
         const sprite = this.emotes.shift()

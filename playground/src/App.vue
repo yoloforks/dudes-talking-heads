@@ -27,7 +27,7 @@ const settings = reactive<DudesSettings>({
       volume: 0.01
     }
   },
-  messageBox: {
+  message: {
     enabled: true,
     borderRadius: 5,
     boxColor: '#e6ac0c',
@@ -37,7 +37,7 @@ const settings = reactive<DudesSettings>({
     showTime: 5 * 1000,
     fill: '#333333'
   },
-  nameBox: {
+  name: {
     fontFamily: 'Arial',
     fontSize: 18,
     fill: '#ffffff',
@@ -55,6 +55,10 @@ const settings = reactive<DudesSettings>({
     dropShadowBlur: 0.1,
     dropShadowDistance: 10,
     dropShadowColor: '#3ac7d9'
+  },
+  spitter: {
+    enabled: true,
+    scale: 0
   }
 })
 
@@ -85,16 +89,11 @@ function spawnDude() {
     `Super ${name} #${randomNum(0, 100)}`,
     playgroundParams.value.selectedSprite,
     {
-      dude: {
-        gravity: settings.dude.gravity,
-        color: settings.dude.color,
-        scale: settings.dude.scale
-      },
-      messageBox: {
+      message: {
         boxColor: 'lightgreen',
         fill: '#000000'
       },
-      nameBox: {
+      name: {
         fill: ['rgb(131, 58, 180)', 'rgb(253, 29, 29)', 'rgb(252, 176, 69)'],
         fillGradientType: 1,
         fillGradientStops: [0.3, 0.6, 1],
@@ -107,10 +106,10 @@ function spawnDude() {
   const color = playgroundParams.value.isRandomColor
     ? randomRgbColor()
     : settings.dude.color
+
   dude.tint(color)
 
   setTimeout(() => {
-    if (dude.shouldBeDeleted) return
     spitEmote(dude)
   }, 2000)
 }
@@ -204,85 +203,85 @@ function onPaneCreated(pane: Pane) {
   dudeFolder.addButton({ title: 'Clear' }).on('click', clearDudes)
 
   const messageBoxFolder = pane.addFolder({ title: 'Message', expanded: false })
-  messageBoxFolder.addBinding(settings.messageBox, 'enabled')
-  messageBoxFolder.addBinding(settings.messageBox, 'fill')
-  messageBoxFolder.addBinding(settings.messageBox, 'boxColor')
-  messageBoxFolder.addBinding(settings.messageBox, 'fontFamily', {
+  messageBoxFolder.addBinding(settings.message, 'enabled')
+  messageBoxFolder.addBinding(settings.message, 'fill')
+  messageBoxFolder.addBinding(settings.message, 'boxColor')
+  messageBoxFolder.addBinding(settings.message, 'fontFamily', {
     options: fonts
   })
-  messageBoxFolder.addBinding(settings.messageBox, 'fontSize', {
+  messageBoxFolder.addBinding(settings.message, 'fontSize', {
     min: 10,
     max: 64,
     step: 1
   })
-  messageBoxFolder.addBinding(settings.messageBox, 'borderRadius', {
+  messageBoxFolder.addBinding(settings.message, 'borderRadius', {
     min: 0,
     max: 64,
     step: 1
   })
-  messageBoxFolder.addBinding(settings.messageBox, 'padding', {
+  messageBoxFolder.addBinding(settings.message, 'padding', {
     min: 0,
     max: 64,
     step: 1
   })
-  messageBoxFolder.addBinding(settings.messageBox, 'showTime', {
+  messageBoxFolder.addBinding(settings.message, 'showTime', {
     min: 1000,
     max: 1000 * 10
   })
 
   const nameBoxFolder = pane.addFolder({ title: 'Name', expanded: false })
-  nameBoxFolder.addBinding(settings.nameBox, 'fill')
-  nameBoxFolder.addBinding(settings.nameBox, 'fontFamily', {
+  nameBoxFolder.addBinding(settings.name, 'fill')
+  nameBoxFolder.addBinding(settings.name, 'fontFamily', {
     options: fonts
   })
-  nameBoxFolder.addBinding(settings.nameBox, 'fontSize', {
+  nameBoxFolder.addBinding(settings.name, 'fontSize', {
     min: 10,
     max: 64,
     step: 1
   })
-  nameBoxFolder.addBinding(settings.nameBox, 'fontStyle', {
+  nameBoxFolder.addBinding(settings.name, 'fontStyle', {
     options: {
       normal: 'normal',
       italic: 'italic'
     }
   })
-  nameBoxFolder.addBinding(settings.nameBox, 'fontVariant', {
+  nameBoxFolder.addBinding(settings.name, 'fontVariant', {
     options: {
       normal: 'normal',
       'small-caps': 'small-caps'
     }
   })
-  nameBoxFolder.addBinding(settings.nameBox, 'fontWeight', {
+  nameBoxFolder.addBinding(settings.name, 'fontWeight', {
     options: {
       normal: 'normal',
       bold: 'bold',
       lighter: 'lighter'
     }
   })
-  nameBoxFolder.addBinding(settings.nameBox, 'stroke')
-  nameBoxFolder.addBinding(settings.nameBox, 'strokeThickness', {
+  nameBoxFolder.addBinding(settings.name, 'stroke')
+  nameBoxFolder.addBinding(settings.name, 'strokeThickness', {
     min: 0,
     max: 10,
     step: 1
   })
-  nameBoxFolder.addBinding(settings.nameBox, 'dropShadow')
-  nameBoxFolder.addBinding(settings.nameBox, 'dropShadowColor')
-  nameBoxFolder.addBinding(settings.nameBox, 'dropShadowDistance', {
+  nameBoxFolder.addBinding(settings.name, 'dropShadow')
+  nameBoxFolder.addBinding(settings.name, 'dropShadowColor')
+  nameBoxFolder.addBinding(settings.name, 'dropShadowDistance', {
     min: 0,
     max: 32,
     step: 0.1
   })
-  nameBoxFolder.addBinding(settings.nameBox, 'dropShadowAlpha', {
+  nameBoxFolder.addBinding(settings.name, 'dropShadowAlpha', {
     min: 0,
     max: 1,
     step: 0.01
   })
-  nameBoxFolder.addBinding(settings.nameBox, 'dropShadowBlur', {
+  nameBoxFolder.addBinding(settings.name, 'dropShadowBlur', {
     min: 0,
     max: 1,
     step: 0.01
   })
-  nameBoxFolder.addBinding(settings.nameBox, 'dropShadowAngle', {
+  nameBoxFolder.addBinding(settings.name, 'dropShadowAngle', {
     min: 0,
     max: Math.PI * 2
   })
