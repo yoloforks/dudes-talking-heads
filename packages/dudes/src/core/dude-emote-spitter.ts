@@ -1,7 +1,6 @@
 import { AnimatedGIF } from '@pixi/gif'
-import { Sprite, Container } from 'pixi.js'
+import { Container, Sprite } from 'pixi.js'
 
-import { dudesSettings } from '../composables/use-settings.js'
 import { DELTA_TIME, ROUND } from '../constants.js'
 
 export interface DudeEmoteSpitterParams {
@@ -9,6 +8,10 @@ export interface DudeEmoteSpitterParams {
 }
 
 const emotesCache = new Map<string, ArrayBuffer>()
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 export class DudeEmoteSpitter {
   view = new Container()
@@ -20,12 +23,16 @@ export class DudeEmoteSpitter {
   private alphaSpeed = 1
   private scaleSpeed = 0.5
 
-  add(url: string): void {
-    if (!dudesSettings.value.spitter.enabled) return
-    this.view.zIndex = 1
-    const sprite = this.loadSprite(url)
-    if (sprite) {
-      this.addSprite(sprite)
+  async add(urls: string[]): Promise<void> {
+    for (const url of urls) {
+      try {
+        this.view.zIndex = 1
+        const sprite = await this.loadSprite(url)
+        this.addSprite(sprite)
+        await sleep(400)
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 
@@ -36,11 +43,11 @@ export class DudeEmoteSpitter {
   }
 
   private bufferToSprite(buffer: ArrayBuffer): Sprite {
-    const sprite = AnimatedGIF.fromBuffer(buffer)
+    const sprite = AnimatedGIF.fromBuffer(buffer, { fps: 60 })
     return sprite
   }
 
-  private loadSprite(url: string): Sprite | undefined {
+  private async loadSprite(url: string): Promise<Sprite> {
     if (!url.endsWith('.gif')) {
       const sprite = Sprite.from(url)
       return sprite
@@ -49,13 +56,11 @@ export class DudeEmoteSpitter {
     const cachedEmote = emotesCache.get(url)
     if (cachedEmote) return this.bufferToSprite(cachedEmote)
 
-    fetch(url)
-      .then((response) => response.arrayBuffer())
-      .then((buffer) => {
-        emotesCache.set(url, buffer)
-        const sprite = this.bufferToSprite(buffer)
-        this.addSprite(sprite)
-      })
+    const response = await fetch(url)
+    const buffer = await response.arrayBuffer()
+    emotesCache.set(url, buffer)
+    const sprite = this.bufferToSprite(buffer)
+    return sprite
   }
 
   update(): void {

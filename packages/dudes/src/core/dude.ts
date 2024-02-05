@@ -228,9 +228,7 @@ export class Dude {
 
   spitEmotes(emotes: string[]): void {
     if (!dudesSettings.value.spitter.enabled) return
-    for (const emote of emotes) {
-      this.emoteSpitter.add(emote)
-    }
+    this.emoteSpitter.add(emotes)
   }
 
   async playAnimation(state: DudeSpriteTagType): Promise<void> {
