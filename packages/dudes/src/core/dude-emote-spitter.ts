@@ -31,7 +31,7 @@ export class DudeEmoteSpitter {
   }
 
   private async loadSprite(url: string): Promise<Sprite> {
-    if (url.endsWith('.gif')) {
+    if (!url.endsWith('.gif')) {
       const sprite = Sprite.from(url)
       return sprite
     }

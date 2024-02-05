@@ -136,7 +136,7 @@ function spitEmotesAllDudes() {
 
 function spitEmote(dude: Dude) {
   const emoteName = dudeEmotes[randomNum(0, dudeEmotes.length - 1)]
-  dude.spitEmotes([`emotes/${emoteName}.gif`])
+  dude.spitEmotes([`emotes/${emoteName}`])
 }
 
 function clearDudes() {

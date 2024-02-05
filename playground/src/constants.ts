@@ -55,6 +55,9 @@ export const dudeAssets: DudeAsset[] = [
 ]
 
 export const dudeEmotes: string[] = [
-  'pepegaGun',
-  'lexot'
+  'pepegaGun.gif',
+  'lexot.gif',
+  'hmm.webp',
+  'pepeSmack.gif',
+  'pepe.gif'
 ]
