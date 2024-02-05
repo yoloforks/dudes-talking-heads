@@ -57,8 +57,7 @@ const settings = reactive<DudesSettings>({
     dropShadowColor: '#3ac7d9'
   },
   spitter: {
-    enabled: true,
-    scale: 0
+    enabled: true
   }
 })
 
@@ -285,6 +284,9 @@ function onPaneCreated(pane: Pane) {
     min: 0,
     max: Math.PI * 2
   })
+
+  const spitterFolder = pane.addFolder({ title: 'Spitter', expanded: false })
+  spitterFolder.addBinding(settings.spitter, 'enabled')
 }
 </script>
 

@@ -44,8 +44,7 @@ export const dudesSettings = ref<DudesSettings>({
     dropShadowColor: '#3EC7d9'
   },
   spitter: {
-    enabled: true,
-    scale: 0
+    enabled: true
   }
 })
 

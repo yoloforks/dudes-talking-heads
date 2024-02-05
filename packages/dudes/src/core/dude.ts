@@ -77,8 +77,8 @@ export class Dude {
     this.direction = Math.random() > 0.5 ? 1 : -1
 
     this.nameBox = new DudeNameBox(name, settings?.name)
-    this.emoteSpitter = new DudeEmoteSpitter()
     this.messageBox = new DudeMessageBox(settings?.message)
+    this.emoteSpitter = new DudeEmoteSpitter()
 
     this.view.sortableChildren = true
     this.view.addChild(this.nameBox.view)

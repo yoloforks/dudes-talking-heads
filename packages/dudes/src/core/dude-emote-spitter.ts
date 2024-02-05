@@ -1,10 +1,10 @@
 import { Container, Sprite } from 'pixi.js'
 
 import { DELTA_TIME, ROUND } from '../constants.js'
+import { dudesSettings } from '../composables/use-settings.js'
 
 export interface DudeEmoteSpitterParams {
   enabled: boolean
-  scale: number
 }
 
 export class DudeEmoteSpitter {
@@ -18,10 +18,13 @@ export class DudeEmoteSpitter {
   private scaleSpeed = 0.5
 
   add(url: string): void {
+    if (!dudesSettings.value.spitter.enabled) return
     this.view.zIndex = 1
+
     const sprite = Sprite.from(url)
     sprite.anchor.set(0.5, 0.5)
     sprite.scale.set(0, 0)
+
     this.emotes.push(sprite)
   }
 
