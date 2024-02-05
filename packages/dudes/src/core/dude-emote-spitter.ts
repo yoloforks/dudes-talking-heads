@@ -20,17 +20,27 @@ export class DudeEmoteSpitter {
   private alphaSpeed = 1
   private scaleSpeed = 0.5
 
-  async add(url: string): Promise<void> {
+  add(url: string): void {
     if (!dudesSettings.value.spitter.enabled) return
     this.view.zIndex = 1
+    const sprite = this.loadSprite(url)
+    if (sprite) {
+      this.addSprite(sprite)
+    }
+  }
 
-    const sprite = await this.loadSprite(url)
+  private addSprite(sprite: Sprite): void {
     sprite.anchor.set(0.5, 0.5)
     sprite.scale.set(0, 0)
     this.emotes.push(sprite)
   }
 
-  private async loadSprite(url: string): Promise<Sprite> {
+  private bufferToSprite(buffer: ArrayBuffer): Sprite {
+    const sprite = AnimatedGIF.fromBuffer(buffer)
+    return sprite
+  }
+
+  private loadSprite(url: string): Sprite | undefined {
     if (!url.endsWith('.gif')) {
       const sprite = Sprite.from(url)
       return sprite
@@ -39,14 +49,13 @@ export class DudeEmoteSpitter {
     const cachedEmote = emotesCache.get(url)
     if (cachedEmote) return this.bufferToSprite(cachedEmote)
 
-    const response = await fetch(url)
-    const buffer = await response.arrayBuffer()
-    emotesCache.set(url, buffer)
-    return this.bufferToSprite(buffer)
-  }
-
-  private bufferToSprite(buffer: ArrayBuffer): Sprite {
-    return AnimatedGIF.fromBuffer(buffer)
+    fetch(url)
+      .then((response) => response.arrayBuffer())
+      .then((buffer) => {
+        emotesCache.set(url, buffer)
+        const sprite = this.bufferToSprite(buffer)
+        this.addSprite(sprite)
+      })
   }
 
   update(): void {
