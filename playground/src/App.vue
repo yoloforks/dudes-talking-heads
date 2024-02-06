@@ -291,6 +291,8 @@ function onPaneCreated(pane: Pane) {
 </script>
 
 <template>
-  <v-tweakpane :pane="{ title: 'Dudes Playground' }" @on-pane-created="onPaneCreated" />
+  <Teleport to="body">
+    <v-tweakpane :pane="{ title: 'Dudes Playground' }" @on-pane-created="onPaneCreated" />
+  </Teleport>
   <dudes-overlay ref="dudesRef" :assets="dudeAssets" :sounds="dudeSounds" :settings="settings" />
 </template>

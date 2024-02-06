@@ -10,7 +10,7 @@ pnpm add @twirapp/dudes
 
 ## Features
 
-- Dude has simple type of animations: Idle, Run, Jump, Fall, Land and Die.
+- Dude has simple type of animations.
 - Dude fully customizable.
 - Dude supports messages and name box.
 
