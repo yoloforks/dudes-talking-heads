@@ -18,8 +18,7 @@ export const useRenderer = () => {
       height: window.innerHeight,
       backgroundAlpha: 0,
       view: canvasRef.value,
-      antialias: true,
-      resolution: 1
+      antialias: true
     })
   }
 

@@ -23,8 +23,7 @@ export const DudeSpriteTags = {
   Jump: 'Jump',
   Fall: 'Fall',
   Land: 'Land',
-  Run: 'Run',
-  Die: 'Die'
+  Run: 'Run'
 } as const
 
 export type DudeSpriteTagType = keyof typeof DudeSpriteTags
