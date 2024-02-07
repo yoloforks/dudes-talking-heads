@@ -37,15 +37,28 @@ export interface DudeParams {
    * @default 1800000 // FIXED_ROUND * 60 * 30 - 30 minutes
    */
   maxLifeTime: number
+
   /**
    * @default 400
    */
   gravity: number
+
   /**
    * Color fallback for dudes
    * @default '#969696'
    */
   color: string
+
+  /**
+   * @default '#ffffff'
+   */
+  eyesColor: string
+
+  /**
+   * @default '#ffffff'
+   */
+  cosmeticsColor: string
+
   /**
    * @default 4
    */

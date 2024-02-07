@@ -6,6 +6,8 @@ import type { DudesSettings } from '../types.js'
 export const dudesSettings = ref<DudesSettings>({
   dude: {
     color: '#969696',
+    eyesColor: '#ffffff',
+    cosmeticsColor: '#ffffff',
     maxLifeTime: 1000 * 60 * 30,
     gravity: 400,
     scale: 4,
@@ -17,20 +19,20 @@ export const dudesSettings = ref<DudesSettings>({
   message: {
     enabled: true,
     borderRadius: 5,
-    boxColor: '#EEE',
+    boxColor: '#eeeeee',
     fontFamily: 'Arial',
     fontSize: 20,
     padding: 10,
     showTime: 5 * 1000,
-    fill: '#333'
+    fill: '#333333'
   },
   name: {
     fontFamily: 'Arial',
     fontSize: 18,
-    fill: '#FFF',
+    fill: '#ffffff',
     lineJoin: 'round',
     strokeThickness: 4,
-    stroke: '#000',
+    stroke: '#000000',
     fillGradientStops: [0],
     fillGradientType: 0,
     fontStyle: 'normal',
@@ -41,7 +43,7 @@ export const dudesSettings = ref<DudesSettings>({
     dropShadowAngle: 0,
     dropShadowBlur: 0.1,
     dropShadowDistance: 10,
-    dropShadowColor: '#3EC7d9'
+    dropShadowColor: '#3ec7d9'
   },
   spitter: {
     enabled: true

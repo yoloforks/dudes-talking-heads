@@ -13,7 +13,9 @@ export type DudeTexture = {
 
 export const DudeSpriteLayers = {
   Body: 'Body',
-  Eyes: 'Eyes'
+  Outline: 'Outline',
+  Eyes: 'Eyes',
+  Cosmetics: 'Cosmetics'
 } as const
 
 export type DudeSpriteLayerType = keyof typeof DudeSpriteLayers
@@ -23,7 +25,8 @@ export const DudeSpriteTags = {
   Jump: 'Jump',
   Fall: 'Fall',
   Land: 'Land',
-  Run: 'Run'
+  Run: 'Run',
+  Die: 'Die'
 } as const
 
 export type DudeSpriteTagType = keyof typeof DudeSpriteTags
@@ -49,20 +52,20 @@ export function getSprite(
     )
 
     for (let i = frameTag.from; i <= frameTag.to; i++) {
-      const framekey = i.toString()
-
       for (const layer in textures) {
-        const texture = asset.textures[layer + '_' + i]
-        const time = asset.data.frames[layer + '_' + framekey].duration
-
-        textures[layer].push({ texture: texture, time: time })
+        const frameKey = layer + '_' + i
+        const texture = asset.textures[frameKey]
+        if (!texture) continue
+        const time = asset.data.frames[frameKey].duration
+        textures[layer].push({ texture, time })
       }
     }
 
-    const entries = Object.entries(textures).map((entry) => {
-      const sprite = new AnimatedSprite(entry[1])
+    const entries = Object.entries(textures).map(([name, texture]) => {
+      if (!texture.length) return []
+      const sprite = new AnimatedSprite(texture, false)
       sprite.texture.baseTexture.scaleMode = SCALE_MODES.NEAREST
-      return [entry[0], sprite]
+      return [name, sprite]
     })
 
     return Object.fromEntries(entries)

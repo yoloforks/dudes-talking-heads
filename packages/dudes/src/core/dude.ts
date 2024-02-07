@@ -4,6 +4,7 @@ import type { IPointData } from 'pixi.js'
 import { removeInternalDude } from '../composables/use-dudes.js'
 import { dudesSettings } from '../composables/use-settings.js'
 import { COLLIDER, DELTA_TIME, ROUND, SPRITE_SIZE } from '../constants.js'
+import { isValidColor } from '../helpers.js'
 import { DudeEmoteSpitter } from './dude-emote-spitter.js'
 import { DudeMessageBox } from './dude-message-box.js'
 import { DudeNameBox } from './dude-name-box.js'
@@ -24,7 +25,10 @@ export class Dude {
   private sprite?: DudeSpriteContainer
   private spriteName: string
   private spriteGravity: number
-  private spriteColor: string
+
+  private bodyColor: string
+  private eyesColor: string
+  private cosmeticsColor: string
 
   private direction: number
   private animationState?: DudeSpriteTagType
@@ -63,7 +67,10 @@ export class Dude {
     this.name = name
     this.spriteName = spriteName
     this.spriteGravity = dudesSettings.value.dude.gravity
-    this.spriteColor = dudesSettings.value.dude.color
+
+    this.bodyTint(dudesSettings.value.dude.color)
+    this.eyesTint(dudesSettings.value.dude.eyesColor)
+    this.cosmeticsTint(dudesSettings.value.dude.cosmeticsColor)
 
     this.view.y =
       -(COLLIDER.y + COLLIDER.height - SPRITE_SIZE / 2) *
@@ -101,14 +108,22 @@ export class Dude {
     }
   }
 
-  tint(color: string): void {
-    // validate color
-    const option = new Option()
-    option.style.color = color
-    if (option.style.color === '' || color === 'transparent') return
+  bodyTint(color: string): void {
+    if (!isValidColor(color)) return
+    this.bodyColor = color
+    this.sprite?.bodyColor(this.bodyColor)
+  }
 
-    this.spriteColor = color
-    this.sprite?.color(this.spriteColor)
+  eyesTint(color: string): void {
+    if (!isValidColor(color)) return
+    this.eyesColor = color
+    this.sprite?.eyesColor(color)
+  }
+
+  cosmeticsTint(color: string): void {
+    if (!isValidColor(color)) return
+    this.cosmeticsColor = color
+    this.sprite?.cosmeticsColor(color)
   }
 
   update(): void {
@@ -249,13 +264,17 @@ export class Dude {
 
     this.sprite = new DudeSpriteContainer({
       body: dudeSprite[DudeSpriteLayers.Body],
-      eyes: dudeSprite[DudeSpriteLayers.Eyes]
+      outline: dudeSprite[DudeSpriteLayers.Outline],
+      eyes: dudeSprite[DudeSpriteLayers.Eyes],
+      cosmetics: dudeSprite[DudeSpriteLayers.Cosmetics]
     })
     this.sprite.view.scale.set(
       this.direction * dudesSettings.value.dude.scale,
       dudesSettings.value.dude.scale
     )
-    this.sprite.color(this.spriteColor)
+    this.sprite.bodyColor(this.bodyColor)
+    this.sprite.eyesColor(this.eyesColor)
+    this.sprite.cosmeticsColor(this.cosmeticsColor)
 
     this.view.addChild(this.sprite.view)
   }

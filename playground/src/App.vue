@@ -19,6 +19,8 @@ const playgroundParams = ref<{
 const settings = reactive<DudesSettings>({
   dude: {
     color: '#969696',
+    eyesColor: '#ffffff',
+    cosmeticsColor: '#ffffff',
     maxLifeTime: 1000 * 60 * 30,
     gravity: 400,
     scale: 4,
@@ -76,7 +78,7 @@ onMounted(async () => {
     const dudeSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
     const dudeColor = randomRgbColor()
     const dude = dudesRef.value.createDude(dudeName, dudeSprite)
-    dude.tint(dudeColor)
+    dude.bodyTint(dudeColor)
   }
 })
 
@@ -106,7 +108,7 @@ function spawnDude() {
     ? randomRgbColor()
     : settings.dude.color
 
-  dude.tint(color)
+  dude.bodyTint(color)
 
   setTimeout(() => {
     spitEmote(dude)
@@ -175,6 +177,12 @@ function onPaneCreated(pane: Pane) {
 
   const color = dudeFolder.addBinding(settings.dude, 'color', {
     label: 'Sprite color'
+  })
+  dudeFolder.addBinding(settings.dude, 'eyesColor', {
+    label: 'Eyes color'
+  })
+  dudeFolder.addBinding(settings.dude, 'cosmeticsColor', {
+    label: 'Cosmetics color'
   })
   dudeFolder.addBinding(settings.dude, 'gravity', {
     label: 'Gravity',
