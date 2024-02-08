@@ -1,6 +1,6 @@
 {
   "name": "@twirapp/dudes",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "type": "module",
   "files": [
     "dist"
