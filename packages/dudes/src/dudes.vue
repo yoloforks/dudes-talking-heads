@@ -5,8 +5,8 @@ import { useDudes } from './composables/use-dudes.js'
 import { useRaf } from './composables/use-raf.js'
 import { assetsLoader, type DudeAsset } from './core/assets-loader.js'
 import { useDudesSettings } from './composables/use-settings.js'
+import { soundsLoader } from './core/sounds-loader.js'
 import type { DudesOverlayMethods, DudesSettings, SoundAsset } from './types.js'
-import { soundsLoader } from './core/sounds-loader'
 
 const props = defineProps<{
   sounds: SoundAsset[]

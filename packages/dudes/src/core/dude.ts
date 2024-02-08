@@ -13,10 +13,10 @@ import { soundsLoader } from './sounds-loader.js'
 import {
   DudeSpriteLayers,
   DudeSpriteTags,
-  getSprite
+  spriteProvider
 } from './sprite-provider.js'
 import type { DudePersonalSettings } from '../types.js'
-import type { DudeSpriteTagType } from './sprite-provider.js'
+import type { DudeSpriteFrameTag } from './sprite-provider.js'
 
 export class Dude {
   name: string
@@ -30,7 +30,7 @@ export class Dude {
   private cosmeticsColor: string
 
   private direction: number
-  private animationState?: DudeSpriteTagType
+  private animationState?: DudeSpriteFrameTag
 
   private nameBox: DudeNameBox
   private messageBox: DudeMessageBox
@@ -244,19 +244,19 @@ export class Dude {
     this.emoteSpitter.add(emotes)
   }
 
-  async playAnimation(state: DudeSpriteTagType): Promise<void> {
-    const dudeSprite = getSprite(this.spriteName, state)
+  async playAnimation(frameTag: DudeSpriteFrameTag): Promise<void> {
+    const dudeSprite = spriteProvider.getSprite(this.spriteName, frameTag)
     if (!dudeSprite) return
 
-    if (this.animationState === state) return
-    this.animationState = state
+    if (this.animationState === frameTag) return
+    this.animationState = frameTag
 
     if (this.sprite) {
       this.view.removeChild(this.sprite.view)
     }
 
     const { enabled: soundEnabled, volume } = dudesSettings.value.dude.sounds
-    if (soundEnabled && state === 'Jump') {
+    if (soundEnabled && frameTag === 'Jump') {
       soundsLoader.play('jump', volume)
     }
 

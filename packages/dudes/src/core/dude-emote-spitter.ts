@@ -2,16 +2,13 @@ import { AnimatedGIF } from '@pixi/gif'
 import { Container, Sprite } from 'pixi.js'
 
 import { DELTA_TIME, ROUND } from '../constants.js'
+import { sleep } from '../helpers.js'
 
 export interface DudeEmoteSpitterParams {
   enabled: boolean
 }
 
 const emotesCache = new Map<string, ArrayBuffer>()
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
 
 export class DudeEmoteSpitter {
   view = new Container()

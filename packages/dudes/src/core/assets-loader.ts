@@ -1,16 +1,17 @@
-import { Assets, utils } from 'pixi.js'
+import { Assets } from 'pixi.js'
+import type { utils } from 'pixi.js'
 import type {
   ISpritesheetData,
   ISpritesheetFrameData,
   Spritesheet
 } from 'pixi.js'
 
-interface AsepriteFrameData extends ISpritesheetFrameData {
+export interface SpriteFrameData extends ISpritesheetFrameData {
   duration: number
 }
 
-interface AsepriteData extends ISpritesheetData {
-  frames: utils.Dict<AsepriteFrameData>
+export interface SpriteData extends ISpritesheetData {
+  frames: utils.Dict<SpriteFrameData>
   duration: number
 }
 
@@ -20,7 +21,7 @@ export interface DudeAsset {
 }
 
 export class AssetsLoader {
-  assets: utils.Dict<Spritesheet<AsepriteData>> = {}
+  assets: utils.Dict<Spritesheet<SpriteData>> = {}
 
   private isLoaded = false
 

@@ -1,6 +1,6 @@
 import { ref, unref } from 'vue'
 
-import { deepMerge } from '../deep-merge.js'
+import { deepMerge } from '../helpers.js'
 import type { DudesSettings } from '../types.js'
 
 export const dudesSettings = ref<DudesSettings>({
