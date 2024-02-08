@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import DudesOverlay from '@twirapp/dudes'
 import { VTweakpane } from 'v-tweakpane'
-import type { Dude, DudesOverlayMethods, DudesSettings } from '@twirapp/dudes/types'
 import { onMounted, reactive, ref, watch } from 'vue'
-import { dudeAssets, dudeSprites, dudeSounds, dudeNames, dudeEmotes, type DudesSprites } from './constants.js'
+import { assetsLoadOptions, dudeAssets, dudeSprites, dudeSounds, dudeNames, dudeEmotes, type DudesSprites } from './constants.js'
 import { randomNum, capitalize } from '@zero-dependency/utils'
 import { randomRgbColor } from './utils.js'
+
 import type { Pane } from 'tweakpane'
+import type { Dude, DudesOverlayMethods, DudesSettings } from '@twirapp/dudes/types'
 
 const playgroundParams = ref<{
   isRandomColor: boolean,
@@ -302,5 +303,11 @@ function onPaneCreated(pane: Pane) {
   <Teleport to="body">
     <v-tweakpane :pane="{ title: 'Dudes Playground' }" @on-pane-created="onPaneCreated" />
   </Teleport>
-  <dudes-overlay ref="dudesRef" :assets="dudeAssets" :sounds="dudeSounds" :settings="settings" />
+  <dudes-overlay
+    ref="dudesRef"
+    :assets-load-options="assetsLoadOptions"
+    :assets="dudeAssets"
+    :sounds="dudeSounds"
+    :settings="settings"
+  />
 </template>

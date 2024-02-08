@@ -1,4 +1,8 @@
-import type { DudeAsset, SoundAsset } from '@twirapp/dudes/types'
+import type {
+  AssetsLoadOptions,
+  DudeAsset,
+  SoundAsset
+} from '@twirapp/dudes/types'
 
 export const dudeSprites = [
   'dude',
@@ -27,30 +31,37 @@ export const dudeSounds: SoundAsset[] = [
   }
 ]
 
+export const assetsLoadOptions: AssetsLoadOptions = {
+  basePath: location.origin + '/sprites/',
+  defaultSearchParams: {
+    ts: Date.now()
+  }
+}
+
 export const dudeAssets: DudeAsset[] = [
   {
     alias: 'dude',
-    src: './sprites/dude/dude.json'
+    src: 'dude/dude.json'
   },
   {
     alias: 'sith',
-    src: './sprites/sith/sith.json'
+    src: 'sith/sith.json'
   },
   {
     alias: 'agent',
-    src: './sprites/agent/agent.json'
+    src: 'agent/agent.json'
   },
   {
     alias: 'girl',
-    src: './sprites/girl/girl.json'
+    src: 'girl/girl.json'
   },
   {
     alias: 'cat',
-    src: './sprites/cat/cat.json'
+    src: 'cat/cat.json'
   },
   {
     alias: 'santa',
-    src: './sprites/santa/santa.json'
+    src: 'santa/santa.json'
   }
 ]
 

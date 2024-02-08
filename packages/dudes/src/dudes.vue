@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { useRenderer } from './composables/use-renderer.js'
 import { useDudes } from './composables/use-dudes.js'
 import { useRaf } from './composables/use-raf.js'
-import { assetsLoader, type DudeAsset } from './core/assets-loader.js'
+import { assetsLoader, type DudeAsset, type AssetsLoadOptions } from './core/assets-loader.js'
 import { useDudesSettings } from './composables/use-settings.js'
 import { soundsLoader } from './core/sounds-loader.js'
 import type { DudesOverlayMethods, DudesSettings, SoundAsset } from './types.js'
@@ -11,6 +11,7 @@ import type { DudesOverlayMethods, DudesSettings, SoundAsset } from './types.js'
 const props = defineProps<{
   sounds: SoundAsset[]
   assets: DudeAsset[]
+  assetsLoadOptions?: AssetsLoadOptions
   settings?: DudesSettings
 }>()
 
@@ -44,7 +45,7 @@ function onResize() {
 
 async function initDudes() {
   await soundsLoader.load(props.sounds)
-  await assetsLoader.load(props.assets)
+  await assetsLoader.load(props.assets, props.assetsLoadOptions)
   initRenderer(canvasRef)
   window.addEventListener('resize', onResize)
   startRaf()

@@ -1,4 +1,4 @@
-import type { DudeAsset } from './core/assets-loader.js'
+import type { AssetsLoadOptions, DudeAsset } from './core/assets-loader.js'
 import type { DudeEmoteSpitterParams } from './core/dude-emote-spitter.js'
 import type {
   DudeMessageBoxParams,
@@ -89,5 +89,6 @@ export type {
   DudeMessageBoxParams,
   DudeNameBoxParams,
   SoundAsset,
-  SoundType
+  SoundType,
+  AssetsLoadOptions
 }
