@@ -24,7 +24,6 @@ export class Dude {
 
   private sprite?: DudeSpriteContainer
   private spriteName: string
-  private spriteGravity: number
 
   private bodyColor: string
   private eyesColor: string
@@ -66,7 +65,6 @@ export class Dude {
   ) {
     this.name = name
     this.spriteName = spriteName
-    this.spriteGravity = dudesSettings.value.dude.gravity
 
     this.bodyTint(dudesSettings.value.dude.color)
     this.eyesTint(dudesSettings.value.dude.eyesColor)
@@ -155,7 +153,7 @@ export class Dude {
     }
 
     this.velocity.y =
-      this.velocity.y + (this.spriteGravity * DELTA_TIME) / ROUND
+      this.velocity.y + (dudesSettings.value.dude.gravity * DELTA_TIME) / ROUND
 
     const newPosition = {
       x: this.view.position.x + (this.velocity.x * DELTA_TIME) / ROUND,
