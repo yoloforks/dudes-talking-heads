@@ -188,7 +188,7 @@ export class Dude {
 
     const width = window.innerWidth
 
-    if (this.animationState != DudeSpriteTags.Idle) {
+    if (this.animationState !== DudeSpriteTags.Idle) {
       this.view.position.x += (1 * this.direction * DELTA_TIME * 60) / ROUND
 
       if (
