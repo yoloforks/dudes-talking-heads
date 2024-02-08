@@ -20,8 +20,8 @@ const playgroundParams = ref<{
 const settings = reactive<DudesSettings>({
   dude: {
     color: '#969696',
-    eyesColor: '#ffffff',
-    cosmeticsColor: '#ffffff',
+    eyesColor: '#FFFFFF',
+    cosmeticsColor: '#FFFFFF',
     maxLifeTime: 1000 * 60 * 30,
     gravity: 400,
     scale: 4,
@@ -33,17 +33,17 @@ const settings = reactive<DudesSettings>({
   message: {
     enabled: true,
     borderRadius: 5,
-    boxColor: '#e6ac0c',
-    fontFamily: 'Courier New',
+    boxColor: '#E6AC0C',
+    fontFamily: 'Roboto',
     fontSize: 12,
     padding: 5,
     showTime: 5 * 1000,
     fill: '#333333'
   },
   name: {
-    fontFamily: 'Arial',
+    fontFamily: 'Roboto',
     fontSize: 18,
-    fill: '#ffffff',
+    fill: '#FFFFFF',
     lineJoin: 'round',
     strokeThickness: 4,
     stroke: '#333333',
@@ -51,13 +51,13 @@ const settings = reactive<DudesSettings>({
     fillGradientType: 0,
     fontStyle: 'normal',
     fontVariant: 'normal',
-    fontWeight: 'normal',
+    fontWeight: 400,
     dropShadow: false,
     dropShadowAlpha: 1,
     dropShadowAngle: 0,
     dropShadowBlur: 0.1,
     dropShadowDistance: 10,
-    dropShadowColor: '#3ac7d9'
+    dropShadowColor: '#3AC7D9'
   },
   spitter: {
     enabled: true
@@ -149,6 +149,7 @@ function clearDudes() {
 
 function onPaneCreated(pane: Pane) {
   const fonts = {
+    'Roboto': 'Roboto',
     'Arial': 'Arial',
     'Times New Roman': 'Times New Roman',
     'Courier New': 'Courier New',
@@ -260,11 +261,10 @@ function onPaneCreated(pane: Pane) {
     }
   })
   nameBoxFolder.addBinding(settings.name, 'fontWeight', {
-    options: {
-      normal: 'normal',
-      bold: 'bold',
-      lighter: 'lighter'
-    }
+    options: [100, 200, 300, 400, 500, 600, 700, 800, 900].map((weight) => ({
+      text: `${weight}`,
+      value: weight
+    }))
   })
   nameBoxFolder.addBinding(settings.name, 'stroke')
   nameBoxFolder.addBinding(settings.name, 'strokeThickness', {

@@ -10,12 +10,12 @@ export interface DudeMessageBoxParams {
   enabled: boolean
 
   /**
-   * @default '#EEE'
+   * @default '#EEEEEE'
    */
   boxColor: string
 
   /**
-   * @default '#333'
+   * @default '#333333'
    */
   fill: string
 

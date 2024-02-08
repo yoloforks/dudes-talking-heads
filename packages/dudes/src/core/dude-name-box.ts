@@ -9,85 +9,85 @@ export interface DudeNameBoxParams {
   /**
    * @default 'Arial'
    */
-  fontFamily: ITextStyle['fontFamily']
+  fontFamily: string
   /**
    * @default 18
    */
-  fontSize: ITextStyle['fontSize']
+  fontSize: number
   /**
-   * Available values: 'normal', 'italic'
+   * Available values: 'normal', 'italic', 'oblique'
    * @default 'normal'
    */
-  fontStyle: ITextStyle['fontStyle']
+  fontStyle: string
   /**
    * Available values: 'normal', 'small-caps'
    * @default 'normal'
    */
-  fontVariant: ITextStyle['fontVariant']
+  fontVariant: string
   /**
-   * Available values: 'normal', 'bold', 'bolder', 'lighter'
-   * @default 'normal'
+   * Available values: 100, 200, 300, 400, 500, 600, 700, 800, 900
+   * @default 400
    */
-  fontWeight: ITextStyle['fontWeight']
+  fontWeight: number
 
   // fill
   /**
-   * @default '#FFF'
+   * @default '#FFFFFF'
    */
-  fill: ITextStyle['fill']
+  fill: string | string[]
   /**
    * Available values: vertical - 0, horizontal - 1
    * @default 0
    */
-  fillGradientType: ITextStyle['fillGradientType']
+  fillGradientType: number
   /**
    * Minimum value is 0, maximum value is 1
    * @default [0]
    */
-  fillGradientStops: ITextStyle['fillGradientStops']
+  fillGradientStops: number[]
 
   // stroke
   /**
-   * @default '#000'
+   * @default '#000000'
    */
-  stroke: ITextStyle['stroke']
+  stroke: string
   /**
    * @default 4
    */
-  strokeThickness: ITextStyle['strokeThickness']
+  strokeThickness: number
   /**
    * Available values: 'round', 'bevel', 'miter'
    * @default 'round'
    */
-  lineJoin: ITextStyle['lineJoin']
+  lineJoin: string
 
   // drop shadow
   /**
    * @default false
    */
-  dropShadow: ITextStyle['dropShadow']
+  dropShadow: boolean
   /**
    * @default 1
    */
-  dropShadowAlpha: ITextStyle['dropShadowAlpha']
+  dropShadowAlpha: number
   /**
    * Recommended range value is 0 to Math.PI * 2
    * @default 0
    */
-  dropShadowAngle: ITextStyle['dropShadowAngle']
+  dropShadowAngle: number
   /**
    * @default 0.1
    */
-  dropShadowBlur: ITextStyle['dropShadowBlur']
+  dropShadowBlur: number
   /**
-   * @default '#3EC7d9'
+   * @default '#3EC7D9'
    */
-  dropShadowColor: ITextStyle['dropShadowColor']
+  dropShadowColor: string
 
   /**
    * @default 10
    */
-  dropShadowDistance: ITextStyle['dropShadowDistance']
+  dropShadowDistance: number
 }
 
 export type DudePersonalNameBoxParams = Partial<
@@ -124,7 +124,7 @@ export class DudeNameBox {
     this.updateStyle(params)
   }
 
-  private updateStyle(settings: Partial<DudeNameBoxParams>): void {
+  private updateStyle(settings: Record<string, any>): void {
     this.view.style = {
       ...settings,
       align: 'center'

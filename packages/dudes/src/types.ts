@@ -50,12 +50,12 @@ export interface DudeParams {
   color: string
 
   /**
-   * @default '#ffffff'
+   * @default '#FFFFFF'
    */
   eyesColor: string
 
   /**
-   * @default '#ffffff'
+   * @default '#FFFFFF'
    */
   cosmeticsColor: string
 
