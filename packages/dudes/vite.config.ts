@@ -11,12 +11,9 @@ export default defineConfig({
       fileName: 'dudes'
     },
     rollupOptions: {
-      external: ['vue'],
+      external: ['vue', 'pixi.js', '@pixi/gif'],
       output: {
-        exports: 'default',
-        globals: {
-          vue: 'Vue'
-        }
+        exports: 'default'
       }
     }
   }
