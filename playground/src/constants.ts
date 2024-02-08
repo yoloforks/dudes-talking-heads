@@ -32,7 +32,7 @@ export const dudeSounds: SoundAsset[] = [
 ]
 
 export const assetsLoadOptions: AssetsLoadOptions = {
-  basePath: location.origin + '/sprites/',
+  basePath: location.href + 'sprites/',
   defaultSearchParams: {
     ts: Date.now()
   }
