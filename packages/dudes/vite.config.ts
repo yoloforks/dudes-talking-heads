@@ -14,7 +14,8 @@ export default defineConfig({
       external: [
         'vue',
         'pixi.js',
-        '@pixi/gif'
+        '@pixi/gif',
+        'gsap'
       ],
       output: {
         exports: 'default'

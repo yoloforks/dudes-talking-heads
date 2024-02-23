@@ -76,11 +76,16 @@ onMounted(async () => {
   if (!dudesRef.value) return
   await dudesRef.value.initDudes()
 
-  for (const dudeName of dudeNames) {
-    const dudeSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
-    const dudeColor = randomRgbColor()
-    const dude = dudesRef.value.createDude(dudeName, dudeSprite)
-    dude.bodyTint(dudeColor)
+  if (import.meta.env.DEV) {
+    const dude = dudesRef.value.createDude('Тwir', dudeSprites[0])
+    dude.bodyTint('#6441A5')
+  } else {
+    for (const dudeName of dudeNames) {
+      const dudeSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
+      const dudeColor = randomRgbColor()
+      const dude = dudesRef.value.createDude(dudeName, dudeSprite)
+      dude.bodyTint(dudeColor)
+    }
   }
 })
 
