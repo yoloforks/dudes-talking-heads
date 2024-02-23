@@ -74,6 +74,11 @@ export interface DudeParams {
      */
     volume: number
   }
+
+  /**
+   * @default true
+   */
+  visibleName: boolean
 }
 
 export interface DudesSettings {

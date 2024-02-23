@@ -1,5 +1,4 @@
 import { Text } from 'pixi.js'
-import type { ITextStyle } from 'pixi.js'
 
 import { dudesSettings } from '../composables/use-settings.js'
 import { COLLIDER, SPRITE_SIZE } from '../constants.js'
@@ -111,6 +110,10 @@ export class DudeNameBox {
     this.view = new Text(name)
     this.view.anchor.set(0.5, 1)
     this.view.zIndex = 100
+  }
+
+  visible(visible: boolean): void {
+    this.view.visible = visible
   }
 
   update(): void {

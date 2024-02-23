@@ -19,6 +19,7 @@ const playgroundParams = ref<{
 
 const settings = reactive<DudesSettings>({
   dude: {
+    visibleName: true,
     color: '#969696',
     eyesColor: '#FFFFFF',
     cosmeticsColor: '#FFFFFF',
@@ -239,6 +240,9 @@ function onPaneCreated(pane: Pane) {
   })
 
   const nameBoxFolder = pane.addFolder({ title: 'Name', expanded: false })
+  nameBoxFolder.addBinding(settings.dude, 'visibleName', {
+    label: 'enabled'
+  })
   nameBoxFolder.addBinding(settings.name, 'fill')
   nameBoxFolder.addBinding(settings.name, 'fontFamily', {
     options: fonts

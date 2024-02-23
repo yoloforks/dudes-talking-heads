@@ -75,6 +75,8 @@ export class Dude {
     this.direction = Math.random() > 0.5 ? 1 : -1
 
     this.nameBox = new DudeNameBox(name, settings?.name)
+    this.visibleName(dudesSettings.value.dude.visibleName)
+
     this.messageBox = new DudeMessageBox(settings?.message)
     this.emoteSpitter = new DudeEmoteSpitter()
 
@@ -88,6 +90,10 @@ export class Dude {
     this.runIdleAnimationTime = performance.now()
     this.maxRunIdleAnimationTime = Math.random() * 5000
     this.currentLifeTime = dudesSettings.value.dude.maxLifeTime
+  }
+
+  visibleName(visible: boolean): void {
+    this.nameBox.visible(visible)
   }
 
   jump(): void {

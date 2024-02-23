@@ -1,6 +1,8 @@
 import { Container } from 'pixi.js'
+import { watch } from 'vue'
 
 import { Dude } from '../core/dude.js'
+import { dudesSettings } from './use-settings.js'
 import type { DudePersonalSettings } from '../types.js'
 
 const dudes = new Map<string, Dude>()
@@ -45,6 +47,15 @@ export const useDudes = () => {
       removeDude(name)
     }
   }
+
+  watch(
+    () => dudesSettings.value.dude.visibleName,
+    (isVisible) => {
+      for (const dude of dudes.values()) {
+        dude.visibleName(isVisible)
+      }
+    }
+  )
 
   return {
     dudes,

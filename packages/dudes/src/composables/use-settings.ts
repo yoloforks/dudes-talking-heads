@@ -5,6 +5,7 @@ import type { DudesSettings } from '../types.js'
 
 export const dudesSettings = ref<DudesSettings>({
   dude: {
+    visibleName: true,
     color: '#969696',
     eyesColor: '#FFFFFF',
     cosmeticsColor: '#FFFFFF',
