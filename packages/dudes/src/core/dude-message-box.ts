@@ -112,9 +112,8 @@ export class DudeMessageBox {
   }
 
   add(message: string): void {
-    if (dudesSettings.value.message.enabled) {
-      this.messageQueue.push(message)
-    }
+    if (!message.length || !dudesSettings.value.message.enabled) return
+    this.messageQueue.push(message.trim())
   }
 
   private trim(text: Text): string {
