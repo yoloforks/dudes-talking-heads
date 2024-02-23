@@ -51,13 +51,6 @@ export class Dude {
   private maxOpacityTime = 5000
   private currentOpacityTime = this.maxOpacityTime
 
-  private get isJumping() {
-    return (
-      this.animationState === DudeSpriteTags.Fall ||
-      this.animationState === DudeSpriteTags.Jump
-    )
-  }
-
   constructor(
     name: string,
     spriteName = 'dude',
@@ -98,12 +91,19 @@ export class Dude {
   }
 
   jump(): void {
-    if (!this.isJumping) {
-      this.velocity.x = this.direction * 100
-      this.velocity.y = -300
+    const tryJump = () => {
+      if (this.animationState !== DudeSpriteTags.Jump) {
+        this.velocity.x = this.direction * 100
+        this.velocity.y = -300
 
-      this.playAnimation(DudeSpriteTags.Jump)
+        this.playAnimation(DudeSpriteTags.Jump)
+        return
+      }
+
+      requestAnimationFrame(tryJump)
     }
+
+    tryJump()
   }
 
   bodyTint(color: string): void {
