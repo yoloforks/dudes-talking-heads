@@ -116,9 +116,8 @@ export class DudeNameBox {
     this.view.visible = visible
   }
 
-  update(): void {
-    this.view.position.y =
-      -(SPRITE_SIZE / 2 - COLLIDER.y + 2) * dudesSettings.value.dude.scale
+  update(scale: number): void {
+    this.view.position.y = -((SPRITE_SIZE * scale) / 3)
 
     const params = this.settings
       ? { ...dudesSettings.value.name, ...this.settings }

@@ -58,7 +58,7 @@ defineExpose<DudesOverlayMethods>({
   createDude,
   removeDude,
   clearDudes,
-  updateSettings,
+  updateSettings
 })
 </script>
 

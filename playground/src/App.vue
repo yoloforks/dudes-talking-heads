@@ -24,6 +24,8 @@ const settings = reactive<DudesSettings>({
     eyesColor: '#FFFFFF',
     cosmeticsColor: '#FFFFFF',
     maxLifeTime: 1000 * 60 * 30,
+    growTime: 1000 * 2,
+    growMaxScale: 20,
     gravity: 400,
     scale: 4,
     sounds: {
@@ -129,6 +131,13 @@ function jumpAllDudes() {
   }
 }
 
+function growAllDudes() {
+  if (!dudesRef.value) return
+  for (const dude of dudesRef.value.dudes.values()) {
+    dude.grow()
+  }
+}
+
 function showMessageAllDudes() {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
@@ -209,10 +218,23 @@ function onPaneCreated(pane: Pane) {
     max: 24,
     step: 0.1
   })
+  dudeFolder.addBinding(settings.dude, 'growTime', {
+    label: 'Grow time',
+    min: 1000 * 1,
+    max: 1000 * 60 * 60,
+    step: 1000
+  })
+  dudeFolder.addBinding(settings.dude, 'growMaxScale', {
+    label: 'Grow max scale',
+    min: 4,
+    max: 24,
+    step: 0.1
+  })
 
   dudeFolder.addBlade({ view: 'separator' })
   dudeFolder.addButton({ title: 'Spawn' }).on('click', spawnDude)
   dudeFolder.addButton({ title: 'Jump' }).on('click', jumpAllDudes)
+  dudeFolder.addButton({ title: 'Grow' }).on('click', growAllDudes)
   dudeFolder.addButton({ title: 'Show message' }).on('click', showMessageAllDudes)
   dudeFolder.addButton({ title: 'Spit emote' }).on('click', spitEmotesAllDudes)
   dudeFolder.addButton({ title: 'Clear' }).on('click', clearDudes)

@@ -79,6 +79,16 @@ export interface DudeParams {
    * @default true
    */
   visibleName: boolean
+
+  /**
+   * @default 1000 * 60 * 5 // 5 minutes
+   */
+  growTime: number
+
+  /**
+   * @default 20
+   */
+  growMaxScale: number
 }
 
 export interface DudesSettings {

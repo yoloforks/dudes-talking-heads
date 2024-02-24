@@ -10,6 +10,8 @@ export const dudesSettings = ref<DudesSettings>({
     eyesColor: '#FFFFFF',
     cosmeticsColor: '#FFFFFF',
     maxLifeTime: 1000 * 60 * 30,
+    growTime: 1000 * 60 * 5,
+    growMaxScale: 20,
     gravity: 400,
     scale: 4,
     sounds: {
