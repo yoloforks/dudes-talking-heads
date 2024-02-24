@@ -42,18 +42,19 @@ export class Dude {
     y: 0
   }
 
-  private landAnimationTime?: number
+  private landAnimationTime: number | null
   private maxLandAnimationTime = 200
 
-  private runIdleAnimationTime?: number
-  private maxRunIdleAnimationTime?: number
+  private idleAnimationTime?: number
+  private maxIdleAnimationTime?: number
+
+  private isGrowing: boolean
+  private growingTime: number
 
   private currentLifeTime: number
   private maxOpacityTime = 5000
   private currentOpacityTime = this.maxOpacityTime
   private scale: number
-  private isGrowing: boolean
-  private growingTime: number
 
   constructor(
     name: string,
@@ -96,8 +97,8 @@ export class Dude {
 
     this.playAnimation(DudeSpriteTags.Idle)
 
-    this.runIdleAnimationTime = performance.now()
-    this.maxRunIdleAnimationTime = Math.random() * 5000
+    this.idleAnimationTime = performance.now()
+    this.maxIdleAnimationTime = Math.random() * 5000
     this.currentLifeTime = dudesSettings.value.dude.maxLifeTime
   }
 
@@ -147,13 +148,13 @@ export class Dude {
       now - this.landAnimationTime > this.maxLandAnimationTime
     ) {
       this.playAnimation(DudeSpriteTags.Idle)
-      this.landAnimationTime = undefined
+      this.landAnimationTime = null
     }
 
     if (
-      this.runIdleAnimationTime &&
-      this.maxRunIdleAnimationTime &&
-      now - this.runIdleAnimationTime > this.maxRunIdleAnimationTime &&
+      this.idleAnimationTime &&
+      this.maxIdleAnimationTime &&
+      now - this.idleAnimationTime > this.maxIdleAnimationTime &&
       (this.animationState === DudeSpriteTags.Run ||
         this.animationState === DudeSpriteTags.Idle)
     ) {
@@ -163,8 +164,8 @@ export class Dude {
         this.playAnimation(DudeSpriteTags.Idle)
       }
 
-      this.runIdleAnimationTime = now
-      this.maxRunIdleAnimationTime = Math.random() * 5000
+      this.idleAnimationTime = now
+      this.maxIdleAnimationTime = Math.random() * 5000
     }
 
     this.velocity.y =
@@ -173,21 +174,6 @@ export class Dude {
     const newPosition = {
       x: this.view.position.x + (this.velocity.x * DELTA_TIME) / ROUND,
       y: this.view.position.y + (this.velocity.y * DELTA_TIME) / ROUND
-    }
-
-    if (this.isGrowing) {
-      if (this.scale <= dudesSettings.value.dude.growMaxScale) {
-        this.updateScale(0.1)
-        newPosition.x += this.direction
-        this.view.position.set(newPosition.x, newPosition.y)
-      }
-
-      this.growingTime -= DELTA_TIME
-    }
-
-    if (this.growingTime <= 0 && this.scale > dudesSettings.value.dude.scale) {
-      this.isGrowing = false
-      this.updateScale(-0.01)
     }
 
     if (
@@ -215,17 +201,38 @@ export class Dude {
     }
 
     const width = window.innerWidth
+    const isCollidingMore =
+      this.view.x + (COLLIDER.width / 2) * this.scale >= width
+    const isCollidingLess = this.view.x - (COLLIDER.width / 2) * this.scale <= 0
 
-    if (
-      this.view.x + (COLLIDER.width / 2) * this.scale >= width ||
-      this.view.x - (COLLIDER.width / 2) * this.scale <= 0
-    ) {
+    if (this.isGrowing) {
+      if (this.scale <= dudesSettings.value.dude.growMaxScale) {
+        this.updateScale(0.1)
+
+        if (isCollidingMore) {
+          this.direction = 1
+        }
+
+        if (isCollidingLess) {
+          this.direction = -1
+        }
+      }
+
+      this.growingTime -= DELTA_TIME
+    }
+
+    if (this.growingTime <= 0 && this.scale > dudesSettings.value.dude.scale) {
+      this.isGrowing = false
+      this.updateScale(-0.01)
+    }
+
+    if (isCollidingMore || isCollidingLess) {
       this.direction = -this.direction
       this.velocity.x = -this.velocity.x
       this.updateScale()
     }
 
-    if (this.animationState !== DudeSpriteTags.Idle) {
+    if (this.animationState !== DudeSpriteTags.Idle || this.isGrowing) {
       this.view.position.x += (this.direction * DELTA_TIME * 60) / ROUND
     }
 
