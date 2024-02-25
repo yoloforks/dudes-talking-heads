@@ -1,7 +1,7 @@
 import { Text } from 'pixi.js'
 
 import { dudesSettings } from '../composables/use-settings.js'
-import { COLLIDER, SPRITE_SIZE } from '../constants.js'
+import { SPRITE_SIZE } from '../constants.js'
 
 export interface DudeNameBoxParams {
   // font
