@@ -117,7 +117,7 @@ export class DudeNameBox {
   }
 
   update(scale: number): void {
-    this.view.position.y = -((SPRITE_SIZE * scale) / 3)
+    this.view.position.y = -((SPRITE_SIZE * scale) / 2)
 
     const params = this.settings
       ? { ...dudesSettings.value.name, ...this.settings }
