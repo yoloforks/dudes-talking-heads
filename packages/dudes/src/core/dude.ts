@@ -21,10 +21,8 @@ import type { DudeSpriteFrameTag } from './sprite-provider.js'
 
 export class Dude {
   name: string
+  spriteName: string
   view = new Container()
-
-  private sprite?: DudeSpriteContainer
-  private spriteName: string
 
   private bodyColor: string
   private eyesColor: string
@@ -33,6 +31,7 @@ export class Dude {
   private direction: number
   private animationState?: DudeSpriteFrameTag
 
+  private sprite?: DudeSpriteContainer
   private nameBox: DudeNameBox
   private messageBox: DudeMessageBox
   private emoteSpitter: DudeEmoteSpitter
@@ -279,11 +278,11 @@ export class Dude {
     this.isGrowing = true
   }
 
-  async playAnimation(frameTag: DudeSpriteFrameTag): Promise<void> {
+  async playAnimation(frameTag: DudeSpriteFrameTag, force = false): Promise<void> {
     const dudeSprite = spriteProvider.getSprite(this.spriteName, frameTag)
     if (!dudeSprite) return
 
-    if (this.animationState === frameTag) return
+    if (this.animationState === frameTag && !force) return
     this.animationState = frameTag
 
     if (this.sprite) {
