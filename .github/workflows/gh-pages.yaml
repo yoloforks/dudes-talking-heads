@@ -41,11 +41,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build website
-        run: pnpm build:playground
+      - name: Build
+        run: pnpm build
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
           branch: gh-pages
-          folder: ./playground/dist
+          folder: ./apps/playground/dist
