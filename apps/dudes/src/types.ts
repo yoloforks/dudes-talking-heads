@@ -1,4 +1,4 @@
-import type { AssetsLoadOptions, DudeAsset } from './core/assets-loader.js'
+import type { AssetsLoadOptions, DudesAsset } from './core/assets-loader.js'
 import type { Dude } from './core/dude.js'
 import type { SoundAsset, SoundType } from './core/sounds-loader.js'
 
@@ -244,4 +244,4 @@ export type DudesSettings = RecursivePartial<{
   spitter: DudesTypes.EmoteSpitterParams
 }>
 
-export type { Dude, DudeAsset, SoundAsset, SoundType, AssetsLoadOptions }
+export type { Dude, DudesAsset, SoundAsset, SoundType, AssetsLoadOptions }

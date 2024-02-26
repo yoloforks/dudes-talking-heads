@@ -231,7 +231,10 @@ export class Dude {
       this.updateScale()
     }
 
-    if (this.animationState !== DudeSpriteTags.Idle) {
+    if (
+      this.animationState !== DudeSpriteTags.Idle ||
+      (this.isGrowing && this.scale < dudesSettings.value.dude.growMaxScale)
+    ) {
       this.view.position.x += (this.direction * DELTA_TIME * 60) / ROUND
     }
 

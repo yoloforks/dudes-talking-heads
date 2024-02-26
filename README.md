@@ -13,7 +13,7 @@ pnpm add @twirapp/dudes
 ```vue
 <script setup lang="ts">
 import DudesOverlay from '@twirapp/dudes'
-import { SoundAsset, AssetsLoadOptions, DudesSettings, DudesMethods } from '@twirapp/dudes/types'
+import { SoundAsset, DudesAsset, AssetsLoadOptions, DudesSettings, DudesMethods } from '@twirapp/dudes/types'
 import { onMounted, ref } from 'vue'
 
 const dudeSounds: SoundAsset[] = [
@@ -31,7 +31,7 @@ const assetsLoadOptions: AssetsLoadOptions = {
   }
 }
 
-const dudesAssets: DudeAsset[] = [
+const dudesAssets: DudesAsset[] = [
   {
     alias: 'dude',
     src: 'dude/dude.json'
@@ -39,10 +39,10 @@ const dudesAssets: DudeAsset[] = [
 ]
 
 const settings = ref<DudesSettings>({
-
+  // override default settings
 })
 
-const dudesRef = ref<DudesOverlayMethods | null>(null)
+const dudesRef = ref<DudesMethods | null>(null)
 
 onMounted(async () => {
   if (!dudesRef.value) return
@@ -55,7 +55,7 @@ onMounted(async () => {
   <dudes-overlay
     ref="dudesRef"
     :assets-load-options="assetsLoadOptions"
-    :assets="dudeAssets"
+    :assets="dudesAssets"
     :sounds="dudeSounds"
     :settings="settings"
   />

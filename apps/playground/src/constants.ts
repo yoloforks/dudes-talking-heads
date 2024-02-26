@@ -1,6 +1,6 @@
 import type {
   AssetsLoadOptions,
-  DudeAsset,
+  DudesAsset,
   SoundAsset
 } from '@twirapp/dudes/types'
 
@@ -33,7 +33,7 @@ export const assetsLoadOptions: AssetsLoadOptions = {
   }
 }
 
-export const dudeAssets: DudeAsset[] = [
+export const dudeAssets: DudesAsset[] = [
   {
     alias: 'dude',
     src: 'dude/dude.json'

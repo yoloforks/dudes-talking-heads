@@ -16,7 +16,7 @@ export interface SpriteData extends ISpritesheetData {
   duration: number
 }
 
-export interface DudeAsset {
+export interface DudesAsset {
   alias: string
   src: string
 }
@@ -29,7 +29,7 @@ export class AssetsLoader {
   private isLoaded = false
 
   async load(
-    assets: DudeAsset[],
+    assets: DudesAsset[],
     loadOptions: AssetsLoadOptions = {}
   ): Promise<void> {
     if (this.isLoaded) return

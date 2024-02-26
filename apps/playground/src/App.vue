@@ -227,7 +227,7 @@ function onPaneCreated(pane: Pane) {
   dudeFolder.addBinding(settings.dude, 'growMaxScale', {
     label: 'Grow max scale',
     min: 4,
-    max: 24,
+    max: 32,
     step: 0.1
   })
 
