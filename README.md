@@ -1,6 +1,6 @@
 # Dudes
 
-> Animated dudes for chatters in your stream.
+> Animated dudes for chatters in your stream
 
 ## Install
 
@@ -8,53 +8,57 @@
 pnpm add @twirapp/dudes
 ```
 
-## Features
-
-- Dude has simple type of animations.
-- Dude fully customizable.
-- Dude supports messages and name box.
-
 ## Usage
 
 ```vue
 <script setup lang="ts">
 import DudesOverlay from '@twirapp/dudes'
-import { DudesOverlayMethods } from '@twirapp/dudes/types'
+import { SoundAsset, AssetsLoadOptions, DudesSettings, DudesOverlayMethods } from '@twirapp/dudes/types'
 import { onMounted, ref } from 'vue'
 
-const dudesSprites = ['dude', 'santa']
-const dudesAssets: DudeAsset[] = [
+const dudeSounds: SoundAsset[] = [
   {
-    alias: 'dude',
-    src: './sprites/dude/dude.json'
-  },
-  {
-    alias: 'santa',
-    src: './sprites/santa/santa.json'
+    alias: 'jump',
+    src: './sounds/jump.mp3'
   }
 ]
 
-const dudesRef = ref<DudesOverlayMethods<typeof dudesSprites[number]> | null>(null)
+const assetsLoadOptions: AssetsLoadOptions = {
+  // sprites/dude/dude.json is used
+  basePath: location.href + 'sprites/',
+  defaultSearchParams: {
+    ts: Date.now()
+  }
+}
+
+const dudesAssets: DudeAsset[] = [
+  {
+    alias: 'dude',
+    src: 'dude/dude.json'
+  }
+]
+
+const settings = ref<DudesSettings>({
+
+})
+
+const dudesRef = ref<DudesOverlayMethods | null>(null)
 
 onMounted(async () => {
   if (!dudesRef.value) return
   await dudesRef.value.initDudes()
+  dudesRef.value.createDude('Dude', 'dude')
 })
-
-function spawnDude() {
-  if (!dudesRef.value) return
-  const dude = dudesRef.value.createDude('Santa Claus', 'santa', {
-    nameBox: {
-      fill: 'red'
-    }
-  })
-  dude.addMessage('Hello')
-  dude.tint('red')
-}
 </script>
 
 <template>
-  <dudes-overlay ref="dudesRef" :assets="dudesAssets" />
+  <dudes-overlay
+    ref="dudesRef"
+    :assets-load-options="assetsLoadOptions"
+    :assets="dudeAssets"
+    :sounds="dudeSounds"
+    :settings="settings"
+  />
 </template>
 
 <style>
@@ -76,7 +80,7 @@ It's really easy to create sprites with [Aseprite](https://github.com/aseprite/a
 
 Sprite size is 32x32.
 
-Example can be found in aseprite folder.
+Example can be found in [sprites](apps/playground/public/sprites) folder.
 
 ## Useful links
 

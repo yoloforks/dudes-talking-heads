@@ -3,52 +3,7 @@ import { Container, Graphics, Text, TextMetrics } from 'pixi.js'
 
 import { dudesSettings } from '../composables/use-settings.js'
 import { DELTA_TIME } from '../constants.js'
-
-export interface DudeMessageBoxParams {
-  /**
-   * @default true
-   */
-  enabled: boolean
-
-  /**
-   * @default '#EEEEEE'
-   */
-  boxColor: string
-
-  /**
-   * @default '#333333'
-   */
-  fill: string
-
-  /**
-   * @default 20
-   */
-  fontSize: number
-
-  /**
-   * @default 'Arial'
-   */
-  fontFamily: string
-
-  /**
-   * @default 10
-   */
-  borderRadius: number
-
-  /**
-   * @default 10
-   */
-  padding: number
-
-  /**
-   * @default 5_000
-   */
-  showTime: number
-}
-
-export type DudePersonalMessageBoxParams = Partial<
-  Pick<DudeMessageBoxParams, 'boxColor' | 'fill'>
->
+import type { DudesTypes } from '../types.js'
 
 const ANIMATION_TIME = 500
 
@@ -69,7 +24,9 @@ export class DudeMessageBox {
   private currentShowTime = 0
   private messageQueue: string[] = []
 
-  constructor(private settings?: DudePersonalMessageBoxParams) {
+  constructor(
+    private individualParams?: DudesTypes.IndividualMessageBoxParams
+  ) {
     this.view.zIndex = 3
     this.view.addChild(this.container)
 
@@ -94,9 +51,9 @@ export class DudeMessageBox {
     this.showAnimation = timeline
   }
 
-  get params(): DudeMessageBoxParams {
-    return this.settings
-      ? { ...dudesSettings.value.message, ...this.settings }
+  get params(): DudesTypes.MessageBoxParams {
+    return this.individualParams
+      ? { ...dudesSettings.value.message, ...this.individualParams }
       : dudesSettings.value.message
   }
 

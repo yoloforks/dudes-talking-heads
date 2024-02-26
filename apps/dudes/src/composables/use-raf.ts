@@ -1,4 +1,4 @@
-import { ROUND } from '../constants.js'
+import { DELTA_TIME, ROUND } from '../constants.js'
 
 export const useRaf = (callback: () => void) => {
   let lastTime = performance.now()

@@ -3,10 +3,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "turbo dev --filter=./packages/*",
-    "build": "turbo build --filter=./packages/*",
-    "playground": "turbo dev --filter=./playground",
-    "build:playground": "turbo build --filter=./playground",
+    "dev": "turbo dev --filter=./apps/*",
+    "build": "turbo build --filter=./apps/*",
     "format": "prettier --write \"**/*.{js,ts,json}\""
   },
   "devDependencies": {

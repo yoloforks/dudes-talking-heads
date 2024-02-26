@@ -3,7 +3,7 @@ import { watch } from 'vue'
 
 import { Dude } from '../core/dude.js'
 import { dudesSettings } from './use-settings.js'
-import type { DudePersonalSettings } from '../types.js'
+import type { DudesTypes } from '../types.js'
 
 const dudes = new Map<string, Dude>()
 const dudesContainer = new Container()
@@ -27,10 +27,10 @@ export const useDudes = () => {
   function createDude(
     name: string,
     sprite: string,
-    settings?: DudePersonalSettings
+    params?: DudesTypes.IndividualDudeParams
   ): Dude {
     removeDude(name)
-    const dude = new Dude(name, sprite, settings)
+    const dude = new Dude(name, sprite, params)
     dudes.set(name, dude)
     dudesContainer.addChild(dude.view)
     return dude
@@ -42,7 +42,7 @@ export const useDudes = () => {
     removeInternalDude(dude)
   }
 
-  function clearDudes(): void {
+  function removeAllDudes(): void {
     for (const name of dudes.keys()) {
       removeDude(name)
     }
@@ -64,6 +64,6 @@ export const useDudes = () => {
     createDude,
     removeDude,
     updateDudes,
-    clearDudes
+    removeAllDudes
   }
 }

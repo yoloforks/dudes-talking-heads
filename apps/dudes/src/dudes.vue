@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
 import { useRenderer } from './composables/use-renderer.js'
 import { useDudes } from './composables/use-dudes.js'
 import { useRaf } from './composables/use-raf.js'
 import { assetsLoader, type DudeAsset, type AssetsLoadOptions } from './core/assets-loader.js'
 import { useDudesSettings } from './composables/use-settings.js'
 import { soundsLoader } from './core/sounds-loader.js'
-import type { DudesOverlayMethods, DudesSettings, SoundAsset } from './types.js'
+import type { DudesMethods, DudesSettings, SoundAsset } from './types.js'
 
 const props = defineProps<{
   sounds: SoundAsset[]
@@ -25,7 +25,7 @@ const {
   createDude,
   removeDude,
   getDude,
-  clearDudes
+  removeAllDudes
 } = useDudes();
 const { startRaf } = useRaf(onRender)
 
@@ -51,13 +51,17 @@ async function initDudes() {
   startRaf()
 }
 
-defineExpose<DudesOverlayMethods>({
+onUnmounted(() => {
+  window.removeEventListener('resize', onResize)
+})
+
+defineExpose<DudesMethods>({
   dudes,
   initDudes,
   getDude,
   createDude,
   removeDude,
-  clearDudes,
+  removeAllDudes,
   updateSettings
 })
 </script>

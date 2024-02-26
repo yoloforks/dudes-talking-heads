@@ -4,17 +4,12 @@ import { Container, Sprite } from 'pixi.js'
 import { DELTA_TIME, ROUND } from '../constants.js'
 import { sleep } from '../helpers.js'
 
-export interface DudeEmoteSpitterParams {
-  enabled: boolean
-}
-
 const emotesCache = new Map<string, ArrayBuffer>()
 
 export class DudeEmoteSpitter {
   view = new Container()
 
   private emotes: Sprite[] = []
-  private gapTime = ROUND
   private currentGapTime = 0
   private moveSpeed = 50
   private alphaSpeed = 1
@@ -82,7 +77,7 @@ export class DudeEmoteSpitter {
         const sprite = this.emotes.shift()
         if (!sprite) return
         this.view.addChild(sprite)
-        this.currentGapTime = this.gapTime
+        this.currentGapTime = ROUND
       }
     }
   }

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import DudesOverlay from '@twirapp/dudes'
 import { VTweakpane } from 'v-tweakpane'
-import { onMounted, reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { assetsLoadOptions, dudeAssets, dudeSprites, dudeSounds, dudeNames, dudeEmotes, type DudesSprites } from './constants.js'
 import { randomNum, capitalize } from '@zero-dependency/utils'
 import { randomRgbColor } from './utils.js'
 
 import type { Pane } from 'tweakpane'
-import type { Dude, DudesOverlayMethods, DudesSettings } from '@twirapp/dudes/types'
+import type { Dude, DudesMethods, DudesTypes } from '@twirapp/dudes/types'
 
 const playgroundParams = ref<{
   isRandomColor: boolean,
@@ -17,7 +17,12 @@ const playgroundParams = ref<{
   selectedSprite: dudeSprites[0]
 })
 
-const settings = reactive<DudesSettings>({
+const settings = reactive<{
+  dude: DudesTypes.DudeParams,
+  message: DudesTypes.MessageBoxParams,
+  name: DudesTypes.NameBoxParams,
+  spitter: DudesTypes.EmoteSpitterParams
+}>({
   dude: {
     visibleName: true,
     color: '#969696',
@@ -67,12 +72,7 @@ const settings = reactive<DudesSettings>({
   }
 })
 
-const dudesRef = ref<DudesOverlayMethods | null>(null)
-
-watch(settings, (settings) => {
-  if (!dudesRef.value) return
-  dudesRef.value.updateSettings(settings)
-})
+const dudesRef = ref<DudesMethods | null>(null)
 
 onMounted(async () => {
   if (!dudesRef.value) return
@@ -159,7 +159,7 @@ function spitEmote(dude: Dude) {
 
 function clearDudes() {
   if (!dudesRef.value) return
-  dudesRef.value.clearDudes()
+  dudesRef.value.removeAllDudes()
 }
 
 function onPaneCreated(pane: Pane) {

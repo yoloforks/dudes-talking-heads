@@ -1,21 +1,14 @@
 import { AnimatedSprite, Container } from 'pixi.js'
 
-interface DudeSpriteContainerParams {
-  body: AnimatedSprite
-  cosmetics?: AnimatedSprite
-  outline: AnimatedSprite
-  eyes?: AnimatedSprite
-}
-
 export class DudeSpriteContainer {
   view = new Container()
 
-  private body: AnimatedSprite
-  private outline: AnimatedSprite
-  private eyes?: AnimatedSprite
-  private cosmetics?: AnimatedSprite
-
-  constructor({ body, cosmetics, outline, eyes }: DudeSpriteContainerParams) {
+  constructor(
+    private body: AnimatedSprite,
+    private outline: AnimatedSprite,
+    private eyes?: AnimatedSprite,
+    private cosmetics?: AnimatedSprite
+  ) {
     this.body = body
     this.outline = outline
 

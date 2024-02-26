@@ -15,14 +15,9 @@ export const dudeSprites = [
 
 export type DudesSprites = (typeof dudeSprites)[number]
 
-export const dudeNames = [
-  'Dude',
-  'Sith',
-  'Agent',
-  'Girl',
-  'Cat',
-  'Santa'
-]
+export const dudeNames = dudeSprites.map((name) => {
+  return name.charAt(0).toUpperCase() + name.slice(1)
+})
 
 export const dudeSounds: SoundAsset[] = [
   {

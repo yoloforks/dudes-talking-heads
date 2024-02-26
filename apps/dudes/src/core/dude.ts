@@ -16,7 +16,7 @@ import {
   DudeSpriteTags,
   spriteProvider
 } from './sprite-provider.js'
-import type { DudePersonalSettings } from '../types.js'
+import type { DudesTypes } from '../types.js'
 import type { DudeSpriteFrameTag } from './sprite-provider.js'
 
 export class Dude {
@@ -58,7 +58,7 @@ export class Dude {
   constructor(
     name: string,
     spriteName = 'dude',
-    settings?: DudePersonalSettings
+    individualParams?: DudesTypes.IndividualDudeParams
   ) {
     this.name = name
     this.spriteName = spriteName
@@ -83,10 +83,10 @@ export class Dude {
 
     this.direction = Math.random() > 0.5 ? 1 : -1
 
-    this.nameBox = new DudeNameBox(name, settings?.name)
+    this.nameBox = new DudeNameBox(name, individualParams?.name)
     this.visibleName(dudesSettings.value.dude.visibleName)
 
-    this.messageBox = new DudeMessageBox(settings?.message)
+    this.messageBox = new DudeMessageBox(individualParams?.message)
     this.emoteSpitter = new DudeEmoteSpitter()
 
     this.view.sortableChildren = true
@@ -278,7 +278,10 @@ export class Dude {
     this.isGrowing = true
   }
 
-  async playAnimation(frameTag: DudeSpriteFrameTag, force = false): Promise<void> {
+  async playAnimation(
+    frameTag: DudeSpriteFrameTag,
+    force = false
+  ): Promise<void> {
     const dudeSprite = spriteProvider.getSprite(this.spriteName, frameTag)
     if (!dudeSprite) return
 
@@ -294,12 +297,12 @@ export class Dude {
       soundsLoader.play('jump', volume)
     }
 
-    this.sprite = new DudeSpriteContainer({
-      body: dudeSprite[DudeSpriteLayers.Body],
-      outline: dudeSprite[DudeSpriteLayers.Outline],
-      eyes: dudeSprite[DudeSpriteLayers.Eyes],
-      cosmetics: dudeSprite[DudeSpriteLayers.Cosmetics]
-    })
+    this.sprite = new DudeSpriteContainer(
+      dudeSprite[DudeSpriteLayers.Body],
+      dudeSprite[DudeSpriteLayers.Outline],
+      dudeSprite[DudeSpriteLayers.Eyes],
+      dudeSprite[DudeSpriteLayers.Cosmetics]
+    )
     this.sprite.view.scale.set(this.direction * this.scale, this.scale)
     this.sprite.bodyColor(this.bodyColor)
     this.sprite.eyesColor(this.eyesColor)
