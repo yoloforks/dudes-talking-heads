@@ -13,7 +13,7 @@ pnpm add @twirapp/dudes
 ```vue
 <script setup lang="ts">
 import DudesOverlay from '@twirapp/dudes'
-import { SoundAsset, AssetsLoadOptions, DudesSettings, DudesOverlayMethods } from '@twirapp/dudes/types'
+import { SoundAsset, AssetsLoadOptions, DudesSettings, DudesMethods } from '@twirapp/dudes/types'
 import { onMounted, ref } from 'vue'
 
 const dudeSounds: SoundAsset[] = [
