@@ -12,7 +12,7 @@ export const dudesSounds: SoundAsset[] = [
 ]
 
 export const assetsLoadOptions: AssetsLoaderOptions = {
-  basePath: location.href + 'sprites/',
+  basePath: location.href + 'custom/',
   defaultSearchParams: {
     ts: Date.now()
   }
@@ -20,22 +20,22 @@ export const assetsLoadOptions: AssetsLoaderOptions = {
 
 const body = {
   alias: 'Body',
-  src: 'custom/body.json'
+  src: 'body.json'
 }
 
 const eyes = {
   alias: 'Eyes',
-  src: 'custom/eyes.json'
+  src: 'eyes.json'
 }
 
 const mouth = {
   alias: 'Mouth',
-  src: 'custom/mouth.json'
+  src: 'mouth.json'
 }
 
 const cosmetics = {
   alias: 'Cosmetics',
-  src: 'custom/cosmetics.json'
+  src: 'cosmetics.json'
 }
 
 export const dudesSpriteNames = {

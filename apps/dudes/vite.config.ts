@@ -14,16 +14,12 @@ export default defineConfig({
     rollupOptions: {
       external: [
         'vue',
-        'pixi.js',
-        '@pixi/gif',
         'gsap'
       ],
       output: {
         exports: 'default',
         globals: {
           vue: 'Vue',
-          'pixi.js': 'PIXI',
-          '@pixi/gif': 'GIF',
           gsap: 'gsap'
         }
       }
