@@ -3,15 +3,14 @@ import { onUnmounted, ref, watch } from 'vue'
 import { useRenderer } from './composables/use-renderer.js'
 import { useDudes } from './composables/use-dudes.js'
 import { useRaf } from './composables/use-raf.js'
-import { assetsLoader, type DudesAsset, type AssetsLoadOptions } from './core/assets-loader.js'
+import { assetsLoader, type AssetsLoaderOptions } from './core/assets-loader.js'
 import { useDudesSettings } from './composables/use-settings.js'
 import { soundsLoader } from './core/sounds-loader.js'
 import type { DudesMethods, DudesSettings, SoundAsset } from './types.js'
 
 const props = defineProps<{
   sounds: SoundAsset[]
-  assets: DudesAsset[]
-  assetsLoadOptions?: AssetsLoadOptions
+  assetsLoaderOptions?: AssetsLoaderOptions
   settings?: DudesSettings
 }>()
 
@@ -44,10 +43,7 @@ function onResize() {
 }
 
 async function initDudes() {
-  if (props.assetsLoadOptions) {
-    assetsLoader.loadOptions = props.assetsLoadOptions
-  }
-
+  await assetsLoader.init(props.assetsLoaderOptions)
   await soundsLoader.load(props.sounds)
   initRenderer(canvasRef)
   window.addEventListener('resize', onResize)

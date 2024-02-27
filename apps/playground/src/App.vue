@@ -2,8 +2,8 @@
 import DudesOverlay from '@twirapp/dudes'
 import { VTweakpane } from 'v-tweakpane'
 import { onMounted, reactive, ref } from 'vue'
-import { assetsLoadOptions, dudeAssets, dudeSprites, dudeSounds, dudeNames, dudeEmotes, type DudesSprites, santaSpriteData } from './constants.js'
-import { randomNum, capitalize } from '@zero-dependency/utils'
+import { assetsLoadOptions, dudesSounds, dudesEmotes, dudesSprites, dudesSpriteNames } from './constants.js'
+import { randomNum } from '@zero-dependency/utils'
 import { randomRgbColor } from './utils.js'
 
 import type { Pane } from 'tweakpane'
@@ -11,10 +11,10 @@ import type { Dude, DudesMethods, DudesTypes } from '@twirapp/dudes/types'
 
 const playgroundParams = ref<{
   isRandomColor: boolean,
-  selectedSprite: DudesSprites
+  selectedSprite: string
 }>({
   isRandomColor: false,
-  selectedSprite: dudeSprites[0]
+  selectedSprite: dudesSprites[0].name
 })
 
 const settings = reactive<{
@@ -78,26 +78,23 @@ onMounted(async () => {
   if (!dudesRef.value) return
   await dudesRef.value.initDudes()
 
-  if (import.meta.env.DEV) {
-    const dude = await dudesRef.value.createDude('Тwir', santaSpriteData)
-    dude.bodyTint('#6441A5')
-  } else {
-    for (const dudeName of dudeNames) {
-      // const dudeSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
-      const dudeColor = randomRgbColor()
-      const dude = await dudesRef.value.createDude(dudeName, santaSpriteData)
-      dude.bodyTint(dudeColor)
-    }
+  for (const dudeSprite of dudesSprites) {
+    const dudeColor = randomRgbColor()
+    const dude = await dudesRef.value.createDude(dudeSprite.name, dudeSprite)
+    dude.bodyTint(dudeColor)
   }
 })
 
 async function spawnDude() {
   if (!dudesRef.value) return
 
-  const name = dudeNames[randomNum(0, dudeNames.length - 1)]
+  const spriteData = dudesSprites
+    .find(sprite => sprite.name === playgroundParams.value.selectedSprite)
+  if (!spriteData) return
+
   const dude = await dudesRef.value.createDude(
-    `Super ${name} #${randomNum(0, 100)}`,
-    santaSpriteData,
+    `Super ${spriteData.name} #${randomNum(0, 100)}`,
+    spriteData,
     {
       message: {
         boxColor: 'lightgreen',
@@ -153,7 +150,7 @@ function spitEmotesAllDudes() {
 }
 
 function spitEmote(dude: Dude) {
-  const emoteName = dudeEmotes[randomNum(0, dudeEmotes.length - 1)]
+  const emoteName = dudesEmotes[randomNum(0, dudesEmotes.length - 1)]
   dude.spitEmotes([`emotes/${emoteName}`])
 }
 
@@ -174,9 +171,9 @@ function onPaneCreated(pane: Pane) {
   const dudeFolder = pane.addFolder({ title: 'Dude' })
   dudeFolder.addBinding(playgroundParams.value, 'selectedSprite', {
     label: 'Sprite',
-    options: dudeSprites.map(sprite => ({
-      text: capitalize(sprite),
-      value: sprite
+    options: Object.entries(dudesSpriteNames).map(([text, value]) => ({
+      text,
+      value
     })),
   })
   dudeFolder.addBinding(settings.dude.sounds, 'enabled', {
@@ -334,11 +331,5 @@ function onPaneCreated(pane: Pane) {
   <Teleport to="body">
     <v-tweakpane :pane="{ title: 'Dudes Playground' }" @on-pane-created="onPaneCreated" />
   </Teleport>
-  <dudes-overlay
-    ref="dudesRef"
-    :assets-load-options="assetsLoadOptions"
-    :assets="dudeAssets"
-    :sounds="dudeSounds"
-    :settings="settings"
-  />
+  <dudes-overlay ref="dudesRef" :assets-loader-options="assetsLoadOptions" :sounds="dudesSounds" :settings="settings" />
 </template>

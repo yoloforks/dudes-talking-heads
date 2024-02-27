@@ -1,4 +1,4 @@
-import type { AssetsLoadOptions, DudesAsset } from './core/assets-loader.js'
+import type { AssetsLoaderOptions, DudesAsset } from './core/assets-loader.js'
 import type { Dude, DudeSpriteData } from './core/dude.js'
 import type { SoundAsset, SoundType } from './core/sounds-loader.js'
 
@@ -250,5 +250,5 @@ export type {
   DudesAsset,
   SoundAsset,
   SoundType,
-  AssetsLoadOptions
+  AssetsLoaderOptions
 }

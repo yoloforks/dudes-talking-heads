@@ -20,28 +20,17 @@ export interface DudesAsset {
   src: string
 }
 
-export type AssetsLoadOptions = Omit<AssetInitOptions, 'manifest'>
+export type AssetsLoaderOptions = Omit<AssetInitOptions, 'manifest'>
 
 export class AssetsLoader {
   bundles: Record<string, Record<string, Spritesheet<SpriteData>>> = {}
-  loadOptions: AssetsLoadOptions = {}
+
+  async init(loadOptions: AssetsLoaderOptions = {}): Promise<void> {
+    await Assets.init({ ...loadOptions })
+  }
 
   async load(spriteName: string, assets: DudesAsset[]): Promise<void> {
-    if (spriteName in this.bundles) {
-      return Promise.resolve()
-    }
-
-    await Assets.init({
-      manifest: {
-        bundles: [
-          {
-            name: spriteName,
-            assets
-          }
-        ]
-      },
-      ...this.loadOptions
-    })
+    Assets.addBundle(spriteName, assets)
     this.bundles[spriteName] = await Assets.loadBundle(spriteName)
   }
 }

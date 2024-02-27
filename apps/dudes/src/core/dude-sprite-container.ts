@@ -5,7 +5,7 @@ export class DudeSpriteContainer {
 
   constructor(
     private body: AnimatedSprite,
-    private eyes: AnimatedSprite,
+    private eyes?: AnimatedSprite,
     private cosmetics?: AnimatedSprite
   ) {
     const sprites = [body]
@@ -15,11 +15,13 @@ export class DudeSpriteContainer {
     body.anchor.set(0.5)
     body.play()
 
-    this.eyes = eyes
-    eyes.zIndex = 2
-    eyes.anchor.set(0.5)
-    eyes.play()
-    sprites.push(eyes)
+    if (eyes) {
+      this.eyes = eyes
+      eyes.zIndex = 2
+      eyes.anchor.set(0.5)
+      eyes.play()
+      sprites.push(eyes)
+    }
 
     if (cosmetics) {
       this.cosmetics = cosmetics
@@ -33,13 +35,13 @@ export class DudeSpriteContainer {
     this.view.sortableChildren = true
 
     this.body.play()
-    this.eyes.play()
+    this.eyes?.play()
     this.cosmetics?.play()
   }
 
   update(delta: number): void {
     this.body.update(delta)
-    this.eyes.update(delta)
+    this.eyes?.update(delta)
     this.cosmetics?.update(delta)
   }
 

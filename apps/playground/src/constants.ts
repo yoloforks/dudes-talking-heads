@@ -1,97 +1,104 @@
 import type {
-  AssetsLoadOptions,
-  DudesAsset,
+  AssetsLoaderOptions,
   DudeSpriteData,
   SoundAsset
 } from '@twirapp/dudes/types'
 
-export const dudeSprites = [
-  'dude',
-  'sith',
-  'agent',
-  'girl',
-  'cat',
-  'santa'
-] as const
-
-export type DudesSprites = (typeof dudeSprites)[number]
-
-export const dudeNames = dudeSprites.map((name) => {
-  return name.charAt(0).toUpperCase() + name.slice(1)
-})
-
-export const dudeSounds: SoundAsset[] = [
+export const dudesSounds: SoundAsset[] = [
   {
     alias: 'jump',
     src: './sounds/jump.mp3'
   }
 ]
 
-export const assetsLoadOptions: AssetsLoadOptions = {
+export const assetsLoadOptions: AssetsLoaderOptions = {
   basePath: location.href + 'sprites/',
   defaultSearchParams: {
     ts: Date.now()
   }
 }
 
-export const santaSpriteData: DudeSpriteData = {
-  name: 'santa',
-  layers: [
-    {
-      alias: 'Body',
-      src: 'custom/body.json'
-    },
-    {
-      alias: 'Eyes',
-      src: 'custom/eyes.json'
-    },
-    {
-      alias: 'Cosmetics',
-      src: 'custom/cosmetics.json'
-    }
-  ]
+const body = {
+  alias: 'Body',
+  src: 'custom/body.json'
 }
 
-export const dudeAssets: DudesAsset[] = [
+const eyes = {
+  alias: 'Eyes',
+  src: 'custom/eyes.json'
+}
+
+const cosmetics = {
+  alias: 'Cosmetics',
+  src: 'custom/cosmetics.json'
+}
+
+export const dudesSpriteNames = {
+  Dude: 'dude',
+  Santa: 'santa',
+  DudeWithoutEyes: 'dude-without-eyes',
+  SantaWithoutEyes: 'santa-without-eyes'
+} as const
+
+export const dudesSprites: DudeSpriteData[] = [
   {
-    alias: 'dude.Body',
-    src: 'custom/body.json'
+    name: dudesSpriteNames.Dude,
+    layers: [
+      body,
+      eyes
+    ]
   },
   {
-    alias: 'dude.Eyes',
-    src: 'custom/eyes.json'
+    name: dudesSpriteNames.DudeWithoutEyes,
+    layers: [
+      body
+    ]
   },
   {
-    alias: 'dude.Cosmetics',
-    src: 'custom/cosmetics.json'
+    name: dudesSpriteNames.Santa,
+    layers: [
+      body,
+      eyes,
+      cosmetics
+    ]
+  },
+  {
+    name: dudesSpriteNames.SantaWithoutEyes,
+    layers: [
+      body,
+      cosmetics
+    ]
   }
-  // {
-  //   alias: 'dude',
-  //   src: 'dude/dude.json'
-  // },
-  // {
-  //   alias: 'sith',
-  //   src: 'sith/sith.json'
-  // },
-  // {
-  //   alias: 'agent',
-  //   src: 'agent/agent.json'
-  // },
-  // {
-  //   alias: 'girl',
-  //   src: 'girl/girl.json'
-  // },
-  // {
-  //   alias: 'cat',
-  //   src: 'cat/cat.json'
-  // },
-  // {
-  //   alias: 'santa',
-  //   src: 'santa/santa.json'
-  // }
 ]
 
-export const dudeEmotes: string[] = [
+// export const dudeAssets: DudesAsset[] = [
+//   {
+//     alias: 'dude',
+//     src: 'dude/dude.json'
+//   },
+//   {
+//     alias: 'sith',
+//     src: 'sith/sith.json'
+//   },
+//   {
+//     alias: 'agent',
+//     src: 'agent/agent.json'
+//   },
+//   {
+//     alias: 'girl',
+//     src: 'girl/girl.json'
+//   },
+//   {
+//     alias: 'cat',
+//     src: 'cat/cat.json'
+//   },
+//   {
+//     alias: 'santa',
+//     src: 'santa/santa.json'
+//   }
+// ]
+
+export const dudesEmotes: string[] = [
   'pepegaGun.gif',
   'lexot.gif',
   'hmm.webp',
