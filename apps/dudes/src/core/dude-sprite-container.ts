@@ -45,13 +45,7 @@ export class DudeSpriteContainer {
     this.cosmetics?.update(delta)
   }
 
-  eyesColor(color: string): void {
-    if (this.eyes) {
-      this.eyes.tint = color
-    }
-  }
-
-  bodyColor(color: string): void {
+  tint(color: string): void {
     this.body.tint = color
   }
 }

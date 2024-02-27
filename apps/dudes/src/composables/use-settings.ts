@@ -12,8 +12,6 @@ export const dudesSettings = ref<{
   dude: {
     visibleName: true,
     color: '#969696',
-    eyesColor: '#FFFFFF',
-    cosmeticsColor: '#FFFFFF',
     maxLifeTime: 1000 * 60 * 30,
     growTime: 1000 * 60 * 5,
     growMaxScale: 20,

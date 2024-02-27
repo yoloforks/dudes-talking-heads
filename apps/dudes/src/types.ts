@@ -43,16 +43,6 @@ export namespace DudesTypes {
     color: string
 
     /**
-     * @default '#FFFFFF'
-     */
-    eyesColor: string
-
-    /**
-     * @default '#FFFFFF'
-     */
-    cosmeticsColor: string
-
-    /**
      * @default 4
      */
     scale: number

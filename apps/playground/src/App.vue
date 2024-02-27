@@ -13,7 +13,7 @@ const playgroundParams = ref<{
   isRandomColor: boolean,
   selectedSprite: string
 }>({
-  isRandomColor: false,
+  isRandomColor: true,
   selectedSprite: dudesSprites[0].name
 })
 
@@ -26,8 +26,6 @@ const settings = reactive<{
   dude: {
     visibleName: true,
     color: '#969696',
-    eyesColor: '#FFFFFF',
-    cosmeticsColor: '#FFFFFF',
     maxLifeTime: 1000 * 60 * 30,
     growTime: 1000 * 2,
     growMaxScale: 20,
@@ -81,7 +79,7 @@ onMounted(async () => {
   for (const dudeSprite of dudesSprites) {
     const dudeColor = randomRgbColor()
     const dude = await dudesRef.value.createDude(dudeSprite.name, dudeSprite)
-    dude.bodyTint(dudeColor)
+    dude.tint(dudeColor)
   }
 })
 
@@ -114,11 +112,7 @@ async function spawnDude() {
     ? randomRgbColor()
     : settings.dude.color
 
-  dude.bodyTint(color)
-
-  setTimeout(() => {
-    spitEmote(dude)
-  }, 2000)
+  dude.tint(color)
 }
 
 function jumpAllDudes() {
@@ -190,13 +184,8 @@ function onPaneCreated(pane: Pane) {
   }).on('change', ({ value }) => color.disabled = value)
 
   const color = dudeFolder.addBinding(settings.dude, 'color', {
-    label: 'Sprite color'
-  })
-  dudeFolder.addBinding(settings.dude, 'eyesColor', {
-    label: 'Eyes color'
-  })
-  dudeFolder.addBinding(settings.dude, 'cosmeticsColor', {
-    label: 'Cosmetics color'
+    label: 'Sprite color',
+    disabled: playgroundParams.value.isRandomColor
   })
   dudeFolder.addBinding(settings.dude, 'gravity', {
     label: 'Gravity',

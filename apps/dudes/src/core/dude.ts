@@ -29,8 +29,6 @@ export class Dude {
   view = new Container()
 
   private bodyColor: string
-  private eyesColor: string
-
   private direction: number
   private animationState?: DudeSpriteFrameTag
 
@@ -69,8 +67,7 @@ export class Dude {
 
     await assetsLoader.load(this.spriteData.name, this.spriteData.layers)
 
-    this.bodyTint(dudesSettings.value.dude.color)
-    this.eyesTint(dudesSettings.value.dude.eyesColor)
+    this.tint(dudesSettings.value.dude.color)
 
     watch(
       () => dudesSettings.value.dude.scale,
@@ -126,16 +123,10 @@ export class Dude {
     tryJump()
   }
 
-  bodyTint(color: string): void {
+  tint(color: string): void {
     if (!isValidColor(color)) return
     this.bodyColor = color
-    this.sprite?.bodyColor(this.bodyColor)
-  }
-
-  eyesTint(color: string): void {
-    if (!isValidColor(color)) return
-    this.eyesColor = color
-    this.sprite?.eyesColor(color)
+    this.sprite?.tint(this.bodyColor)
   }
 
   update(): void {
@@ -305,8 +296,7 @@ export class Dude {
       dudeSprite[DudeSpriteLayers.Cosmetics]
     )
     this.sprite.view.scale.set(this.direction * this.scale, this.scale)
-    this.sprite.bodyColor(this.bodyColor)
-    this.sprite.eyesColor(this.eyesColor)
+    this.sprite.tint(this.bodyColor)
 
     this.view.addChild(this.sprite.view)
   }
