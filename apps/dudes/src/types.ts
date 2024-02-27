@@ -1,5 +1,5 @@
 import type { AssetsLoadOptions, DudesAsset } from './core/assets-loader.js'
-import type { Dude } from './core/dude.js'
+import type { Dude, DudeSpriteData } from './core/dude.js'
 import type { SoundAsset, SoundType } from './core/sounds-loader.js'
 
 export type RecursivePartial<T> = {
@@ -16,9 +16,9 @@ export interface DudesMethods {
   getDude: (name: string) => Dude | undefined
   createDude: (
     name: string,
-    sprite: string,
+    spriteData: DudeSpriteData,
     params?: DudesTypes.IndividualDudeParams
-  ) => Dude
+  ) => Promise<Dude>
   removeDude: (name: string) => void
   removeAllDudes: () => void
   updateSettings: (settings: RecursivePartial<DudesSettings>) => void
@@ -244,4 +244,11 @@ export type DudesSettings = RecursivePartial<{
   spitter: DudesTypes.EmoteSpitterParams
 }>
 
-export type { Dude, DudesAsset, SoundAsset, SoundType, AssetsLoadOptions }
+export type {
+  Dude,
+  DudeSpriteData,
+  DudesAsset,
+  SoundAsset,
+  SoundType,
+  AssetsLoadOptions
+}

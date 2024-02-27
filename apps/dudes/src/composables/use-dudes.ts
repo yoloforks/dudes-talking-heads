@@ -3,6 +3,7 @@ import { watch } from 'vue'
 
 import { Dude } from '../core/dude.js'
 import { dudesSettings } from './use-settings.js'
+import type { DudeSpriteData } from '../core/dude.js'
 import type { DudesTypes } from '../types.js'
 
 const dudes = new Map<string, Dude>()
@@ -24,13 +25,14 @@ export const useDudes = () => {
     return dudes.get(name) as Dude
   }
 
-  function createDude(
+  async function createDude(
     name: string,
-    sprite: string,
+    spriteData: DudeSpriteData,
     params?: DudesTypes.IndividualDudeParams
-  ): Dude {
+  ): Promise<Dude> {
     removeDude(name)
-    const dude = new Dude(name, sprite, params)
+    const dude = new Dude(name, spriteData, params)
+    await dude.init()
     dudes.set(name, dude)
     dudesContainer.addChild(dude.view)
     return dude

@@ -1,6 +1,7 @@
 import type {
   AssetsLoadOptions,
   DudesAsset,
+  DudeSpriteData,
   SoundAsset
 } from '@twirapp/dudes/types'
 
@@ -33,31 +34,61 @@ export const assetsLoadOptions: AssetsLoadOptions = {
   }
 }
 
+export const santaSpriteData: DudeSpriteData = {
+  name: 'santa',
+  layers: [
+    {
+      alias: 'Body',
+      src: 'custom/body.json'
+    },
+    {
+      alias: 'Eyes',
+      src: 'custom/eyes.json'
+    },
+    {
+      alias: 'Cosmetics',
+      src: 'custom/cosmetics.json'
+    }
+  ]
+}
+
 export const dudeAssets: DudesAsset[] = [
   {
-    alias: 'dude',
-    src: 'dude/dude.json'
+    alias: 'dude.Body',
+    src: 'custom/body.json'
   },
   {
-    alias: 'sith',
-    src: 'sith/sith.json'
+    alias: 'dude.Eyes',
+    src: 'custom/eyes.json'
   },
   {
-    alias: 'agent',
-    src: 'agent/agent.json'
-  },
-  {
-    alias: 'girl',
-    src: 'girl/girl.json'
-  },
-  {
-    alias: 'cat',
-    src: 'cat/cat.json'
-  },
-  {
-    alias: 'santa',
-    src: 'santa/santa.json'
+    alias: 'dude.Cosmetics',
+    src: 'custom/cosmetics.json'
   }
+  // {
+  //   alias: 'dude',
+  //   src: 'dude/dude.json'
+  // },
+  // {
+  //   alias: 'sith',
+  //   src: 'sith/sith.json'
+  // },
+  // {
+  //   alias: 'agent',
+  //   src: 'agent/agent.json'
+  // },
+  // {
+  //   alias: 'girl',
+  //   src: 'girl/girl.json'
+  // },
+  // {
+  //   alias: 'cat',
+  //   src: 'cat/cat.json'
+  // },
+  // {
+  //   alias: 'santa',
+  //   src: 'santa/santa.json'
+  // }
 ]
 
 export const dudeEmotes: string[] = [

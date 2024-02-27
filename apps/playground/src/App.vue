@@ -2,7 +2,7 @@
 import DudesOverlay from '@twirapp/dudes'
 import { VTweakpane } from 'v-tweakpane'
 import { onMounted, reactive, ref } from 'vue'
-import { assetsLoadOptions, dudeAssets, dudeSprites, dudeSounds, dudeNames, dudeEmotes, type DudesSprites } from './constants.js'
+import { assetsLoadOptions, dudeAssets, dudeSprites, dudeSounds, dudeNames, dudeEmotes, type DudesSprites, santaSpriteData } from './constants.js'
 import { randomNum, capitalize } from '@zero-dependency/utils'
 import { randomRgbColor } from './utils.js'
 
@@ -79,25 +79,25 @@ onMounted(async () => {
   await dudesRef.value.initDudes()
 
   if (import.meta.env.DEV) {
-    const dude = dudesRef.value.createDude('Тwir', dudeSprites[0])
+    const dude = await dudesRef.value.createDude('Тwir', santaSpriteData)
     dude.bodyTint('#6441A5')
   } else {
     for (const dudeName of dudeNames) {
-      const dudeSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
+      // const dudeSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
       const dudeColor = randomRgbColor()
-      const dude = dudesRef.value.createDude(dudeName, dudeSprite)
+      const dude = await dudesRef.value.createDude(dudeName, santaSpriteData)
       dude.bodyTint(dudeColor)
     }
   }
 })
 
-function spawnDude() {
+async function spawnDude() {
   if (!dudesRef.value) return
 
   const name = dudeNames[randomNum(0, dudeNames.length - 1)]
-  const dude = dudesRef.value.createDude(
+  const dude = await dudesRef.value.createDude(
     `Super ${name} #${randomNum(0, 100)}`,
-    playgroundParams.value.selectedSprite,
+    santaSpriteData,
     {
       message: {
         boxColor: 'lightgreen',

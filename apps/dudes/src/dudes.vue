@@ -44,8 +44,11 @@ function onResize() {
 }
 
 async function initDudes() {
+  if (props.assetsLoadOptions) {
+    assetsLoader.loadOptions = props.assetsLoadOptions
+  }
+
   await soundsLoader.load(props.sounds)
-  await assetsLoader.load(props.assets, props.assetsLoadOptions)
   initRenderer(canvasRef)
   window.addEventListener('resize', onResize)
   startRaf()

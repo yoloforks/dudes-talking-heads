@@ -6,6 +6,7 @@ import { removeInternalDude } from '../composables/use-dudes.js'
 import { dudesSettings } from '../composables/use-settings.js'
 import { COLLIDER, DELTA_TIME, ROUND, SPRITE_SIZE } from '../constants.js'
 import { isValidColor } from '../helpers.js'
+import { assetsLoader } from './assets-loader.js'
 import { DudeEmoteSpitter } from './dude-emote-spitter.js'
 import { DudeMessageBox } from './dude-message-box.js'
 import { DudeNameBox } from './dude-name-box.js'
@@ -16,17 +17,19 @@ import {
   DudeSpriteTags,
   spriteProvider
 } from './sprite-provider.js'
-import type { DudesTypes } from '../types.js'
+import type { DudesAsset, DudesTypes } from '../types.js'
 import type { DudeSpriteFrameTag } from './sprite-provider.js'
 
-export class Dude {
+export interface DudeSpriteData {
   name: string
-  spriteName: string
+  layers: DudesAsset[]
+}
+
+export class Dude {
   view = new Container()
 
   private bodyColor: string
   private eyesColor: string
-  private cosmeticsColor: string
 
   private direction: number
   private animationState?: DudeSpriteFrameTag
@@ -56,16 +59,18 @@ export class Dude {
   private scale: number
 
   constructor(
-    name: string,
-    spriteName = 'dude',
-    individualParams?: DudesTypes.IndividualDudeParams
-  ) {
-    this.name = name
-    this.spriteName = spriteName
+    public name: string,
+    private spriteData: DudeSpriteData,
+    private individualParams?: DudesTypes.IndividualDudeParams
+  ) {}
+
+  async init(): Promise<void> {
+    if (this.currentLifeTime) return
+
+    await assetsLoader.load(this.spriteData.name, this.spriteData.layers)
 
     this.bodyTint(dudesSettings.value.dude.color)
     this.eyesTint(dudesSettings.value.dude.eyesColor)
-    this.cosmeticsTint(dudesSettings.value.dude.cosmeticsColor)
 
     watch(
       () => dudesSettings.value.dude.scale,
@@ -83,10 +88,10 @@ export class Dude {
 
     this.direction = Math.random() > 0.5 ? 1 : -1
 
-    this.nameBox = new DudeNameBox(name, individualParams?.name)
+    this.nameBox = new DudeNameBox(this.name, this.individualParams?.name)
     this.visibleName(dudesSettings.value.dude.visibleName)
 
-    this.messageBox = new DudeMessageBox(individualParams?.message)
+    this.messageBox = new DudeMessageBox(this.individualParams?.message)
     this.emoteSpitter = new DudeEmoteSpitter()
 
     this.view.sortableChildren = true
@@ -131,12 +136,6 @@ export class Dude {
     if (!isValidColor(color)) return
     this.eyesColor = color
     this.sprite?.eyesColor(color)
-  }
-
-  cosmeticsTint(color: string): void {
-    if (!isValidColor(color)) return
-    this.cosmeticsColor = color
-    this.sprite?.cosmeticsColor(color)
   }
 
   update(): void {
@@ -285,7 +284,7 @@ export class Dude {
     frameTag: DudeSpriteFrameTag,
     force = false
   ): Promise<void> {
-    const dudeSprite = spriteProvider.getSprite(this.spriteName, frameTag)
+    const dudeSprite = spriteProvider.getSprite(this.spriteData.name, frameTag)
     if (!dudeSprite) return
 
     if (this.animationState === frameTag && !force) return
@@ -302,14 +301,12 @@ export class Dude {
 
     this.sprite = new DudeSpriteContainer(
       dudeSprite[DudeSpriteLayers.Body],
-      dudeSprite[DudeSpriteLayers.Outline],
       dudeSprite[DudeSpriteLayers.Eyes],
       dudeSprite[DudeSpriteLayers.Cosmetics]
     )
     this.sprite.view.scale.set(this.direction * this.scale, this.scale)
     this.sprite.bodyColor(this.bodyColor)
     this.sprite.eyesColor(this.eyesColor)
-    this.sprite.cosmeticsColor(this.cosmeticsColor)
 
     this.view.addChild(this.sprite.view)
   }

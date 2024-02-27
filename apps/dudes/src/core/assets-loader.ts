@@ -3,8 +3,7 @@ import type {
   AssetInitOptions,
   ISpritesheetData,
   ISpritesheetFrameData,
-  Spritesheet,
-  utils
+  Spritesheet
 } from 'pixi.js'
 
 export interface SpriteFrameData extends ISpritesheetFrameData {
@@ -12,7 +11,7 @@ export interface SpriteFrameData extends ISpritesheetFrameData {
 }
 
 export interface SpriteData extends ISpritesheetData {
-  frames: utils.Dict<SpriteFrameData>
+  frames: Record<string, SpriteFrameData>
   duration: number
 }
 
@@ -24,29 +23,26 @@ export interface DudesAsset {
 export type AssetsLoadOptions = Omit<AssetInitOptions, 'manifest'>
 
 export class AssetsLoader {
-  assets: utils.Dict<Spritesheet<SpriteData>> = {}
+  bundles: Record<string, Record<string, Spritesheet<SpriteData>>> = {}
+  loadOptions: AssetsLoadOptions = {}
 
-  private isLoaded = false
-
-  async load(
-    assets: DudesAsset[],
-    loadOptions: AssetsLoadOptions = {}
-  ): Promise<void> {
-    if (this.isLoaded) return
+  async load(spriteName: string, assets: DudesAsset[]): Promise<void> {
+    if (spriteName in this.bundles) {
+      return Promise.resolve()
+    }
 
     await Assets.init({
       manifest: {
         bundles: [
           {
-            name: 'main',
+            name: spriteName,
             assets
           }
         ]
       },
-      ...loadOptions
+      ...this.loadOptions
     })
-    this.assets = await Assets.loadBundle('main')
-    this.isLoaded = true
+    this.bundles[spriteName] = await Assets.loadBundle(spriteName)
   }
 }
 
