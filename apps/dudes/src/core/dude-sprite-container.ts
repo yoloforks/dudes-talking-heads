@@ -1,51 +1,56 @@
 import { AnimatedSprite, Container } from 'pixi.js'
 
+function prepareSprite(sprite: AnimatedSprite, zIndex: number): AnimatedSprite {
+  sprite.zIndex = zIndex
+  sprite.anchor.set(0.5)
+  sprite.play()
+  return sprite
+}
+
 export class DudeSpriteContainer {
   view = new Container()
 
   constructor(
-    private body: AnimatedSprite,
+    private body?: AnimatedSprite,
     private eyes?: AnimatedSprite,
+    private mouth?: AnimatedSprite,
     private cosmetics?: AnimatedSprite
   ) {
-    const sprites = [body]
+    const sprites = []
 
-    this.body = body
-    body.zIndex = 1
-    body.anchor.set(0.5)
-    body.play()
+    if (body) {
+      this.body = prepareSprite(body, 1)
+      sprites.push(this.body)
+    }
 
     if (eyes) {
-      this.eyes = eyes
-      eyes.zIndex = 2
-      eyes.anchor.set(0.5)
-      eyes.play()
-      sprites.push(eyes)
+      this.eyes = prepareSprite(eyes, 2)
+      sprites.push(this.eyes)
+    }
+
+    if (mouth) {
+      this.mouth = prepareSprite(mouth, 2)
+      sprites.push(this.mouth)
     }
 
     if (cosmetics) {
-      this.cosmetics = cosmetics
-      cosmetics.zIndex = 3
-      cosmetics.anchor.set(0.5)
-      cosmetics.play()
-      sprites.push(cosmetics)
+      this.cosmetics = prepareSprite(cosmetics, 3)
+      sprites.push(this.cosmetics)
     }
 
     this.view.addChild(...sprites)
     this.view.sortableChildren = true
-
-    this.body.play()
-    this.eyes?.play()
-    this.cosmetics?.play()
   }
 
   update(delta: number): void {
-    this.body.update(delta)
+    this.body?.update(delta)
     this.eyes?.update(delta)
+    this.mouth?.update(delta)
     this.cosmetics?.update(delta)
   }
 
   tint(color: string): void {
+    if (!this.body) return
     this.body.tint = color
   }
 }

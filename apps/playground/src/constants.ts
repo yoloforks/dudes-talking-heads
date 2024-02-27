@@ -28,6 +28,11 @@ const eyes = {
   src: 'custom/eyes.json'
 }
 
+const mouth = {
+  alias: 'Mouth',
+  src: 'custom/mouth.json'
+}
+
 const cosmetics = {
   alias: 'Cosmetics',
   src: 'custom/cosmetics.json'
@@ -37,7 +42,8 @@ export const dudesSpriteNames = {
   Dude: 'dude',
   Santa: 'santa',
   DudeWithoutEyes: 'dude-without-eyes',
-  SantaWithoutEyes: 'santa-without-eyes'
+  SantaWithoutEyes: 'santa-without-eyes',
+  DudeWithMouth: 'dude-with-mouth'
 } as const
 
 export const dudesSprites: DudeSpriteData[] = [
@@ -67,6 +73,14 @@ export const dudesSprites: DudeSpriteData[] = [
     layers: [
       body,
       cosmetics
+    ]
+  },
+  {
+    name: dudesSpriteNames.DudeWithMouth,
+    layers: [
+      body,
+      eyes,
+      mouth
     ]
   }
 ]

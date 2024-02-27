@@ -6,6 +6,7 @@ import { assetsLoader } from './assets-loader.js'
 export const DudeSpriteLayers = {
   Body: 'Body',
   Eyes: 'Eyes',
+  Mouth: 'Mouth',
   Cosmetics: 'Cosmetics'
 } as const
 const DudeSpriteKeys = Object.keys(DudeSpriteLayers)

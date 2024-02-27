@@ -293,6 +293,7 @@ export class Dude {
     this.sprite = new DudeSpriteContainer(
       dudeSprite[DudeSpriteLayers.Body],
       dudeSprite[DudeSpriteLayers.Eyes],
+      dudeSprite[DudeSpriteLayers.Mouth],
       dudeSprite[DudeSpriteLayers.Cosmetics]
     )
     this.sprite.view.scale.set(this.direction * this.scale, this.scale)

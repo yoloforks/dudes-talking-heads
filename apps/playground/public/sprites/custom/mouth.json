@@ -1,5 +1,5 @@
 { "frames": {
-  "Eyes_0": {
+  "Mouth_0": {
    "frame": { "x": 0, "y": 0, "w": 32, "h": 32 },
    "rotated": false,
    "trimmed": false,
@@ -7,7 +7,7 @@
    "sourceSize": { "w": 32, "h": 32 },
    "duration": 300
   },
-  "Eyes_1": {
+  "Mouth_1": {
    "frame": { "x": 32, "y": 0, "w": 32, "h": 32 },
    "rotated": false,
    "trimmed": false,
@@ -15,7 +15,7 @@
    "sourceSize": { "w": 32, "h": 32 },
    "duration": 300
   },
-  "Eyes_2": {
+  "Mouth_2": {
    "frame": { "x": 64, "y": 0, "w": 32, "h": 32 },
    "rotated": false,
    "trimmed": false,
@@ -23,7 +23,7 @@
    "sourceSize": { "w": 32, "h": 32 },
    "duration": 300
   },
-  "Eyes_3": {
+  "Mouth_3": {
    "frame": { "x": 96, "y": 0, "w": 32, "h": 32 },
    "rotated": false,
    "trimmed": false,
@@ -31,7 +31,7 @@
    "sourceSize": { "w": 32, "h": 32 },
    "duration": 100
   },
-  "Eyes_4": {
+  "Mouth_4": {
    "frame": { "x": 128, "y": 0, "w": 32, "h": 32 },
    "rotated": false,
    "trimmed": false,
@@ -39,7 +39,7 @@
    "sourceSize": { "w": 32, "h": 32 },
    "duration": 100
   },
-  "Eyes_5": {
+  "Mouth_5": {
    "frame": { "x": 160, "y": 0, "w": 32, "h": 32 },
    "rotated": false,
    "trimmed": false,
@@ -47,7 +47,7 @@
    "sourceSize": { "w": 32, "h": 32 },
    "duration": 100
   },
-  "Eyes_6": {
+  "Mouth_6": {
    "frame": { "x": 192, "y": 0, "w": 32, "h": 32 },
    "rotated": false,
    "trimmed": false,
@@ -55,7 +55,7 @@
    "sourceSize": { "w": 32, "h": 32 },
    "duration": 100
   },
-  "Eyes_7": {
+  "Mouth_7": {
    "frame": { "x": 224, "y": 0, "w": 32, "h": 32 },
    "rotated": false,
    "trimmed": false,
@@ -63,7 +63,7 @@
    "sourceSize": { "w": 32, "h": 32 },
    "duration": 100
   },
-  "Eyes_8": {
+  "Mouth_8": {
    "frame": { "x": 256, "y": 0, "w": 32, "h": 32 },
    "rotated": false,
    "trimmed": false,
@@ -73,7 +73,7 @@
   }
 },
 "meta": {
- "image": "eyes.png",
+ "image": "mouth.png",
  "format": "RGBA8888",
  "size": { "w": 288, "h": 32 },
  "scale": "1",
@@ -85,7 +85,7 @@
   { "name": "Run", "from": 6, "to": 8, "direction": "forward", "color": "#000000ff" }
  ],
  "layers": [
-  { "name": "Eyes", "opacity": 255, "blendMode": "normal" }
+  { "name": "Mouth", "opacity": 255, "blendMode": "normal" }
  ]
 }
 }
