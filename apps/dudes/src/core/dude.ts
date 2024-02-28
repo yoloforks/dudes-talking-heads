@@ -13,7 +13,7 @@ import { DudeNameBox } from './dude-name-box.js'
 import { DudeSpriteContainer } from './dude-sprite-container.js'
 import { soundsLoader } from './sounds-loader.js'
 import {
-  DudeSpriteLayers,
+  DudesLayers,
   DudeSpriteTags,
   spriteProvider
 } from './sprite-provider.js'
@@ -291,10 +291,10 @@ export class Dude {
     }
 
     this.sprite = new DudeSpriteContainer(
-      dudeSprite[DudeSpriteLayers.Body],
-      dudeSprite[DudeSpriteLayers.Eyes],
-      dudeSprite[DudeSpriteLayers.Mouth],
-      dudeSprite[DudeSpriteLayers.Cosmetics]
+      dudeSprite[DudesLayers.Body],
+      dudeSprite[DudesLayers.Eyes],
+      dudeSprite[DudesLayers.Mouth],
+      dudeSprite[DudesLayers.Cosmetics]
     )
     this.sprite.view.scale.set(this.direction * this.scale, this.scale)
     this.sprite.tint(this.bodyColor)

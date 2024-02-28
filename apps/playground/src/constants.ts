@@ -1,6 +1,7 @@
 import type {
   AssetsLoaderOptions,
-  DudeSpriteData,
+  DudesAsset,
+  DudesLayer,
   SoundAsset
 } from '@twirapp/dudes/types'
 
@@ -18,99 +19,24 @@ export const assetsLoadOptions: AssetsLoaderOptions = {
   }
 }
 
-const body = {
-  alias: 'Body',
-  src: 'body.json'
-}
-
-const eyes = {
-  alias: 'Eyes',
-  src: 'eyes.json'
-}
-
-const mouth = {
-  alias: 'Mouth',
-  src: 'mouth.json'
-}
-
-const cosmetics = {
-  alias: 'Cosmetics',
-  src: 'cosmetics.json'
-}
-
-export const dudesSpriteNames = {
-  Dude: 'dude',
-  Santa: 'santa',
-  DudeWithoutEyes: 'dude-without-eyes',
-  SantaWithoutEyes: 'santa-without-eyes',
-  DudeWithMouth: 'dude-with-mouth'
-} as const
-
-export const dudesSprites: DudeSpriteData[] = [
-  {
-    name: dudesSpriteNames.Dude,
-    layers: [
-      body,
-      eyes
-    ]
+export const dudesAssets: Record<DudesLayer, DudesAsset> = {
+  Body: {
+    alias: 'Body',
+    src: 'body.json'
   },
-  {
-    name: dudesSpriteNames.DudeWithoutEyes,
-    layers: [
-      body
-    ]
+  Eyes: {
+    alias: 'Eyes',
+    src: 'eyes.json'
   },
-  {
-    name: dudesSpriteNames.Santa,
-    layers: [
-      body,
-      eyes,
-      cosmetics
-    ]
+  Mouth: {
+    alias: 'Mouth',
+    src: 'mouth.json'
   },
-  {
-    name: dudesSpriteNames.SantaWithoutEyes,
-    layers: [
-      body,
-      cosmetics
-    ]
-  },
-  {
-    name: dudesSpriteNames.DudeWithMouth,
-    layers: [
-      body,
-      eyes,
-      mouth
-    ]
+  Cosmetics: {
+    alias: 'Cosmetics',
+    src: 'cosmetics.json'
   }
-]
-
-// export const dudeAssets: DudesAsset[] = [
-//   {
-//     alias: 'dude',
-//     src: 'dude/dude.json'
-//   },
-//   {
-//     alias: 'sith',
-//     src: 'sith/sith.json'
-//   },
-//   {
-//     alias: 'agent',
-//     src: 'agent/agent.json'
-//   },
-//   {
-//     alias: 'girl',
-//     src: 'girl/girl.json'
-//   },
-//   {
-//     alias: 'cat',
-//     src: 'cat/cat.json'
-//   },
-//   {
-//     alias: 'santa',
-//     src: 'santa/santa.json'
-//   }
-// ]
+}
 
 export const dudesEmotes: string[] = [
   'pepegaGun.gif',

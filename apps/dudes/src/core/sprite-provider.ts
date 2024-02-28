@@ -3,14 +3,14 @@ import type { FrameObject } from 'pixi.js'
 
 import { assetsLoader } from './assets-loader.js'
 
-export const DudeSpriteLayers = {
+export const DudesLayers = {
   Body: 'Body',
   Eyes: 'Eyes',
   Mouth: 'Mouth',
   Cosmetics: 'Cosmetics'
 } as const
-const DudeSpriteKeys = Object.keys(DudeSpriteLayers)
-export type DudeSpriteLayerType = keyof typeof DudeSpriteLayers
+const DudesLayersKeys = Object.keys(DudesLayers)
+export type DudesLayer = keyof typeof DudesLayers
 
 export const DudeSpriteTags = {
   Idle: 'Idle',
@@ -46,17 +46,17 @@ class SpriteProvider {
   getSprite(spriteName: string, frameTag: DudeSpriteFrameTag) {
     const sprites: Record<string, AnimatedSprite> = {}
 
-    for (const spriteType of DudeSpriteKeys) {
-      const spriteNameGroup = `${spriteName}.${spriteType}`
+    for (const layerType of DudesLayersKeys) {
+      const spriteNameGroup = `${spriteName}.${layerType}`
       const spriteKey = this.getSpriteKey(spriteNameGroup, frameTag)
 
-      const sprite = this.getAnimatedSprite(spriteKey, spriteType)
+      const sprite = this.getAnimatedSprite(spriteKey, layerType)
       if (sprite) {
-        sprites[spriteType] = sprite
+        sprites[layerType] = sprite
         continue
       }
 
-      const assets = assetsLoader.bundles[spriteName][spriteType]
+      const assets = assetsLoader.bundles[spriteName][layerType]
       if (!assets) continue
 
       const layers = assets.data.meta.layers
@@ -80,7 +80,7 @@ class SpriteProvider {
         }
 
         this.spriteTextures.set(spriteKey, textures)
-        sprites[spriteType] = this.texturesToSprites(textures, spriteType)
+        sprites[layerType] = this.texturesToSprites(textures, layerType)
       }
     }
 

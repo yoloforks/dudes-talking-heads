@@ -1,6 +1,7 @@
 import type { AssetsLoaderOptions, DudesAsset } from './core/assets-loader.js'
 import type { Dude, DudeSpriteData } from './core/dude.js'
 import type { SoundAsset, SoundType } from './core/sounds-loader.js'
+import type { DudesLayer } from './core/sprite-provider.js'
 
 export type RecursivePartial<T> = {
   [P in keyof T]?: T[P] extends (infer U)[]
@@ -238,6 +239,7 @@ export type {
   Dude,
   DudeSpriteData,
   DudesAsset,
+  DudesLayer,
   SoundAsset,
   SoundType,
   AssetsLoaderOptions

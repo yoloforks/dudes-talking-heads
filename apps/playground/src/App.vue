@@ -2,19 +2,23 @@
 import DudesOverlay from '@twirapp/dudes'
 import { VTweakpane } from 'v-tweakpane'
 import { onMounted, reactive, ref } from 'vue'
-import { assetsLoadOptions, dudesSounds, dudesEmotes, dudesSprites, dudesSpriteNames } from './constants.js'
+import { assetsLoadOptions, dudesSounds, dudesEmotes, dudesAssets } from './constants.js'
 import { randomNum } from '@zero-dependency/utils'
-import { randomRgbColor } from './utils.js'
+import { createDudeSprite, randomRgbColor } from './utils.js'
 
 import type { Pane } from 'tweakpane'
 import type { Dude, DudesMethods, DudesTypes } from '@twirapp/dudes/types'
 
 const playgroundParams = ref<{
   isRandomColor: boolean,
-  selectedSprite: string
+  eyes: boolean,
+  mouth: boolean,
+  cosmetics: boolean
 }>({
   isRandomColor: true,
-  selectedSprite: dudesSprites[0].name
+  eyes: true,
+  mouth: false,
+  cosmetics: false
 })
 
 const settings = reactive<{
@@ -76,23 +80,32 @@ onMounted(async () => {
   if (!dudesRef.value) return
   await dudesRef.value.initDudes()
 
-  for (const dudeSprite of dudesSprites) {
-    const dudeColor = randomRgbColor()
-    const dude = await dudesRef.value.createDude(dudeSprite.name, dudeSprite)
-    dude.tint(dudeColor)
-  }
+  const dudeColor = randomRgbColor()
+  const dudeSprite = createDudeSprite('twir', [dudesAssets.Body, dudesAssets.Eyes])
+  const dude = await dudesRef.value.createDude('Twir', dudeSprite)
+  dude.tint(dudeColor)
 })
 
 async function spawnDude() {
   if (!dudesRef.value) return
 
-  const spriteData = dudesSprites
-    .find(sprite => sprite.name === playgroundParams.value.selectedSprite)
-  if (!spriteData) return
+  const dudeName = `Super Dude #${randomNum(0, 100)}`
+
+  const dudesLayers = [dudesAssets.Body]
+  if (playgroundParams.value.eyes) {
+    dudesLayers.push(dudesAssets.Eyes)
+  }
+  if (playgroundParams.value.mouth) {
+    dudesLayers.push(dudesAssets.Mouth)
+  }
+  if (playgroundParams.value.cosmetics) {
+    dudesLayers.push(dudesAssets.Cosmetics)
+  }
+  const dudeSprite = createDudeSprite(dudeName, dudesLayers)
 
   const dude = await dudesRef.value.createDude(
-    `Super ${spriteData.name} #${randomNum(0, 100)}`,
-    spriteData,
+    dudeName,
+    dudeSprite,
     {
       message: {
         boxColor: 'lightgreen',
@@ -163,30 +176,56 @@ function onPaneCreated(pane: Pane) {
   }
 
   const dudeFolder = pane.addFolder({ title: 'Dude' })
-  dudeFolder.addBinding(playgroundParams.value, 'selectedSprite', {
-    label: 'Sprite',
-    options: Object.entries(dudesSpriteNames).map(([text, value]) => ({
-      text,
-      value
-    })),
+  dudeFolder.addBinding(playgroundParams.value, 'eyes', {
+    label: 'Eyes'
   })
+  dudeFolder.addBinding(playgroundParams.value, 'mouth', {
+    label: 'Mouth'
+  })
+  dudeFolder.addBinding(playgroundParams.value, 'cosmetics', {
+    label: 'Cosmetics'
+  })
+
+  dudeFolder.addBlade({ view: 'separator' })
+
   dudeFolder.addBinding(settings.dude.sounds, 'enabled', {
     label: 'Sounds'
   })
   dudeFolder.addBinding(settings.dude.sounds, 'volume', {
-    label: 'Sounds volume',
+    label: 'Volume',
     min: 0.01,
     max: 1,
     step: 0.01
   })
-  dudeFolder.addBinding(playgroundParams.value, 'isRandomColor', {
-    label: 'Random sprite color'
-  }).on('change', ({ value }) => color.disabled = value)
+
+  dudeFolder.addBlade({ view: 'separator' })
 
   const color = dudeFolder.addBinding(settings.dude, 'color', {
     label: 'Sprite color',
     disabled: playgroundParams.value.isRandomColor
   })
+
+  dudeFolder.addBinding(playgroundParams.value, 'isRandomColor', {
+    label: 'Is random'
+  }).on('change', ({ value }) => color.disabled = value)
+
+  dudeFolder.addBlade({ view: 'separator' })
+
+  dudeFolder.addBinding(settings.dude, 'growTime', {
+    label: 'Grow time',
+    min: 1000 * 1,
+    max: 1000 * 60 * 60,
+    step: 1000
+  })
+  dudeFolder.addBinding(settings.dude, 'growMaxScale', {
+    label: 'Grow max scale',
+    min: 4,
+    max: 32,
+    step: 0.1
+  })
+
+  dudeFolder.addBlade({ view: 'separator' })
+
   dudeFolder.addBinding(settings.dude, 'gravity', {
     label: 'Gravity',
     min: 10,
@@ -204,18 +243,7 @@ function onPaneCreated(pane: Pane) {
     max: 24,
     step: 0.1
   })
-  dudeFolder.addBinding(settings.dude, 'growTime', {
-    label: 'Grow time',
-    min: 1000 * 1,
-    max: 1000 * 60 * 60,
-    step: 1000
-  })
-  dudeFolder.addBinding(settings.dude, 'growMaxScale', {
-    label: 'Grow max scale',
-    min: 4,
-    max: 32,
-    step: 0.1
-  })
+
 
   dudeFolder.addBlade({ view: 'separator' })
   dudeFolder.addButton({ title: 'Spawn' }).on('click', spawnDude)

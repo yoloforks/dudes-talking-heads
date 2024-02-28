@@ -19,8 +19,7 @@
     "dev": "pnpm run \"/^watch:.*/\"",
     "watch:build": "vite build --watch",
     "watch:types": "vue-tsc --noEmit --watch",
-    "build": "vite build",
-    "types": "vue-tsc --declaration --emitDeclarationOnly"
+    "build": "vite build"
   },
   "devDependencies": {
     "@pixi/gif": "2.1.1",
