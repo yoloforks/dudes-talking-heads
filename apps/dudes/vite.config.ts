@@ -6,6 +6,8 @@ export default defineConfig({
   plugins: [vue(), dts()],
   build: {
     sourcemap: true,
+    minify: false,
+    emptyOutDir: false,
     lib: {
       entry: './src/index.ts',
       name: 'dudes',
