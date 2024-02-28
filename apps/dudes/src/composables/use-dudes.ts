@@ -1,6 +1,7 @@
 import { Container } from 'pixi.js'
 import { watch } from 'vue'
 
+import { assetsLoader } from '../core/assets-loader.js'
 import { Dude } from '../core/dude.js'
 import { dudesSettings } from './use-settings.js'
 import type { DudeSpriteData } from '../core/dude.js'
@@ -12,6 +13,7 @@ const dudesContainer = new Container()
 export function removeInternalDude(dude: Dude) {
   dudes.delete(dude.name)
   dudesContainer.removeChild(dude.view)
+  assetsLoader.unload(dude.spriteData.name)
 }
 
 export const useDudes = () => {

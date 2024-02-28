@@ -58,7 +58,7 @@ export class Dude {
 
   constructor(
     public name: string,
-    private spriteData: DudeSpriteData,
+    public spriteData: DudeSpriteData,
     private individualParams?: DudesTypes.IndividualDudeParams
   ) {}
 

@@ -56,7 +56,7 @@ class SpriteProvider {
         continue
       }
 
-      const assets = assetsLoader.bundles[spriteName][layerType]
+      const assets = assetsLoader.getAssets(spriteName, layerType)
       if (!assets) continue
 
       const layers = assets.data.meta.layers
