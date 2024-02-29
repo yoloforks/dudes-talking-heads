@@ -4,7 +4,7 @@ import { VTweakpane } from 'v-tweakpane'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { assetsLoadOptions, dudesSounds, dudesEmotes, dudesLayers } from './constants.js'
 import { randomNum } from '@zero-dependency/utils'
-import { mapDudeSprite, randomRgbColor } from './utils.js'
+import { mapDudeSpriteData, randomRgbColor } from './utils.js'
 
 import type { Pane } from 'tweakpane'
 import type { Dude, DudesMethods, DudesTypes } from '@twirapp/dudes/types'
@@ -105,15 +105,15 @@ onMounted(async () => {
   await dudesRef.value.initDudes()
 
   const dudeName = 'Twir'
-  const dudeSprite = mapDudeSprite(dudeName, dudeSpriteParams)
+  const dudeSprite = mapDudeSpriteData(dudeName, dudeSpriteParams)
   const dude = await dudesRef.value.createDude(dudeName, dudeSprite)
-  setDudeColors(dude)
+  updateDudeSprite(dude)
 })
 
 watch(dudeSpriteParams, () => {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
-    setDudeColors(dude as Dude)
+    updateDudeSprite(dude as Dude, true)
   }
 })
 
@@ -121,7 +121,7 @@ async function spawnDude() {
   if (!dudesRef.value) return
 
   const dudeName = `Super Dude #${randomNum(0, 100)}`
-  const dudeSprite = mapDudeSprite(dudeName, dudeSpriteParams)
+  const dudeSprite = mapDudeSpriteData(dudeName, dudeSpriteParams)
   const dudeParams = {
     message: {
       boxColor: 'lightgreen',
@@ -137,10 +137,15 @@ async function spawnDude() {
   }
 
   const dude = await dudesRef.value.createDude(dudeName, dudeSprite, dudeParams)
-  setDudeColors(dude)
+  updateDudeSprite(dude)
 }
 
-function setDudeColors(dude: Dude) {
+function updateDudeSprite(dude: Dude, force = false) {
+  if (force) {
+    const spriteData = mapDudeSpriteData(dude.name, dudeSpriteParams)
+    dude.setSpriteData(spriteData)
+  }
+
   dude.setColor(DudesLayers.Body, dudeSpriteParams.bodyColor)
   dude.setColor(DudesLayers.Eyes, dudeSpriteParams.eyesColor)
   dude.setColor(DudesLayers.Mouth, dudeSpriteParams.mouthColor)

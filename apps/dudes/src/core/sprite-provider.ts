@@ -13,27 +13,41 @@ export const DudesLayers = {
 export const DudesLayersKeys = Object.keys(DudesLayers)
 export type DudesLayer = keyof typeof DudesLayers
 
-export const DudeSpriteTags = {
+export const DudesFrameTags = {
   Idle: 'Idle',
   Jump: 'Jump',
   Fall: 'Fall',
   Land: 'Land',
   Run: 'Run'
 } as const
-export type DudeSpriteFrameTag = keyof typeof DudeSpriteTags
+export const DudeFrameTagsKeys = Object.keys(DudesFrameTags)
+export type DudeSpriteFrameTag = keyof typeof DudesFrameTags
 
 export type DudeFrameObject = Record<string, FrameObject[]>
 
 class SpriteProvider {
   private spriteTextures = new Map<string, DudeFrameObject>()
 
-  private getSpriteKey(spriteName: string, frameTag: string): string {
-    return `${spriteName}.${frameTag}`
+  unloadTextures(spriteName: string): void {
+    for (const layer of DudesLayersKeys) {
+      for (const frameTag of DudeFrameTagsKeys) {
+        const spriteKey = this.getSpriteKey(spriteName, layer, frameTag)
+        this.spriteTextures.delete(spriteKey)
+      }
+    }
   }
 
-  private getAnimatedSprite(spriteKey: string, spriteType: string) {
+  private getSpriteKey(
+    spriteName: string,
+    layer: string,
+    frameTag: string
+  ): string {
+    return `${spriteName}.${layer}.${frameTag}`
+  }
+
+  private getAnimatedSprite(spriteKey: string, layer: string) {
     const textures = this.spriteTextures.get(spriteKey)
-    if (textures) return this.texturesToSprites(textures, spriteType)
+    if (textures) return this.texturesToSprites(textures, layer)
     return null
   }
 
@@ -47,17 +61,15 @@ class SpriteProvider {
   getSprite(spriteName: string, frameTag: DudeSpriteFrameTag) {
     const sprites: Record<string, AnimatedSprite> = {}
 
-    for (const layerType of DudesLayersKeys) {
-      const spriteNameGroup = `${spriteName}.${layerType}`
-      const spriteKey = this.getSpriteKey(spriteNameGroup, frameTag)
-
-      const sprite = this.getAnimatedSprite(spriteKey, layerType)
+    for (const layer of DudesLayersKeys) {
+      const spriteKey = this.getSpriteKey(spriteName, layer, frameTag)
+      const sprite = this.getAnimatedSprite(spriteKey, layer)
       if (sprite) {
-        sprites[layerType] = sprite
+        sprites[layer] = sprite
         continue
       }
 
-      const assets = assetsLoader.getAssets(spriteName, layerType)
+      const assets = assetsLoader.getAssets(spriteName, layer)
       if (!assets) continue
 
       const layers = assets.data.meta.layers
@@ -81,7 +93,7 @@ class SpriteProvider {
         }
 
         this.spriteTextures.set(spriteKey, textures)
-        sprites[layerType] = this.texturesToSprites(textures, layerType)
+        sprites[layer] = this.texturesToSprites(textures, layer)
       }
     }
 

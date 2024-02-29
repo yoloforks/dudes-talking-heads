@@ -106,14 +106,13 @@ export class AssetsLoader {
   }
 
   async unload(spriteName: string): Promise<void> {
-    if (!(spriteName in this.bundles)) return
+    if (!this.bundles[spriteName]) return
     await Assets.unloadBundle(spriteName)
     delete this.bundles[spriteName]
   }
 
   async load(spriteData: DudesTypes.SpriteData): Promise<void> {
-    if (spriteData.name in this.bundles) return
-
+    if (this.bundles[spriteData.name]) return
     for (const layer of spriteData.layers) {
       const sprite = await loadSprite(layer)
       await sprite.parse()

@@ -12,7 +12,7 @@ export function randomRgbColor(): string {
   })
 }
 
-export function mapDudeSprite(
+export function mapDudeSpriteData(
   name: string,
   spriteParams: UnwrapNestedRefs<DudeSpriteParams>
 ) {
