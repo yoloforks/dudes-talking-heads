@@ -7,7 +7,7 @@ import type { DudesTypes } from '../types.js'
 
 const ANIMATION_TIME = 500
 
-const ARROW_WIDTH = 25
+const ARROW_WIDTH = 22
 const ARROW_HEIGHT = 10
 const ARROW_HALF_WIDTH = ARROW_WIDTH / 2
 
@@ -155,10 +155,14 @@ export class DudeMessageBox {
     this.box.lineTo(arrowX, arrowY + ARROW_HEIGHT)
     this.box.lineTo(arrowX + ARROW_HALF_WIDTH, arrowY)
 
+    const isShortMessage = message.length < 6
+    const paddingLeft = isShortMessage ? padding + ARROW_HALF_WIDTH : padding
+    const paddingRight = isShortMessage ? padding + ARROW_HALF_WIDTH : padding
+
     this.box.drawRoundedRect(
-      this.text.x - padding - this.text.width * this.text.anchor.x,
+      this.text.x - paddingLeft - this.text.width * this.text.anchor.x,
       this.text.y - padding - this.text.height * this.text.anchor.y,
-      this.text.width + padding * 2,
+      this.text.width + paddingRight * 2,
       this.text.height + padding * 2,
       borderRadius
     )
