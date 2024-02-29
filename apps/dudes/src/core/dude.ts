@@ -224,7 +224,10 @@ export class Dude {
     if (isCollidingMore || isCollidingLess) {
       this.direction = -this.direction
       this.velocity.x = -this.velocity.x
-      this.updateScale()
+
+      if (Math.random() > 0.5) {
+        this.updateScale()
+      }
     }
 
     if (
