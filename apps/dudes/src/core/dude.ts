@@ -27,6 +27,7 @@ export class Dude {
     Body: dudesSettings.value.dude.bodyColor,
     Eyes: '#FFF',
     Mouth: '#FFF',
+    Hat: '#FFF',
     Cosmetics: '#FFF'
   }
   private direction: number
@@ -290,6 +291,7 @@ export class Dude {
       dudeSprite[DudesLayers.Body],
       dudeSprite[DudesLayers.Eyes],
       dudeSprite[DudesLayers.Mouth],
+      dudeSprite[DudesLayers.Hat],
       dudeSprite[DudesLayers.Cosmetics]
     )
     this.sprite.view.scale.set(this.direction * this.scale, this.scale)

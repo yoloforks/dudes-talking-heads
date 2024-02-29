@@ -11,7 +11,24 @@ import type { Dude, DudesMethods, DudesTypes } from '@twirapp/dudes/types'
 
 const initialBodyColor = randomRgbColor()
 
-const dudeSpriteParams = reactive({
+export interface DudeSpriteParams {
+  bodySprite: string
+  bodyColor: string
+
+  eyesSprite: string
+  eyesColor: string
+
+  mouthSprite: string
+  mouthColor: string
+
+  hatSprite: string
+  hatColor: string
+
+  cosmeticsSprite: string
+  cosmeticsColor: string
+}
+
+const dudeSpriteParams = reactive<DudeSpriteParams>({
   bodySprite: dudesLayers.Body[0].src,
   bodyColor: initialBodyColor,
 
@@ -20,6 +37,9 @@ const dudeSpriteParams = reactive({
 
   mouthSprite: '',
   mouthColor: '#FFF',
+
+  hatSprite: '',
+  hatColor: '#FFF',
 
   cosmeticsSprite: '',
   cosmeticsColor: '#FFF'
@@ -85,13 +105,7 @@ onMounted(async () => {
   await dudesRef.value.initDudes()
 
   const dudeName = 'Twir'
-  const dudeSprite = mapDudeSprite(dudeName, {
-    Body: dudeSpriteParams.bodySprite,
-    Eyes: dudeSpriteParams.eyesSprite,
-    Mouth: dudeSpriteParams.mouthSprite,
-    Cosmetics: dudeSpriteParams.cosmeticsSprite
-  })
-
+  const dudeSprite = mapDudeSprite(dudeName, dudeSpriteParams)
   const dude = await dudesRef.value.createDude(dudeName, dudeSprite)
   setDudeColors(dude)
 })
@@ -107,12 +121,7 @@ async function spawnDude() {
   if (!dudesRef.value) return
 
   const dudeName = `Super Dude #${randomNum(0, 100)}`
-  const dudeSprite = mapDudeSprite(dudeName, {
-    Body: dudeSpriteParams.bodySprite,
-    Eyes: dudeSpriteParams.eyesSprite,
-    Mouth: dudeSpriteParams.mouthSprite,
-    Cosmetics: dudeSpriteParams.cosmeticsSprite
-  })
+  const dudeSprite = mapDudeSprite(dudeName, dudeSpriteParams)
   const dudeParams = {
     message: {
       boxColor: 'lightgreen',
@@ -135,6 +144,7 @@ function setDudeColors(dude: Dude) {
   dude.setColor(DudesLayers.Body, dudeSpriteParams.bodyColor)
   dude.setColor(DudesLayers.Eyes, dudeSpriteParams.eyesColor)
   dude.setColor(DudesLayers.Mouth, dudeSpriteParams.mouthColor)
+  dude.setColor(DudesLayers.Hat, dudeSpriteParams.hatColor)
   dude.setColor(DudesLayers.Cosmetics, dudeSpriteParams.cosmeticsColor)
 }
 
@@ -225,6 +235,20 @@ function onPaneCreated(pane: Pane) {
   })
 
   dudeFolder.addBinding(dudeSpriteParams, 'mouthColor', {
+    label: ''
+  })
+
+  dudeFolder.addBlade({ view: 'separator' })
+
+  const hatSpriteOptions = dudesLayers.Hat
+    .map((layer) => ({ text: layer.name, value: layer.src }))
+  hatSpriteOptions.unshift(hiddenOption)
+  dudeFolder.addBinding(dudeSpriteParams, 'hatSprite', {
+    label: 'Hat',
+    options: hatSpriteOptions
+  })
+
+  dudeFolder.addBinding(dudeSpriteParams, 'hatColor', {
     label: ''
   })
 

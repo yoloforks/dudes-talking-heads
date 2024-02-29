@@ -1,5 +1,8 @@
 import { randomNum, rgbToHex } from '@zero-dependency/utils'
-import type { DudesLayer, DudeSpriteData } from '@twirapp/dudes/types'
+import type { DudesLayer, DudesTypes } from '@twirapp/dudes/types'
+import type { UnwrapNestedRefs } from 'vue'
+
+import { DudeSpriteParams } from './App.vue'
 
 export function randomRgbColor(): string {
   return rgbToHex({
@@ -11,9 +14,17 @@ export function randomRgbColor(): string {
 
 export function mapDudeSprite(
   name: string,
-  layers: Record<DudesLayer, string>
+  spriteParams: UnwrapNestedRefs<DudeSpriteParams>
 ) {
-  const sprite: DudeSpriteData = {
+  const layers: Record<DudesLayer, string> = {
+    Body: spriteParams.bodySprite,
+    Eyes: spriteParams.eyesSprite,
+    Mouth: spriteParams.mouthSprite,
+    Hat: spriteParams.hatSprite,
+    Cosmetics: spriteParams.cosmeticsSprite
+  }
+
+  const sprite: DudesTypes.SpriteData = {
     name,
     layers: Object.entries(layers)
       .map(([layer, src]) => ({ alias: layer, src }))

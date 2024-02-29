@@ -7,6 +7,7 @@ export const DudesLayers = {
   Body: 'Body',
   Eyes: 'Eyes',
   Mouth: 'Mouth',
+  Hat: 'Hat',
   Cosmetics: 'Cosmetics'
 } as const
 export const DudesLayersKeys = Object.keys(DudesLayers)

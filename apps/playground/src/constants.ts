@@ -58,7 +58,7 @@ export const dudesLayers: Record<DudesLayer, { name: string; src: string }[]> =
         src: 'mouth/mexican-moustache.png'
       }
     ],
-    Cosmetics: [
+    Hat: [
       {
         name: 'Santa hat',
         src: 'cosmetics/santa-hat.png'
@@ -68,12 +68,14 @@ export const dudesLayers: Record<DudesLayer, { name: string; src: string }[]> =
         src: 'cosmetics/cowboy-hat.png'
       },
       {
-        name: 'Gun',
-        src: 'cosmetics/gun.png'
-      },
-      {
         name: 'Girl ribbon',
         src: 'cosmetics/girl-ribbon.png'
+      }
+    ],
+    Cosmetics: [
+      {
+        name: 'Gun',
+        src: 'cosmetics/gun.png'
       },
       {
         name: 'Lightsaber',

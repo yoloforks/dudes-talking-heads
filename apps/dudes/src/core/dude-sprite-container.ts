@@ -1,5 +1,6 @@
 import { AnimatedSprite, Container } from 'pixi.js'
 
+import { DudesLayers, DudesLayersKeys } from './sprite-provider.js'
 import type { DudesLayer } from './sprite-provider.js'
 
 function prepareSprite(sprite: AnimatedSprite, zIndex: number): AnimatedSprite {
@@ -16,6 +17,7 @@ export class DudeSpriteContainer {
     private Body?: AnimatedSprite,
     private Eyes?: AnimatedSprite,
     private Mouth?: AnimatedSprite,
+    private Hat?: AnimatedSprite,
     private Cosmetics?: AnimatedSprite
   ) {
     const sprites = []
@@ -35,8 +37,13 @@ export class DudeSpriteContainer {
       sprites.push(this.Mouth)
     }
 
+    if (Hat) {
+      this.Hat = prepareSprite(Hat, 3)
+      sprites.push(this.Hat)
+    }
+
     if (Cosmetics) {
-      this.Cosmetics = prepareSprite(Cosmetics, 3)
+      this.Cosmetics = prepareSprite(Cosmetics, 4)
       sprites.push(this.Cosmetics)
     }
 
@@ -45,10 +52,10 @@ export class DudeSpriteContainer {
   }
 
   update(delta: number): void {
-    this.Body?.update(delta)
-    this.Eyes?.update(delta)
-    this.Mouth?.update(delta)
-    this.Cosmetics?.update(delta)
+    for (const layer of DudesLayersKeys) {
+      const layerKey = layer as keyof typeof DudesLayers
+      this[layerKey]?.update(delta)
+    }
   }
 
   setColor(type: DudesLayer, color: string): void {
