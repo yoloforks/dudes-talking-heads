@@ -1,33 +1,58 @@
 <script setup lang="ts">
-import DudesOverlay from '@twirapp/dudes'
+import DudesOverlay, { DudesLayers } from '@twirapp/dudes'
 import { VTweakpane } from 'v-tweakpane'
-import { onMounted, reactive, ref } from 'vue'
-import { assetsLoadOptions, dudeAssets, dudeSprites, dudeSounds, dudeNames, dudeEmotes, type DudesSprites } from './constants.js'
-import { randomNum, capitalize } from '@zero-dependency/utils'
-import { randomRgbColor } from './utils.js'
+import { onMounted, reactive, ref, watch } from 'vue'
+import { assetsLoadOptions, dudesSounds, dudesEmotes, dudesLayers } from './constants.js'
+import { randomNum } from '@zero-dependency/utils'
+import { mapDudeSpriteData, randomRgbColor } from './utils.js'
 
 import type { Pane } from 'tweakpane'
 import type { Dude, DudesMethods, DudesTypes } from '@twirapp/dudes/types'
 
-const playgroundParams = ref<{
-  isRandomColor: boolean,
-  selectedSprite: DudesSprites
-}>({
-  isRandomColor: false,
-  selectedSprite: dudeSprites[0]
+const initialBodyColor = randomRgbColor()
+
+export interface DudeSpriteParams {
+  bodySprite: string
+  bodyColor: string
+
+  eyesSprite: string
+  eyesColor: string
+
+  mouthSprite: string
+  mouthColor: string
+
+  hatSprite: string
+  hatColor: string
+
+  cosmeticsSprite: string
+  cosmeticsColor: string
+}
+
+const dudeSpriteParams = reactive<DudeSpriteParams>({
+  bodySprite: dudesLayers.Body[0].src,
+  bodyColor: initialBodyColor,
+
+  eyesSprite: dudesLayers.Eyes[0].src,
+  eyesColor: '#FFF',
+
+  mouthSprite: '',
+  mouthColor: '#FFF',
+
+  hatSprite: '',
+  hatColor: '#FFF',
+
+  cosmeticsSprite: '',
+  cosmeticsColor: '#FFF'
 })
 
 const settings = reactive<{
   dude: DudesTypes.DudeParams,
   message: DudesTypes.MessageBoxParams,
   name: DudesTypes.NameBoxParams,
-  spitter: DudesTypes.EmoteSpitterParams
+  emotes: DudesTypes.EmotesParams
 }>({
   dude: {
-    visibleName: true,
-    color: '#969696',
-    eyesColor: '#FFFFFF',
-    cosmeticsColor: '#FFFFFF',
+    bodyColor: initialBodyColor,
     maxLifeTime: 1000 * 60 * 30,
     growTime: 1000 * 2,
     growMaxScale: 20,
@@ -49,6 +74,7 @@ const settings = reactive<{
     fill: '#333333'
   },
   name: {
+    enabled: true,
     fontFamily: 'Roboto',
     fontSize: 18,
     fill: '#FFFFFF',
@@ -67,7 +93,7 @@ const settings = reactive<{
     dropShadowDistance: 10,
     dropShadowColor: '#3AC7D9'
   },
-  spitter: {
+  emotes: {
     enabled: true
   }
 })
@@ -78,50 +104,53 @@ onMounted(async () => {
   if (!dudesRef.value) return
   await dudesRef.value.initDudes()
 
-  if (import.meta.env.DEV) {
-    const dude = dudesRef.value.createDude('Тwir', dudeSprites[0])
-    dude.bodyTint('#6441A5')
-  } else {
-    for (const dudeName of dudeNames) {
-      const dudeSprite = dudeSprites[randomNum(0, dudeSprites.length - 1)]
-      const dudeColor = randomRgbColor()
-      const dude = dudesRef.value.createDude(dudeName, dudeSprite)
-      dude.bodyTint(dudeColor)
-    }
+  const dudeName = 'Twir'
+  const dudeSprite = mapDudeSpriteData(dudeName, dudeSpriteParams)
+  const dude = await dudesRef.value.createDude(dudeName, dudeSprite)
+  updateDudeSprite(dude)
+})
+
+watch(dudeSpriteParams, () => {
+  if (!dudesRef.value) return
+  for (const dude of dudesRef.value.dudes.values()) {
+    updateDudeSprite(dude as Dude, true)
   }
 })
 
-function spawnDude() {
+async function spawnDude() {
   if (!dudesRef.value) return
 
-  const name = dudeNames[randomNum(0, dudeNames.length - 1)]
-  const dude = dudesRef.value.createDude(
-    `Super ${name} #${randomNum(0, 100)}`,
-    playgroundParams.value.selectedSprite,
-    {
-      message: {
-        boxColor: 'lightgreen',
-        fill: '#000000'
-      },
-      name: {
-        fill: ['rgb(131, 58, 180)', 'rgb(253, 29, 29)', 'rgb(252, 176, 69)'],
-        fillGradientType: 1,
-        fillGradientStops: [0.3, 0.6, 1],
-        stroke: '#ffffff',
-        strokeThickness: 4
-      }
+  const dudeName = `Super Dude #${randomNum(0, 100)}`
+  const dudeSprite = mapDudeSpriteData(dudeName, dudeSpriteParams)
+  const dudeParams = {
+    message: {
+      boxColor: 'lightgreen',
+      fill: '#000000'
+    },
+    name: {
+      fill: ['rgb(131, 58, 180)', 'rgb(253, 29, 29)', 'rgb(252, 176, 69)'],
+      fillGradientType: 1,
+      fillGradientStops: [0.3, 0.6, 1],
+      stroke: '#ffffff',
+      strokeThickness: 4
     }
-  )
+  }
 
-  const color = playgroundParams.value.isRandomColor
-    ? randomRgbColor()
-    : settings.dude.color
+  const dude = await dudesRef.value.createDude(dudeName, dudeSprite, dudeParams)
+  updateDudeSprite(dude)
+}
 
-  dude.bodyTint(color)
+function updateDudeSprite(dude: Dude, force = false) {
+  if (force) {
+    const spriteData = mapDudeSpriteData(dude.name, dudeSpriteParams)
+    dude.setSpriteData(spriteData)
+  }
 
-  setTimeout(() => {
-    spitEmote(dude)
-  }, 2000)
+  dude.setColor(DudesLayers.Body, dudeSpriteParams.bodyColor)
+  dude.setColor(DudesLayers.Eyes, dudeSpriteParams.eyesColor)
+  dude.setColor(DudesLayers.Mouth, dudeSpriteParams.mouthColor)
+  dude.setColor(DudesLayers.Hat, dudeSpriteParams.hatColor)
+  dude.setColor(DudesLayers.Cosmetics, dudeSpriteParams.cosmeticsColor)
 }
 
 function jumpAllDudes() {
@@ -145,16 +174,16 @@ function showMessageAllDudes() {
   }
 }
 
-function spitEmotesAllDudes() {
+function showEmotesAllDudes() {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
-    spitEmote(dude as Dude)
+    showEmotes(dude as Dude)
   }
 }
 
-function spitEmote(dude: Dude) {
-  const emoteName = dudeEmotes[randomNum(0, dudeEmotes.length - 1)]
-  dude.spitEmotes([`emotes/${emoteName}`])
+function showEmotes(dude: Dude) {
+  const emoteName = dudesEmotes[randomNum(0, dudesEmotes.length - 1)]
+  dude.addEmotes([`emotes/${emoteName}`])
 }
 
 function clearDudes() {
@@ -172,35 +201,105 @@ function onPaneCreated(pane: Pane) {
   }
 
   const dudeFolder = pane.addFolder({ title: 'Dude' })
-  dudeFolder.addBinding(playgroundParams.value, 'selectedSprite', {
-    label: 'Sprite',
-    options: dudeSprites.map(sprite => ({
-      text: capitalize(sprite),
-      value: sprite
-    })),
+
+  const hiddenOption = { text: 'Hidden', value: '' }
+  const bodySpriteOptions = dudesLayers.Body
+    .map((layer) => ({ text: layer.name, value: layer.src }))
+  bodySpriteOptions.unshift(hiddenOption)
+  dudeFolder.addBinding(dudeSpriteParams, 'bodySprite', {
+    label: 'Body',
+    options: bodySpriteOptions
   })
+
+  dudeFolder.addBinding(dudeSpriteParams, 'bodyColor', {
+    label: ''
+  })
+
+  dudeFolder.addBlade({ view: 'separator' })
+
+  const eyesSpriteOptions = dudesLayers.Eyes
+    .map((layer) => ({ text: layer.name, value: layer.src }))
+  eyesSpriteOptions.unshift(hiddenOption)
+  dudeFolder.addBinding(dudeSpriteParams, 'eyesSprite', {
+    label: 'Eyes',
+    options: eyesSpriteOptions
+  })
+
+  dudeFolder.addBinding(dudeSpriteParams, 'eyesColor', {
+    label: ''
+  })
+
+  dudeFolder.addBlade({ view: 'separator' })
+
+  const mouthSpriteOptions = dudesLayers.Mouth
+    .map((layer) => ({ text: layer.name, value: layer.src }))
+  mouthSpriteOptions.unshift(hiddenOption)
+  dudeFolder.addBinding(dudeSpriteParams, 'mouthSprite', {
+    label: 'Mouth',
+    options: mouthSpriteOptions
+  })
+
+  dudeFolder.addBinding(dudeSpriteParams, 'mouthColor', {
+    label: ''
+  })
+
+  dudeFolder.addBlade({ view: 'separator' })
+
+  const hatSpriteOptions = dudesLayers.Hat
+    .map((layer) => ({ text: layer.name, value: layer.src }))
+  hatSpriteOptions.unshift(hiddenOption)
+  dudeFolder.addBinding(dudeSpriteParams, 'hatSprite', {
+    label: 'Hat',
+    options: hatSpriteOptions
+  })
+
+  dudeFolder.addBinding(dudeSpriteParams, 'hatColor', {
+    label: ''
+  })
+
+  dudeFolder.addBlade({ view: 'separator' })
+
+  const cosmeticsSpriteOptions = dudesLayers.Cosmetics
+    .map((layer) => ({ text: layer.name, value: layer.src }))
+  cosmeticsSpriteOptions.unshift(hiddenOption)
+  dudeFolder.addBinding(dudeSpriteParams, 'cosmeticsSprite', {
+    label: 'Cosmetics',
+    options: cosmeticsSpriteOptions
+  })
+
+  dudeFolder.addBinding(dudeSpriteParams, 'cosmeticsColor', {
+    label: ''
+  })
+
+  dudeFolder.addBlade({ view: 'separator' })
+
   dudeFolder.addBinding(settings.dude.sounds, 'enabled', {
     label: 'Sounds'
   })
   dudeFolder.addBinding(settings.dude.sounds, 'volume', {
-    label: 'Sounds volume',
+    label: 'Volume',
     min: 0.01,
     max: 1,
     step: 0.01
   })
-  dudeFolder.addBinding(playgroundParams.value, 'isRandomColor', {
-    label: 'Random sprite color'
-  }).on('change', ({ value }) => color.disabled = value)
 
-  const color = dudeFolder.addBinding(settings.dude, 'color', {
-    label: 'Sprite color'
+  dudeFolder.addBlade({ view: 'separator' })
+
+  dudeFolder.addBinding(settings.dude, 'growTime', {
+    label: 'Grow time',
+    min: 1000 * 1,
+    max: 1000 * 60 * 60,
+    step: 1000
   })
-  dudeFolder.addBinding(settings.dude, 'eyesColor', {
-    label: 'Eyes color'
+  dudeFolder.addBinding(settings.dude, 'growMaxScale', {
+    label: 'Grow max scale',
+    min: 4,
+    max: 32,
+    step: 0.1
   })
-  dudeFolder.addBinding(settings.dude, 'cosmeticsColor', {
-    label: 'Cosmetics color'
-  })
+
+  dudeFolder.addBlade({ view: 'separator' })
+
   dudeFolder.addBinding(settings.dude, 'gravity', {
     label: 'Gravity',
     min: 10,
@@ -216,27 +315,16 @@ function onPaneCreated(pane: Pane) {
     label: 'Scale',
     min: 1,
     max: 24,
-    step: 0.1
-  })
-  dudeFolder.addBinding(settings.dude, 'growTime', {
-    label: 'Grow time',
-    min: 1000 * 1,
-    max: 1000 * 60 * 60,
-    step: 1000
-  })
-  dudeFolder.addBinding(settings.dude, 'growMaxScale', {
-    label: 'Grow max scale',
-    min: 4,
-    max: 32,
-    step: 0.1
+    step: 0.1,
   })
 
   dudeFolder.addBlade({ view: 'separator' })
+
   dudeFolder.addButton({ title: 'Spawn' }).on('click', spawnDude)
   dudeFolder.addButton({ title: 'Jump' }).on('click', jumpAllDudes)
   dudeFolder.addButton({ title: 'Grow' }).on('click', growAllDudes)
   dudeFolder.addButton({ title: 'Show message' }).on('click', showMessageAllDudes)
-  dudeFolder.addButton({ title: 'Spit emote' }).on('click', spitEmotesAllDudes)
+  dudeFolder.addButton({ title: 'Show emote' }).on('click', showEmotesAllDudes)
   dudeFolder.addButton({ title: 'Clear' }).on('click', clearDudes)
 
   const messageBoxFolder = pane.addFolder({ title: 'Message', expanded: false })
@@ -267,9 +355,7 @@ function onPaneCreated(pane: Pane) {
   })
 
   const nameBoxFolder = pane.addFolder({ title: 'Name', expanded: false })
-  nameBoxFolder.addBinding(settings.dude, 'visibleName', {
-    label: 'enabled'
-  })
+  nameBoxFolder.addBinding(settings.name, 'enabled')
   nameBoxFolder.addBinding(settings.name, 'fill')
   nameBoxFolder.addBinding(settings.name, 'fontFamily', {
     options: fonts
@@ -325,8 +411,8 @@ function onPaneCreated(pane: Pane) {
     max: Math.PI * 2
   })
 
-  const spitterFolder = pane.addFolder({ title: 'Spitter', expanded: false })
-  spitterFolder.addBinding(settings.spitter, 'enabled')
+  const emoteFolder = pane.addFolder({ title: 'Emote', expanded: false })
+  emoteFolder.addBinding(settings.emotes, 'enabled')
 }
 </script>
 
@@ -334,11 +420,5 @@ function onPaneCreated(pane: Pane) {
   <Teleport to="body">
     <v-tweakpane :pane="{ title: 'Dudes Playground' }" @on-pane-created="onPaneCreated" />
   </Teleport>
-  <dudes-overlay
-    ref="dudesRef"
-    :assets-load-options="assetsLoadOptions"
-    :assets="dudeAssets"
-    :sounds="dudeSounds"
-    :settings="settings"
-  />
+  <dudes-overlay ref="dudesRef" :assets-loader-options="assetsLoadOptions" :sounds="dudesSounds" :settings="settings" />
 </template>

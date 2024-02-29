@@ -1,6 +1,7 @@
-import type { AssetsLoadOptions, DudesAsset } from './core/assets-loader.js'
+import type { AssetsLoaderOptions, DudesAsset } from './core/assets-loader.js'
 import type { Dude } from './core/dude.js'
 import type { SoundAsset, SoundType } from './core/sounds-loader.js'
+import type { DudesLayer } from './core/sprite-provider.js'
 
 export type RecursivePartial<T> = {
   [P in keyof T]?: T[P] extends (infer U)[]
@@ -16,9 +17,9 @@ export interface DudesMethods {
   getDude: (name: string) => Dude | undefined
   createDude: (
     name: string,
-    sprite: string,
+    spriteData: DudesTypes.SpriteData,
     params?: DudesTypes.IndividualDudeParams
-  ) => Dude
+  ) => Promise<Dude>
   removeDude: (name: string) => void
   removeAllDudes: () => void
   updateSettings: (settings: RecursivePartial<DudesSettings>) => void
@@ -37,20 +38,9 @@ export namespace DudesTypes {
     gravity: number
 
     /**
-     * Color fallback for dudes
      * @default '#969696'
      */
-    color: string
-
-    /**
-     * @default '#FFFFFF'
-     */
-    eyesColor: string
-
-    /**
-     * @default '#FFFFFF'
-     */
-    cosmeticsColor: string
+    bodyColor: string
 
     /**
      * @default 4
@@ -67,11 +57,6 @@ export namespace DudesTypes {
        */
       volume: number
     }
-
-    /**
-     * @default true
-     */
-    visibleName: boolean
 
     /**
      * @default 1000 * 60 * 5 // 5 minutes
@@ -136,25 +121,34 @@ export namespace DudesTypes {
   >
 
   export interface NameBoxParams {
+    /**
+     * @default true
+     */
+    enabled: boolean
+
     // font
     /**
      * @default 'Arial'
      */
     fontFamily: string
+
     /**
      * @default 18
      */
     fontSize: number
+
     /**
      * Available values: 'normal', 'italic', 'oblique'
      * @default 'normal'
      */
     fontStyle: string
+
     /**
      * Available values: 'normal', 'small-caps'
      * @default 'normal'
      */
     fontVariant: string
+
     /**
      * Available values: 100, 200, 300, 400, 500, 600, 700, 800, 900
      * @default 400
@@ -166,11 +160,13 @@ export namespace DudesTypes {
      * @default '#FFFFFF'
      */
     fill: string | string[]
+
     /**
      * Available values: vertical - 0, horizontal - 1
      * @default 0
      */
     fillGradientType: number
+
     /**
      * Minimum value is 0, maximum value is 1
      * @default [0]
@@ -182,10 +178,12 @@ export namespace DudesTypes {
      * @default '#000000'
      */
     stroke: string
+
     /**
      * @default 4
      */
     strokeThickness: number
+
     /**
      * Available values: 'round', 'bevel', 'miter'
      * @default 'round'
@@ -197,19 +195,23 @@ export namespace DudesTypes {
      * @default false
      */
     dropShadow: boolean
+
     /**
      * @default 1
      */
     dropShadowAlpha: number
+
     /**
      * Recommended range value is 0 to Math.PI * 2
      * @default 0
      */
     dropShadowAngle: number
+
     /**
      * @default 0.1
      */
     dropShadowBlur: number
+
     /**
      * @default '#3EC7D9'
      */
@@ -232,8 +234,13 @@ export namespace DudesTypes {
     >
   >
 
-  export interface EmoteSpitterParams {
+  export interface EmotesParams {
     enabled: boolean
+  }
+
+  export interface SpriteData {
+    name: string
+    layers: DudesAsset[]
   }
 }
 
@@ -241,7 +248,14 @@ export type DudesSettings = RecursivePartial<{
   dude: DudesTypes.DudeParams
   message: DudesTypes.MessageBoxParams
   name: DudesTypes.NameBoxParams
-  spitter: DudesTypes.EmoteSpitterParams
+  emotes: DudesTypes.EmotesParams
 }>
 
-export type { Dude, DudesAsset, SoundAsset, SoundType, AssetsLoadOptions }
+export type {
+  Dude,
+  DudesAsset,
+  DudesLayer,
+  SoundAsset,
+  SoundType,
+  AssetsLoaderOptions
+}

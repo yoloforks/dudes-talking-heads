@@ -7,13 +7,10 @@ export const dudesSettings = ref<{
   dude: DudesTypes.DudeParams
   message: DudesTypes.MessageBoxParams
   name: DudesTypes.NameBoxParams
-  spitter: DudesTypes.EmoteSpitterParams
+  emotes: DudesTypes.EmotesParams
 }>({
   dude: {
-    visibleName: true,
-    color: '#969696',
-    eyesColor: '#FFFFFF',
-    cosmeticsColor: '#FFFFFF',
+    bodyColor: '#969696',
     maxLifeTime: 1000 * 60 * 30,
     growTime: 1000 * 60 * 5,
     growMaxScale: 20,
@@ -35,6 +32,7 @@ export const dudesSettings = ref<{
     fill: '#333333'
   },
   name: {
+    enabled: true,
     fontFamily: 'Arial',
     fontSize: 18,
     fill: '#FFFFFF',
@@ -53,7 +51,7 @@ export const dudesSettings = ref<{
     dropShadowDistance: 10,
     dropShadowColor: '#3EC7D9'
   },
-  spitter: {
+  emotes: {
     enabled: true
   }
 })

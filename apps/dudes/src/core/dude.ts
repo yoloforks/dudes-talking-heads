@@ -1,33 +1,35 @@
 import { Container } from 'pixi.js'
-import { watch } from 'vue'
 import type { IPointData } from 'pixi.js'
 
 import { removeInternalDude } from '../composables/use-dudes.js'
 import { dudesSettings } from '../composables/use-settings.js'
 import { COLLIDER, DELTA_TIME, ROUND, SPRITE_SIZE } from '../constants.js'
 import { isValidColor } from '../helpers.js'
+import { assetsLoader } from './assets-loader.js'
 import { DudeEmoteSpitter } from './dude-emote-spitter.js'
 import { DudeMessageBox } from './dude-message-box.js'
 import { DudeNameBox } from './dude-name-box.js'
 import { DudeSpriteContainer } from './dude-sprite-container.js'
 import { soundsLoader } from './sounds-loader.js'
 import {
-  DudeSpriteLayers,
-  DudeSpriteTags,
+  DudesFrameTags,
+  DudesLayers,
+  DudesLayersKeys,
   spriteProvider
 } from './sprite-provider.js'
 import type { DudesTypes } from '../types.js'
-import type { DudeSpriteFrameTag } from './sprite-provider.js'
+import type { DudesLayer, DudeSpriteFrameTag } from './sprite-provider.js'
 
 export class Dude {
-  name: string
-  spriteName: string
   view = new Container()
 
-  private bodyColor: string
-  private eyesColor: string
-  private cosmeticsColor: string
-
+  private colors: Record<DudesLayer, string> = {
+    Body: dudesSettings.value.dude.bodyColor,
+    Eyes: '#FFF',
+    Mouth: '#FFF',
+    Hat: '#FFF',
+    Cosmetics: '#FFF'
+  }
   private direction: number
   private animationState?: DudeSpriteFrameTag
 
@@ -53,27 +55,29 @@ export class Dude {
   private currentLifeTime: number
   private maxOpacityTime = 5000
   private currentOpacityTime = this.maxOpacityTime
-  private scale: number
+  private scale = dudesSettings.value.dude.scale
 
   constructor(
-    name: string,
-    spriteName = 'dude',
-    individualParams?: DudesTypes.IndividualDudeParams
-  ) {
-    this.name = name
-    this.spriteName = spriteName
+    public name: string,
+    public spriteData: DudesTypes.SpriteData,
+    private individualParams?: DudesTypes.IndividualDudeParams
+  ) {}
 
-    this.bodyTint(dudesSettings.value.dude.color)
-    this.eyesTint(dudesSettings.value.dude.eyesColor)
-    this.cosmeticsTint(dudesSettings.value.dude.cosmeticsColor)
+  async setSpriteData(spriteData: DudesTypes.SpriteData): Promise<void> {
+    spriteData.name += '-' + Date.now()
+    await assetsLoader.load(spriteData)
 
-    watch(
-      () => dudesSettings.value.dude.scale,
-      (scale) => {
-        this.scale = scale
-      },
-      { immediate: true }
-    )
+    assetsLoader.unload(this.spriteData.name)
+    spriteProvider.unloadTextures(this.spriteData.name)
+    this.spriteData = spriteData
+
+    this.playAnimation('Idle', true)
+  }
+
+  async init(): Promise<void> {
+    if (this.currentLifeTime) return
+
+    await assetsLoader.load(this.spriteData)
 
     this.view.y = -(COLLIDER.y + COLLIDER.height - SPRITE_SIZE / 2) * this.scale
 
@@ -83,60 +87,52 @@ export class Dude {
 
     this.direction = Math.random() > 0.5 ? 1 : -1
 
-    this.nameBox = new DudeNameBox(name, individualParams?.name)
-    this.visibleName(dudesSettings.value.dude.visibleName)
-
-    this.messageBox = new DudeMessageBox(individualParams?.message)
+    this.nameBox = new DudeNameBox(this.name, this.individualParams?.name)
+    this.messageBox = new DudeMessageBox(this.individualParams?.message)
     this.emoteSpitter = new DudeEmoteSpitter()
 
     this.view.sortableChildren = true
     this.view.addChild(this.nameBox.view)
-    this.view.addChild(this.emoteSpitter.view)
     this.view.addChild(this.messageBox.view)
+    this.view.addChild(this.emoteSpitter.view)
 
-    this.playAnimation(DudeSpriteTags.Idle)
+    this.playAnimation(DudesFrameTags.Idle)
 
     this.idleAnimationTime = performance.now()
     this.maxIdleAnimationTime = Math.random() * 5000
     this.currentLifeTime = dudesSettings.value.dude.maxLifeTime
+
+    this.jump = this.jump.bind(this)
   }
 
-  visibleName(visible: boolean): void {
-    this.nameBox.visible(visible)
-  }
+  jump() {
+    if (this.animationState !== DudesFrameTags.Jump) {
+      this.velocity.x = this.direction * 100
+      this.velocity.y = -300
 
-  jump(): void {
-    const tryJump = () => {
-      if (this.animationState !== DudeSpriteTags.Jump) {
-        this.velocity.x = this.direction * 100
-        this.velocity.y = -300
-
-        this.playAnimation(DudeSpriteTags.Jump)
-        return
-      }
-
-      requestAnimationFrame(tryJump)
+      this.playAnimation(DudesFrameTags.Jump)
+      return
     }
 
-    tryJump()
+    requestAnimationFrame(this.jump)
   }
 
-  bodyTint(color: string): void {
-    if (!isValidColor(color)) return
-    this.bodyColor = color
-    this.sprite?.bodyColor(this.bodyColor)
+  setColor(type: DudesLayer, color: string): void {
+    if (!isValidColor(color) || !this.sprite?.[type]) return
+    this.colors[type] = color
+    this.sprite.setColor(type, color)
   }
 
-  eyesTint(color: string): void {
-    if (!isValidColor(color)) return
-    this.eyesColor = color
-    this.sprite?.eyesColor(color)
-  }
+  updateScale(scale?: number, force = false): void {
+    if (scale) {
+      if (force) {
+        this.scale = scale
+      } else {
+        this.scale += scale
+      }
+    }
 
-  cosmeticsTint(color: string): void {
-    if (!isValidColor(color)) return
-    this.cosmeticsColor = color
-    this.sprite?.cosmeticsColor(color)
+    this.sprite?.view.scale.set(this.direction * this.scale, this.scale)
   }
 
   update(): void {
@@ -146,7 +142,7 @@ export class Dude {
       this.landAnimationTime &&
       now - this.landAnimationTime > this.maxLandAnimationTime
     ) {
-      this.playAnimation(DudeSpriteTags.Idle)
+      this.playAnimation(DudesFrameTags.Idle)
       this.landAnimationTime = null
     }
 
@@ -154,13 +150,13 @@ export class Dude {
       this.idleAnimationTime &&
       this.maxIdleAnimationTime &&
       now - this.idleAnimationTime > this.maxIdleAnimationTime &&
-      (this.animationState === DudeSpriteTags.Run ||
-        this.animationState === DudeSpriteTags.Idle)
+      (this.animationState === DudesFrameTags.Run ||
+        this.animationState === DudesFrameTags.Idle)
     ) {
-      if (this.animationState === DudeSpriteTags.Idle) {
-        this.playAnimation(DudeSpriteTags.Run)
+      if (this.animationState === DudesFrameTags.Idle) {
+        this.playAnimation(DudesFrameTags.Run)
       } else {
-        this.playAnimation(DudeSpriteTags.Idle)
+        this.playAnimation(DudesFrameTags.Idle)
       }
 
       this.idleAnimationTime = now
@@ -187,8 +183,8 @@ export class Dude {
         window.innerHeight -
         (COLLIDER.y + COLLIDER.height - SPRITE_SIZE / 2) * this.scale
 
-      if (this.animationState === DudeSpriteTags.Fall) {
-        this.playAnimation(DudeSpriteTags.Land)
+      if (this.animationState === DudesFrameTags.Fall) {
+        this.playAnimation(DudesFrameTags.Land)
         this.landAnimationTime = now
       }
     }
@@ -196,7 +192,7 @@ export class Dude {
     this.view.position.set(newPosition.x, newPosition.y)
 
     if (this.velocity.y > 0) {
-      this.playAnimation(DudeSpriteTags.Fall)
+      this.playAnimation(DudesFrameTags.Fall)
     }
 
     const width = window.innerWidth
@@ -232,7 +228,7 @@ export class Dude {
     }
 
     if (
-      this.animationState !== DudeSpriteTags.Idle ||
+      this.animationState !== DudesFrameTags.Idle ||
       (this.isGrowing && this.scale < dudesSettings.value.dude.growMaxScale)
     ) {
       this.view.position.x += (this.direction * DELTA_TIME * 60) / ROUND
@@ -270,8 +266,8 @@ export class Dude {
     this.view.alpha = 1
   }
 
-  spitEmotes(emotes: string[]): void {
-    if (!dudesSettings.value.spitter.enabled) return
+  addEmotes(emotes: string[]): void {
+    if (!dudesSettings.value.emotes.enabled) return
     this.emoteSpitter.add(emotes)
   }
 
@@ -285,7 +281,7 @@ export class Dude {
     frameTag: DudeSpriteFrameTag,
     force = false
   ): Promise<void> {
-    const dudeSprite = spriteProvider.getSprite(this.spriteName, frameTag)
+    const dudeSprite = spriteProvider.getSprite(this.spriteData.name, frameTag)
     if (!dudeSprite) return
 
     if (this.animationState === frameTag && !force) return
@@ -301,24 +297,19 @@ export class Dude {
     }
 
     this.sprite = new DudeSpriteContainer(
-      dudeSprite[DudeSpriteLayers.Body],
-      dudeSprite[DudeSpriteLayers.Outline],
-      dudeSprite[DudeSpriteLayers.Eyes],
-      dudeSprite[DudeSpriteLayers.Cosmetics]
+      dudeSprite[DudesLayers.Body],
+      dudeSprite[DudesLayers.Eyes],
+      dudeSprite[DudesLayers.Mouth],
+      dudeSprite[DudesLayers.Hat],
+      dudeSprite[DudesLayers.Cosmetics]
     )
     this.sprite.view.scale.set(this.direction * this.scale, this.scale)
-    this.sprite.bodyColor(this.bodyColor)
-    this.sprite.eyesColor(this.eyesColor)
-    this.sprite.cosmeticsColor(this.cosmeticsColor)
 
-    this.view.addChild(this.sprite.view)
-  }
-
-  private updateScale(scale?: number): void {
-    if (scale) {
-      this.scale += scale
+    for (const layer of DudesLayersKeys) {
+      const layerKey = layer as keyof typeof DudesLayers
+      this.sprite?.setColor(DudesLayers[layerKey], this.colors[layerKey])
     }
 
-    this.sprite?.view.scale.set(this.direction * this.scale, this.scale)
+    this.view.addChild(this.sprite.view)
   }
 }

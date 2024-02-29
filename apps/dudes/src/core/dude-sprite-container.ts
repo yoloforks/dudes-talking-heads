@@ -1,68 +1,65 @@
 import { AnimatedSprite, Container } from 'pixi.js'
 
+import { DudesLayers, DudesLayersKeys } from './sprite-provider.js'
+import type { DudesLayer } from './sprite-provider.js'
+
+function prepareSprite(sprite: AnimatedSprite, zIndex: number): AnimatedSprite {
+  sprite.zIndex = zIndex
+  sprite.anchor.set(0.5)
+  sprite.play()
+  return sprite
+}
+
 export class DudeSpriteContainer {
   view = new Container()
 
   constructor(
-    private body: AnimatedSprite,
-    private outline: AnimatedSprite,
-    private eyes?: AnimatedSprite,
-    private cosmetics?: AnimatedSprite
+    private Body?: AnimatedSprite,
+    private Eyes?: AnimatedSprite,
+    private Mouth?: AnimatedSprite,
+    private Hat?: AnimatedSprite,
+    private Cosmetics?: AnimatedSprite
   ) {
-    this.body = body
-    this.outline = outline
+    const sprites = []
 
-    this.outline.zIndex = 1
-    this.body.zIndex = 2
-
-    const sprites = [body, outline]
-
-    if (eyes) {
-      this.eyes = eyes
-      this.eyes.zIndex = 3
-      this.eyes.anchor.set(0.5)
-      this.eyes.play()
-      sprites.push(eyes)
+    if (Body) {
+      this.Body = prepareSprite(Body, 1)
+      sprites.push(this.Body)
     }
 
-    if (cosmetics) {
-      this.cosmetics = cosmetics
-      this.cosmetics.zIndex = 4
-      this.cosmetics.anchor.set(0.5)
-      this.cosmetics.play()
-      sprites.push(cosmetics)
+    if (Eyes) {
+      this.Eyes = prepareSprite(Eyes, 2)
+      sprites.push(this.Eyes)
+    }
+
+    if (Mouth) {
+      this.Mouth = prepareSprite(Mouth, 2)
+      sprites.push(this.Mouth)
+    }
+
+    if (Hat) {
+      this.Hat = prepareSprite(Hat, 3)
+      sprites.push(this.Hat)
+    }
+
+    if (Cosmetics) {
+      this.Cosmetics = prepareSprite(Cosmetics, 4)
+      sprites.push(this.Cosmetics)
     }
 
     this.view.addChild(...sprites)
     this.view.sortableChildren = true
-
-    this.body.anchor.set(0.5)
-    this.outline.anchor.set(0.5)
-
-    this.body.play()
-    this.outline.play()
   }
 
   update(delta: number): void {
-    this.body.update(delta)
-    this.outline.update(delta)
-    this.eyes?.update(delta)
-    this.cosmetics?.update(delta)
-  }
-
-  eyesColor(color: string): void {
-    if (this.eyes) {
-      this.eyes.tint = color
+    for (const layer of DudesLayersKeys) {
+      const layerKey = layer as keyof typeof DudesLayers
+      this[layerKey]?.update(delta)
     }
   }
 
-  cosmeticsColor(color: string): void {
-    if (this.cosmetics) {
-      this.cosmetics.tint = color
-    }
-  }
-
-  bodyColor(color: string): void {
-    this.body.tint = color
+  setColor(type: DudesLayer, color: string): void {
+    if (!this[type]) return
+    this[type]!.tint = color
   }
 }

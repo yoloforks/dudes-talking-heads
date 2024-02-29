@@ -11,11 +11,12 @@
   "devDependencies": {
     "@changesets/cli": "2.27.1",
     "@crashmax/prettier-config": "5.0.2",
-    "turbo": "1.12.2"
+    "turbo": "1.12.4"
   },
   "pnpm": {
     "patchedDependencies": {
-      "v-tweakpane@0.2.0": "patches/v-tweakpane@0.2.0.patch"
+      "v-tweakpane@0.2.0": "patches/v-tweakpane@0.2.0.patch",
+      "pixi.js@7.4.0": "patches/pixi.js@7.4.0.patch"
     }
   }
 }

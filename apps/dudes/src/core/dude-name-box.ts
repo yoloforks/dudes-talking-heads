@@ -16,11 +16,8 @@ export class DudeNameBox {
     this.view.zIndex = 100
   }
 
-  visible(visible: boolean): void {
-    this.view.visible = visible
-  }
-
   update(scale: number): void {
+    this.view.visible = dudesSettings.value.name.enabled
     this.view.position.y = -((SPRITE_SIZE * scale) / 2)
 
     const params = this.individualParams

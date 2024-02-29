@@ -6,6 +6,8 @@ export default defineConfig({
   plugins: [vue(), dts()],
   build: {
     sourcemap: true,
+    minify: false,
+    emptyOutDir: false,
     lib: {
       entry: './src/index.ts',
       name: 'dudes',
@@ -14,16 +16,12 @@ export default defineConfig({
     rollupOptions: {
       external: [
         'vue',
-        'pixi.js',
-        '@pixi/gif',
         'gsap'
       ],
       output: {
-        exports: 'default',
+        exports: 'named',
         globals: {
           vue: 'Vue',
-          'pixi.js': 'PIXI',
-          '@pixi/gif': 'GIF',
           gsap: 'gsap'
         }
       }
