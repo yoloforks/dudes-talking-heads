@@ -65,7 +65,7 @@ export class Dude {
   async init(): Promise<void> {
     if (this.currentLifeTime) return
 
-    await assetsLoader.load(this.spriteData.name, this.spriteData.layers)
+    await assetsLoader.load(this.spriteData)
 
     this.tint(dudesSettings.value.dude.color)
 

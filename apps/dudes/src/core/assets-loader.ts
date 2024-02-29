@@ -1,10 +1,11 @@
-import { Assets } from 'pixi.js'
+import { Assets, Spritesheet } from 'pixi.js'
 import type {
   AssetInitOptions,
   ISpritesheetData,
-  ISpritesheetFrameData,
-  Spritesheet
+  ISpritesheetFrameData
 } from 'pixi.js'
+
+import type { DudeSpriteData } from './dude.js'
 
 export interface SpriteFrameData extends ISpritesheetFrameData {
   duration: number
@@ -12,7 +13,6 @@ export interface SpriteFrameData extends ISpritesheetFrameData {
 
 export interface SpriteData extends ISpritesheetData {
   frames: Record<string, SpriteFrameData>
-  duration: number
 }
 
 export interface DudesAsset {
@@ -21,6 +21,69 @@ export interface DudesAsset {
 }
 
 export type AssetsLoaderOptions = Omit<AssetInitOptions, 'manifest'>
+
+async function loadSprite(assetData: DudesAsset) {
+  const frames = Object.fromEntries(
+    Array.from({ length: 9 }, (_, index) => {
+      const frame = {
+        frame: { x: index * 32, y: 0, w: 32, h: 32 },
+        rotated: false,
+        trimmed: false,
+        spriteSourceSize: { x: 0, y: 0, w: 32, h: 32 },
+        sourceSize: { w: 32, h: 32 },
+        duration: index < 3 ? 300 : 100
+      }
+
+      return [`${assetData.alias}_${index}`, frame]
+    })
+  )
+
+  const spritesheet: SpriteData = {
+    frames,
+    meta: {
+      format: 'RGBA8888',
+      size: { w: 288, h: 32 },
+      scale: '1',
+      frameTags: [
+        {
+          name: 'Idle',
+          from: 0,
+          to: 2,
+          direction: 'forward'
+        },
+        {
+          name: 'Jump',
+          from: 3,
+          to: 3,
+          direction: 'forward'
+        },
+        {
+          name: 'Fall',
+          from: 4,
+          to: 4,
+          direction: 'forward'
+        },
+        {
+          name: 'Land',
+          from: 5,
+          to: 5,
+          direction: 'forward'
+        },
+        {
+          name: 'Run',
+          from: 6,
+          to: 8,
+          direction: 'forward'
+        }
+      ],
+      layers: [
+        { name: assetData.alias, opacity: 255, blendMode: 'normal' }]
+    }
+  }
+
+  const texture = await Assets.load(assetData.src)
+  return new Spritesheet(texture, spritesheet)
+}
 
 export class AssetsLoader {
   private bundles: Record<string, Record<string, Spritesheet<SpriteData>>> = {}
@@ -37,14 +100,21 @@ export class AssetsLoader {
   }
 
   async unload(spriteName: string): Promise<void> {
+    if (!(spriteName in this.bundles)) return
     await Assets.unloadBundle(spriteName)
     delete this.bundles[spriteName]
   }
 
-  async load(spriteName: string, assets: DudesAsset[]): Promise<void> {
-    if (spriteName in this.bundles) return
-    Assets.addBundle(spriteName, assets)
-    this.bundles[spriteName] = await Assets.loadBundle(spriteName)
+  async load(spriteData: DudeSpriteData): Promise<void> {
+    if (spriteData.name in this.bundles) return
+
+    for (const layer of spriteData.layers) {
+      const sprite = await loadSprite(layer)
+      await sprite.parse()
+
+      this.bundles[spriteData.name] ??= {}
+      this.bundles[spriteData.name][layer.alias] = sprite
+    }
   }
 }
 

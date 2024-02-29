@@ -1,16 +1,20 @@
 import { randomNum } from '@zero-dependency/utils'
-import type { DudeSpriteData } from '@twirapp/dudes/types'
+import type { DudesLayer, DudeSpriteData } from '@twirapp/dudes/types'
 
 export function randomRgbColor(): string {
   return `rgb(${randomNum(0, 255)}, ${randomNum(0, 255)}, ${randomNum(0, 255)})`
 }
 
-export function createDudeSprite(
+export function mapDudeSprite(
   name: string,
-  layers: DudeSpriteData['layers']
+  layers: Record<DudesLayer, string>
 ) {
-  return {
+  const sprite: DudeSpriteData = {
     name,
-    layers
+    layers: Object.entries(layers)
+      .map(([layer, src]) => ({ alias: layer, src }))
+      .filter((layer) => layer.src)
   }
+
+  return sprite
 }

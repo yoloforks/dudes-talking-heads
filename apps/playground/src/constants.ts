@@ -1,6 +1,5 @@
 import type {
   AssetsLoaderOptions,
-  DudesAsset,
   DudesLayer,
   SoundAsset
 } from '@twirapp/dudes/types'
@@ -13,30 +12,39 @@ export const dudesSounds: SoundAsset[] = [
 ]
 
 export const assetsLoadOptions: AssetsLoaderOptions = {
-  basePath: location.href + 'custom/',
+  basePath: location.href + 'sprites/',
   defaultSearchParams: {
     ts: Date.now()
   }
 }
 
-export const dudesAssets: Record<DudesLayer, DudesAsset> = {
-  Body: {
-    alias: 'Body',
-    src: 'body.json'
-  },
-  Eyes: {
-    alias: 'Eyes',
-    src: 'eyes.json'
-  },
-  Mouth: {
-    alias: 'Mouth',
-    src: 'mouth.json'
-  },
-  Cosmetics: {
-    alias: 'Cosmetics',
-    src: 'cosmetics.json'
+export const dudesLayers: Record<DudesLayer, { name: string; src: string }[]> =
+  {
+    Body: [
+      {
+        name: 'Default',
+        src: 'default-body.png'
+      }
+    ],
+    Eyes: [
+      {
+        name: 'Default',
+        src: 'default-eyes.png'
+      }
+    ],
+    Mouth: [
+      {
+        name: 'Cat',
+        src: 'cat-mouth.png'
+      }
+    ],
+    Cosmetics: [
+      {
+        name: 'Santa hat',
+        src: 'santa-hat-cosmetics.png'
+      }
+    ]
   }
-}
 
 export const dudesEmotes: string[] = [
   'pepegaGun.gif',
