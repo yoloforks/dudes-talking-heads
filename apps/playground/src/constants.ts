@@ -22,26 +22,62 @@ export const dudesLayers: Record<DudesLayer, { name: string; src: string }[]> =
   {
     Body: [
       {
-        name: 'Default',
-        src: 'default-body.png'
+        name: 'Dude',
+        src: 'body/dude.png'
+      },
+      {
+        name: 'Cat',
+        src: 'body/cat.png'
+      },
+      {
+        name: 'Devil',
+        src: 'body/devil.png'
       }
     ],
     Eyes: [
       {
-        name: 'Default',
-        src: 'default-eyes.png'
+        name: 'Dude',
+        src: 'eyes/dude.png'
+      },
+      {
+        name: 'Toned glasses',
+        src: 'eyes/toned-glasses.png'
+      },
+      {
+        name: 'Smart guy glasses',
+        src: 'eyes/smart-guy-glasses.png'
       }
     ],
     Mouth: [
       {
         name: 'Cat',
-        src: 'cat-mouth.png'
+        src: 'mouth/cat.png'
+      },
+      {
+        name: 'Mexican moustache',
+        src: 'mouth/mexican-moustache.png'
       }
     ],
     Cosmetics: [
       {
         name: 'Santa hat',
-        src: 'santa-hat-cosmetics.png'
+        src: 'cosmetics/santa-hat.png'
+      },
+      {
+        name: 'Cowboy hat',
+        src: 'cosmetics/cowboy-hat.png'
+      },
+      {
+        name: 'Gun',
+        src: 'cosmetics/gun.png'
+      },
+      {
+        name: 'Girl ribbon',
+        src: 'cosmetics/girl-ribbon.png'
+      },
+      {
+        name: 'Lightsaber',
+        src: 'cosmetics/lightsaber.png'
       }
     ]
   }

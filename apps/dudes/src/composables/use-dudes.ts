@@ -4,7 +4,6 @@ import { watch } from 'vue'
 import { assetsLoader } from '../core/assets-loader.js'
 import { Dude } from '../core/dude.js'
 import { dudesSettings } from './use-settings.js'
-import type { DudeSpriteData } from '../core/dude.js'
 import type { DudesTypes } from '../types.js'
 
 const dudes = new Map<string, Dude>()
@@ -29,7 +28,7 @@ export const useDudes = () => {
 
   async function createDude(
     name: string,
-    spriteData: DudeSpriteData,
+    spriteData: DudesTypes.SpriteData,
     params?: DudesTypes.IndividualDudeParams
   ): Promise<Dude> {
     removeDude(name)
@@ -53,10 +52,10 @@ export const useDudes = () => {
   }
 
   watch(
-    () => dudesSettings.value.dude.visibleName,
-    (isVisible) => {
+    () => dudesSettings.value.dude.scale,
+    (scale) => {
       for (const dude of dudes.values()) {
-        dude.visibleName(isVisible)
+        dude.updateScale(scale, true)
       }
     }
   )

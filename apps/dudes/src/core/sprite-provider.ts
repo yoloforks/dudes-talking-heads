@@ -9,7 +9,7 @@ export const DudesLayers = {
   Mouth: 'Mouth',
   Cosmetics: 'Cosmetics'
 } as const
-const DudesLayersKeys = Object.keys(DudesLayers)
+export const DudesLayersKeys = Object.keys(DudesLayers)
 export type DudesLayer = keyof typeof DudesLayers
 
 export const DudeSpriteTags = {

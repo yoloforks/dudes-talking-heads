@@ -1,5 +1,4 @@
 import { Container } from 'pixi.js'
-import { watch } from 'vue'
 import type { IPointData } from 'pixi.js'
 
 import { removeInternalDude } from '../composables/use-dudes.js'
@@ -14,21 +13,22 @@ import { DudeSpriteContainer } from './dude-sprite-container.js'
 import { soundsLoader } from './sounds-loader.js'
 import {
   DudesLayers,
+  DudesLayersKeys,
   DudeSpriteTags,
   spriteProvider
 } from './sprite-provider.js'
-import type { DudesAsset, DudesTypes } from '../types.js'
-import type { DudeSpriteFrameTag } from './sprite-provider.js'
-
-export interface DudeSpriteData {
-  name: string
-  layers: DudesAsset[]
-}
+import type { DudesTypes } from '../types.js'
+import type { DudesLayer, DudeSpriteFrameTag } from './sprite-provider.js'
 
 export class Dude {
   view = new Container()
 
-  private bodyColor: string
+  private colors: Record<DudesLayer, string> = {
+    Body: dudesSettings.value.dude.bodyColor,
+    Eyes: '#FFF',
+    Mouth: '#FFF',
+    Cosmetics: '#FFF'
+  }
   private direction: number
   private animationState?: DudeSpriteFrameTag
 
@@ -54,11 +54,11 @@ export class Dude {
   private currentLifeTime: number
   private maxOpacityTime = 5000
   private currentOpacityTime = this.maxOpacityTime
-  private scale: number
+  private scale = dudesSettings.value.dude.scale
 
   constructor(
     public name: string,
-    public spriteData: DudeSpriteData,
+    public spriteData: DudesTypes.SpriteData,
     private individualParams?: DudesTypes.IndividualDudeParams
   ) {}
 
@@ -67,15 +67,7 @@ export class Dude {
 
     await assetsLoader.load(this.spriteData)
 
-    this.tint(dudesSettings.value.dude.color)
-
-    watch(
-      () => dudesSettings.value.dude.scale,
-      (scale) => {
-        this.scale = scale
-      },
-      { immediate: true }
-    )
+    this.setColor(DudesLayers.Body, this.colors.Body)
 
     this.view.y = -(COLLIDER.y + COLLIDER.height - SPRITE_SIZE / 2) * this.scale
 
@@ -86,47 +78,51 @@ export class Dude {
     this.direction = Math.random() > 0.5 ? 1 : -1
 
     this.nameBox = new DudeNameBox(this.name, this.individualParams?.name)
-    this.visibleName(dudesSettings.value.dude.visibleName)
-
     this.messageBox = new DudeMessageBox(this.individualParams?.message)
     this.emoteSpitter = new DudeEmoteSpitter()
 
     this.view.sortableChildren = true
     this.view.addChild(this.nameBox.view)
-    this.view.addChild(this.emoteSpitter.view)
     this.view.addChild(this.messageBox.view)
+    this.view.addChild(this.emoteSpitter.view)
 
     this.playAnimation(DudeSpriteTags.Idle)
 
     this.idleAnimationTime = performance.now()
     this.maxIdleAnimationTime = Math.random() * 5000
     this.currentLifeTime = dudesSettings.value.dude.maxLifeTime
+
+    this.jump = this.jump.bind(this)
   }
 
-  visibleName(visible: boolean): void {
-    this.nameBox.visible(visible)
-  }
+  jump() {
+    if (this.animationState !== DudeSpriteTags.Jump) {
+      this.velocity.x = this.direction * 100
+      this.velocity.y = -300
 
-  jump(): void {
-    const tryJump = () => {
-      if (this.animationState !== DudeSpriteTags.Jump) {
-        this.velocity.x = this.direction * 100
-        this.velocity.y = -300
-
-        this.playAnimation(DudeSpriteTags.Jump)
-        return
-      }
-
-      requestAnimationFrame(tryJump)
+      this.playAnimation(DudeSpriteTags.Jump)
+      return
     }
 
-    tryJump()
+    requestAnimationFrame(this.jump)
   }
 
-  tint(color: string): void {
-    if (!isValidColor(color)) return
-    this.bodyColor = color
-    this.sprite?.tint(this.bodyColor)
+  setColor(type: DudesLayer, color: string): void {
+    if (!isValidColor(color) || !this.sprite?.[type]) return
+    this.colors[type] = color
+    this.sprite.setColor(type, color)
+  }
+
+  updateScale(scale?: number, force = false): void {
+    if (scale) {
+      if (force) {
+        this.scale = scale
+      } else {
+        this.scale += scale
+      }
+    }
+
+    this.sprite?.view.scale.set(this.direction * this.scale, this.scale)
   }
 
   update(): void {
@@ -260,8 +256,8 @@ export class Dude {
     this.view.alpha = 1
   }
 
-  spitEmotes(emotes: string[]): void {
-    if (!dudesSettings.value.spitter.enabled) return
+  addEmotes(emotes: string[]): void {
+    if (!dudesSettings.value.emotes.enabled) return
     this.emoteSpitter.add(emotes)
   }
 
@@ -297,16 +293,12 @@ export class Dude {
       dudeSprite[DudesLayers.Cosmetics]
     )
     this.sprite.view.scale.set(this.direction * this.scale, this.scale)
-    this.sprite.tint(this.bodyColor)
 
-    this.view.addChild(this.sprite.view)
-  }
-
-  private updateScale(scale?: number): void {
-    if (scale) {
-      this.scale += scale
+    for (const layer of DudesLayersKeys) {
+      const layerKey = layer as keyof typeof DudesLayers
+      this.sprite?.setColor(DudesLayers[layerKey], this.colors[layerKey])
     }
 
-    this.sprite?.view.scale.set(this.direction * this.scale, this.scale)
+    this.view.addChild(this.sprite.view)
   }
 }

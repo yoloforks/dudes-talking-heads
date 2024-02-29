@@ -19,7 +19,7 @@ export default defineConfig({
         'gsap'
       ],
       output: {
-        exports: 'default',
+        exports: 'named',
         globals: {
           vue: 'Vue',
           gsap: 'gsap'

@@ -1,5 +1,7 @@
 import { AnimatedSprite, Container } from 'pixi.js'
 
+import type { DudesLayer } from './sprite-provider.js'
+
 function prepareSprite(sprite: AnimatedSprite, zIndex: number): AnimatedSprite {
   sprite.zIndex = zIndex
   sprite.anchor.set(0.5)
@@ -11,31 +13,31 @@ export class DudeSpriteContainer {
   view = new Container()
 
   constructor(
-    private body?: AnimatedSprite,
-    private eyes?: AnimatedSprite,
-    private mouth?: AnimatedSprite,
-    private cosmetics?: AnimatedSprite
+    private Body?: AnimatedSprite,
+    private Eyes?: AnimatedSprite,
+    private Mouth?: AnimatedSprite,
+    private Cosmetics?: AnimatedSprite
   ) {
     const sprites = []
 
-    if (body) {
-      this.body = prepareSprite(body, 1)
-      sprites.push(this.body)
+    if (Body) {
+      this.Body = prepareSprite(Body, 1)
+      sprites.push(this.Body)
     }
 
-    if (eyes) {
-      this.eyes = prepareSprite(eyes, 2)
-      sprites.push(this.eyes)
+    if (Eyes) {
+      this.Eyes = prepareSprite(Eyes, 2)
+      sprites.push(this.Eyes)
     }
 
-    if (mouth) {
-      this.mouth = prepareSprite(mouth, 2)
-      sprites.push(this.mouth)
+    if (Mouth) {
+      this.Mouth = prepareSprite(Mouth, 2)
+      sprites.push(this.Mouth)
     }
 
-    if (cosmetics) {
-      this.cosmetics = prepareSprite(cosmetics, 3)
-      sprites.push(this.cosmetics)
+    if (Cosmetics) {
+      this.Cosmetics = prepareSprite(Cosmetics, 3)
+      sprites.push(this.Cosmetics)
     }
 
     this.view.addChild(...sprites)
@@ -43,14 +45,14 @@ export class DudeSpriteContainer {
   }
 
   update(delta: number): void {
-    this.body?.update(delta)
-    this.eyes?.update(delta)
-    this.mouth?.update(delta)
-    this.cosmetics?.update(delta)
+    this.Body?.update(delta)
+    this.Eyes?.update(delta)
+    this.Mouth?.update(delta)
+    this.Cosmetics?.update(delta)
   }
 
-  tint(color: string): void {
-    if (!this.body) return
-    this.body.tint = color
+  setColor(type: DudesLayer, color: string): void {
+    if (!this[type]) return
+    this[type]!.tint = color
   }
 }

@@ -5,7 +5,7 @@ import type {
   ISpritesheetFrameData
 } from 'pixi.js'
 
-import type { DudeSpriteData } from './dude.js'
+import type { DudesTypes } from '../types.js'
 
 export interface SpriteFrameData extends ISpritesheetFrameData {
   duration: number
@@ -92,7 +92,7 @@ export class AssetsLoader {
     spriteName: string,
     layerType: string
   ): Spritesheet<SpriteData> | undefined {
-    return this.bundles[spriteName][layerType]
+    return this.bundles?.[spriteName]?.[layerType]
   }
 
   async init(loadOptions: AssetsLoaderOptions = {}): Promise<void> {
@@ -105,7 +105,7 @@ export class AssetsLoader {
     delete this.bundles[spriteName]
   }
 
-  async load(spriteData: DudeSpriteData): Promise<void> {
+  async load(spriteData: DudesTypes.SpriteData): Promise<void> {
     if (spriteData.name in this.bundles) return
 
     for (const layer of spriteData.layers) {

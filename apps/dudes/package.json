@@ -7,7 +7,7 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/dudes.vue.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/dudes.js",
       "require": "./dist/dudes.umd.cjs"
     },
