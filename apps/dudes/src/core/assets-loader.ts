@@ -1,10 +1,11 @@
-import { Assets, Spritesheet } from 'pixi.js'
+import { Assets, BaseTexture, Spritesheet } from 'pixi.js'
 import type {
   AssetInitOptions,
   ISpritesheetData,
   ISpritesheetFrameData
 } from 'pixi.js'
 
+import { isBase64 } from '../helpers.js'
 import type { DudesTypes } from '../types.js'
 
 export interface SpriteFrameData extends ISpritesheetFrameData {
@@ -79,6 +80,11 @@ async function loadSprite(assetData: DudesAsset) {
       layers: [
         { name: assetData.alias, opacity: 255, blendMode: 'normal' }]
     }
+  }
+
+  if (isBase64(assetData.src)) {
+    const baseTexture = BaseTexture.from(assetData.src)
+    return new Spritesheet(baseTexture, spritesheet)
   }
 
   const texture = await Assets.load(assetData.src)
