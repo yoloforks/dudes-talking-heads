@@ -20,6 +20,8 @@ import {
 import type { DudesTypes } from '../types.js'
 import type { DudesLayer, DudeSpriteFrameTag } from './sprite-provider.js'
 
+type Direction = 1 | -1
+
 export class Dude {
   view = new Container()
 
@@ -30,8 +32,8 @@ export class Dude {
     Hat: '#FFF',
     Cosmetics: '#FFF'
   }
-  private direction: number
-  private animationState?: DudeSpriteFrameTag
+  private direction: Direction
+  private currentFrameTag?: DudeSpriteFrameTag
 
   private sprite?: DudeSpriteContainer
   private nameBox: DudeNameBox
@@ -43,7 +45,7 @@ export class Dude {
     y: 0
   }
 
-  private landAnimationTime: number | null
+  private landAnimationTime: number | null = null
   private maxLandAnimationTime = 200
 
   private idleAnimationTime?: number
@@ -52,7 +54,7 @@ export class Dude {
   private isGrowing: boolean
   private growingTime: number
 
-  private currentLifeTime: number
+  private currentLifeTime = dudesSettings.value.dude.maxLifeTime
   private maxOpacityTime = 5000
   private currentOpacityTime = this.maxOpacityTime
   private scale = dudesSettings.value.dude.scale
@@ -61,31 +63,19 @@ export class Dude {
     public name: string,
     public spriteData: DudesTypes.SpriteData,
     private individualParams?: DudesTypes.IndividualDudeParams
-  ) {}
-
-  async setSpriteData(spriteData: DudesTypes.SpriteData): Promise<void> {
-    spriteData.name += '-' + Date.now()
-    await assetsLoader.load(spriteData)
-
-    assetsLoader.unload(this.spriteData.name)
-    spriteProvider.unloadTextures(this.spriteData.name)
-    this.spriteData = spriteData
-
-    this.playAnimation('Idle', true)
+  ) {
+    this.jump = this.jump.bind(this)
   }
 
   async init(): Promise<void> {
-    if (this.currentLifeTime) return
+    if (this.sprite) return
 
     await assetsLoader.load(this.spriteData)
 
     this.view.y = -(COLLIDER.y + COLLIDER.height - SPRITE_SIZE / 2) * this.scale
-
     this.view.x =
       Math.random() * (window.innerWidth - SPRITE_SIZE * this.scale) +
       (SPRITE_SIZE / 2) * this.scale
-
-    this.direction = Math.random() > 0.5 ? 1 : -1
 
     this.nameBox = new DudeNameBox(this.name, this.individualParams?.name)
     this.messageBox = new DudeMessageBox(this.individualParams?.message)
@@ -96,17 +86,14 @@ export class Dude {
     this.view.addChild(this.messageBox.view)
     this.view.addChild(this.emoteSpitter.view)
 
+    this.updateDirection()
+    this.updateIdleAnimationTime(performance.now())
+
     this.playAnimation(DudesFrameTags.Idle)
-
-    this.idleAnimationTime = performance.now()
-    this.maxIdleAnimationTime = Math.random() * 5000
-    this.currentLifeTime = dudesSettings.value.dude.maxLifeTime
-
-    this.jump = this.jump.bind(this)
   }
 
-  jump() {
-    if (this.animationState !== DudesFrameTags.Jump) {
+  jump(): void {
+    if (this.currentFrameTag !== DudesFrameTags.Jump) {
       this.velocity.x = this.direction * 100
       this.velocity.y = -300
 
@@ -117,22 +104,59 @@ export class Dude {
     requestAnimationFrame(this.jump)
   }
 
-  setColor(type: DudesLayer, color: string): void {
-    if (!isValidColor(color) || !this.sprite?.[type]) return
-    this.colors[type] = color
-    this.sprite.setColor(type, color)
+  addMessage(message: string): void {
+    this.messageBox.add(message)
+
+    this.currentLifeTime = dudesSettings.value.dude.maxLifeTime
+    this.currentOpacityTime = this.maxOpacityTime
+    this.view.alpha = 1
   }
 
-  updateScale(scale?: number, force = false): void {
-    if (scale) {
-      if (force) {
-        this.scale = scale
-      } else {
-        this.scale += scale
-      }
+  addEmotes(emotes: string[]): void {
+    if (!dudesSettings.value.emotes.enabled) return
+    this.emoteSpitter.add(emotes)
+  }
+
+  grow(): void {
+    if (this.isGrowing) return
+    this.growingTime = dudesSettings.value.dude.growTime
+    this.isGrowing = true
+  }
+
+  async playAnimation(
+    frameTag: DudeSpriteFrameTag,
+    force = false
+  ): Promise<void> {
+    const dudeSprite = spriteProvider.getSprite(this.spriteData.name, frameTag)
+    if (!dudeSprite) return
+
+    if (this.currentFrameTag === frameTag && !force) return
+    this.currentFrameTag = frameTag
+
+    if (this.sprite) {
+      this.view.removeChild(this.sprite.view)
     }
 
-    this.sprite?.view.scale.set(this.direction * this.scale, this.scale)
+    const { enabled: soundEnabled, volume } = dudesSettings.value.dude.sounds
+    if (soundEnabled && frameTag === 'Jump') {
+      soundsLoader.play('jump', volume)
+    }
+
+    this.sprite = new DudeSpriteContainer([
+      dudeSprite[DudesLayers.Body],
+      dudeSprite[DudesLayers.Eyes],
+      dudeSprite[DudesLayers.Mouth],
+      dudeSprite[DudesLayers.Hat],
+      dudeSprite[DudesLayers.Cosmetics]
+    ])
+    this.sprite.view.scale.set(this.direction * this.scale, this.scale)
+
+    for (const layer of DudesLayersKeys) {
+      const layerKey = layer as DudesLayer
+      this.sprite?.setColor(DudesLayers[layerKey], this.colors[layerKey])
+    }
+
+    this.view.addChild(this.sprite.view)
   }
 
   update(): void {
@@ -150,17 +174,16 @@ export class Dude {
       this.idleAnimationTime &&
       this.maxIdleAnimationTime &&
       now - this.idleAnimationTime > this.maxIdleAnimationTime &&
-      (this.animationState === DudesFrameTags.Run ||
-        this.animationState === DudesFrameTags.Idle)
+      (this.currentFrameTag === DudesFrameTags.Run ||
+        this.currentFrameTag === DudesFrameTags.Idle)
     ) {
-      if (this.animationState === DudesFrameTags.Idle) {
+      if (this.currentFrameTag === DudesFrameTags.Idle) {
         this.playAnimation(DudesFrameTags.Run)
       } else {
         this.playAnimation(DudesFrameTags.Idle)
       }
 
-      this.idleAnimationTime = now
-      this.maxIdleAnimationTime = Math.random() * 5000
+      this.updateIdleAnimationTime(now)
     }
 
     this.velocity.y =
@@ -183,7 +206,7 @@ export class Dude {
         window.innerHeight -
         (COLLIDER.y + COLLIDER.height - SPRITE_SIZE / 2) * this.scale
 
-      if (this.animationState === DudesFrameTags.Fall) {
+      if (this.currentFrameTag === DudesFrameTags.Fall) {
         this.playAnimation(DudesFrameTags.Land)
         this.landAnimationTime = now
       }
@@ -205,11 +228,11 @@ export class Dude {
         this.updateScale(0.1)
 
         if (isCollidingMore) {
-          this.direction = 1
+          this.updateDirection(1)
         }
 
         if (isCollidingLess) {
-          this.direction = -1
+          this.updateDirection(-1)
         }
       }
 
@@ -222,16 +245,18 @@ export class Dude {
     }
 
     if (isCollidingMore || isCollidingLess) {
-      this.direction = -this.direction
+      // TODO: fix
+      this.updateDirection(-this.direction)
       this.velocity.x = -this.velocity.x
+      this.view.position.x += (this.direction * DELTA_TIME * 60) / ROUND
 
-      if (Math.random() > 0.5) {
+      if (Math.random() >= 0.7) {
         this.updateScale()
       }
     }
 
     if (
-      this.animationState !== DudesFrameTags.Idle ||
+      this.currentFrameTag !== DudesFrameTags.Idle ||
       (this.isGrowing && this.scale < dudesSettings.value.dude.growMaxScale)
     ) {
       this.view.position.x += (this.direction * DELTA_TIME * 60) / ROUND
@@ -261,58 +286,41 @@ export class Dude {
     this.nameBox.update(this.scale)
   }
 
-  addMessage(message: string): void {
-    this.messageBox.add(message)
-
-    this.currentLifeTime = dudesSettings.value.dude.maxLifeTime
-    this.currentOpacityTime = this.maxOpacityTime
-    this.view.alpha = 1
+  updateDirection(direction?: Direction): void {
+    this.direction = direction ?? Math.random() > 0.5 ? 1 : -1
   }
 
-  addEmotes(emotes: string[]): void {
-    if (!dudesSettings.value.emotes.enabled) return
-    this.emoteSpitter.add(emotes)
+  updateColor(layer: DudesLayer, color: string): void {
+    if (!isValidColor(color) || !this.sprite?.[layer]) return
+    this.colors[layer] = color
+    this.sprite.setColor(layer, color)
   }
 
-  grow(): void {
-    if (this.isGrowing) return
-    this.growingTime = dudesSettings.value.dude.growTime
-    this.isGrowing = true
+  updateScale(scale?: number, force = false): void {
+    if (scale) {
+      if (force) {
+        this.scale = scale
+      } else {
+        this.scale += scale
+      }
+    }
+
+    this.sprite?.view.scale.set(this.direction * this.scale, this.scale)
   }
 
-  async playAnimation(
-    frameTag: DudeSpriteFrameTag,
-    force = false
-  ): Promise<void> {
-    const dudeSprite = spriteProvider.getSprite(this.spriteData.name, frameTag)
-    if (!dudeSprite) return
+  updateIdleAnimationTime(time: number, maxTime?: number): void {
+    this.idleAnimationTime = time
+    this.maxIdleAnimationTime = maxTime ?? Math.random() * 5000
+  }
 
-    if (this.animationState === frameTag && !force) return
-    this.animationState = frameTag
+  async updateSpriteData(spriteData: DudesTypes.SpriteData): Promise<void> {
+    spriteData.name += '-' + Date.now()
+    await assetsLoader.load(spriteData)
 
-    if (this.sprite) {
-      this.view.removeChild(this.sprite.view)
-    }
+    assetsLoader.unload(this.spriteData.name)
+    spriteProvider.unloadTextures(this.spriteData.name)
+    this.spriteData = spriteData
 
-    const { enabled: soundEnabled, volume } = dudesSettings.value.dude.sounds
-    if (soundEnabled && frameTag === 'Jump') {
-      soundsLoader.play('jump', volume)
-    }
-
-    this.sprite = new DudeSpriteContainer(
-      dudeSprite[DudesLayers.Body],
-      dudeSprite[DudesLayers.Eyes],
-      dudeSprite[DudesLayers.Mouth],
-      dudeSprite[DudesLayers.Hat],
-      dudeSprite[DudesLayers.Cosmetics]
-    )
-    this.sprite.view.scale.set(this.direction * this.scale, this.scale)
-
-    for (const layer of DudesLayersKeys) {
-      const layerKey = layer as keyof typeof DudesLayers
-      this.sprite?.setColor(DudesLayers[layerKey], this.colors[layerKey])
-    }
-
-    this.view.addChild(this.sprite.view)
+    this.playAnimation('Idle', true)
   }
 }

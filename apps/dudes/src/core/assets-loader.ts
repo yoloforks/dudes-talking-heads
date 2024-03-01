@@ -26,7 +26,7 @@ export type AssetsLoaderOptions = Omit<AssetInitOptions, 'manifest'>
 async function loadSprite(assetData: DudesAsset) {
   const frames = Object.fromEntries(
     Array.from({ length: 9 }, (_, index) => {
-      const frame = {
+      const frame: SpriteFrameData = {
         frame: { x: index * 32, y: 0, w: 32, h: 32 },
         rotated: false,
         trimmed: false,

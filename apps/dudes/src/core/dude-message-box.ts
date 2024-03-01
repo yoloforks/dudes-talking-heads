@@ -2,31 +2,28 @@ import { gsap } from 'gsap'
 import { Container, Graphics, Text, TextMetrics } from 'pixi.js'
 
 import { dudesSettings } from '../composables/use-settings.js'
-import { DELTA_TIME } from '../constants.js'
+import {
+  ANIMATION_TIME,
+  ARROW_HALF_WIDTH,
+  ARROW_HEIGHT,
+  DELTA_TIME
+} from '../constants.js'
 import type { DudesTypes } from '../types.js'
-
-const ANIMATION_TIME = 500
-
-const ARROW_WIDTH = 22
-const ARROW_HEIGHT = 10
-const ARROW_HALF_WIDTH = ARROW_WIDTH / 2
 
 export class DudeMessageBox {
   view = new Container()
 
   private container = new Container()
-  private box: Graphics | null = null
-  private text: Text | null = null
+  private box?: Graphics
+  private text?: Text
   private showAnimation: gsap.core.Timeline
-  private hideAnimation: gsap.core.Tween | null = null
+  private hideAnimation?: gsap.core.Tween
 
   private currentAnimationTime = 0
   private currentShowTime = 0
   private messageQueue: string[] = []
 
-  constructor(
-    private individualParams?: DudesTypes.IndividualMessageBoxParams
-  ) {
+  constructor(private params?: DudesTypes.IndividualMessageBoxParams) {
     this.view.zIndex = 3
     this.view.addChild(this.container)
 
@@ -51,9 +48,9 @@ export class DudeMessageBox {
     this.showAnimation = timeline
   }
 
-  get params(): DudesTypes.MessageBoxParams {
-    return this.individualParams
-      ? { ...dudesSettings.value.message, ...this.individualParams }
+  private mergeParams(): DudesTypes.MessageBoxParams {
+    return this.params
+      ? { ...dudesSettings.value.message, ...this.params }
       : dudesSettings.value.message
   }
 
@@ -125,7 +122,6 @@ export class DudeMessageBox {
       ease: 'sine.out',
       onComplete: () => {
         this.hideAnimation?.kill()
-        this.hideAnimation = null
         this.showAnimation.pause()
         this.container.removeChildren()
       }
@@ -133,21 +129,22 @@ export class DudeMessageBox {
   }
 
   private show(message: string): void {
+    const params = this.mergeParams()
+
     this.text = new Text('', {
-      ...this.params,
+      ...params,
       align: 'left',
       breakWords: true,
       wordWrap: true,
       wordWrapWidth: 200
     })
 
-    const { padding, boxColor, borderRadius } = this.params
     this.text.anchor.set(0.5, 1)
-    this.text.position.set(0, -padding)
+    this.text.position.set(0, -params.padding)
     this.setText(message)
 
     this.box = new Graphics()
-    this.box.beginFill(boxColor)
+    this.box.beginFill(params.boxColor)
 
     const arrowX = this.box.x + this.box.width / 2
     const arrowY = this.box.y + this.box.height
@@ -156,15 +153,19 @@ export class DudeMessageBox {
     this.box.lineTo(arrowX + ARROW_HALF_WIDTH, arrowY)
 
     const isShortMessage = message.length < 6
-    const paddingLeft = isShortMessage ? padding + ARROW_HALF_WIDTH : padding
-    const paddingRight = isShortMessage ? padding + ARROW_HALF_WIDTH : padding
+    const paddingLeft = isShortMessage
+      ? params.padding + ARROW_HALF_WIDTH
+      : params.padding
+    const paddingRight = isShortMessage
+      ? params.padding + ARROW_HALF_WIDTH
+      : params.padding
 
     this.box.drawRoundedRect(
       this.text.x - paddingLeft - this.text.width * this.text.anchor.x,
-      this.text.y - padding - this.text.height * this.text.anchor.y,
+      this.text.y - params.padding - this.text.height * this.text.anchor.y,
       this.text.width + paddingRight * 2,
-      this.text.height + padding * 2,
-      borderRadius
+      this.text.height + params.padding * 2,
+      params.borderRadius
     )
     this.box.endFill()
 

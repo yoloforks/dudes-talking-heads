@@ -55,6 +55,7 @@ class SpriteProvider {
     const texture = textures[spriteType]
     const sprite = new AnimatedSprite(texture, false)
     sprite.texture.baseTexture.scaleMode = SCALE_MODES.NEAREST
+    sprite.name = spriteType
     return sprite
   }
 

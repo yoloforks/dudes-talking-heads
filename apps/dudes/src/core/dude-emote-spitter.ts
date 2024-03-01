@@ -1,26 +1,30 @@
 import { AnimatedGIF } from '@pixi/gif'
 import { Container, Sprite } from 'pixi.js'
 
-import { DELTA_TIME, ROUND } from '../constants.js'
+import {
+  ALPHA_SPEED,
+  DELTA_TIME,
+  MOVE_SPEED,
+  ROUND,
+  SCALE_SPEED
+} from '../constants.js'
 import { sleep } from '../helpers.js'
 
-const emotesCache = new Map<string, ArrayBuffer>()
+type EmoteSprite = Sprite | AnimatedGIF
+
+const emotesCache = new Map<string, EmoteSprite>()
 
 export class DudeEmoteSpitter {
   view = new Container()
 
-  private emotes: Sprite[] = []
+  private queueEmotes: EmoteSprite[] = []
   private currentGapTime = 0
-  private moveSpeed = 50
-  private alphaSpeed = 1
-  private scaleSpeed = 0.5
 
   async add(urls: string[]): Promise<void> {
     for (const url of urls) {
       try {
-        this.view.zIndex = 1
-        const sprite = await this.loadSprite(url)
-        this.addSprite(sprite)
+        const emote = await this.loadEmote(url)
+        this.addEmoteToQueue(emote)
         await sleep(400)
       } catch (err) {
         console.error(err)
@@ -28,41 +32,42 @@ export class DudeEmoteSpitter {
     }
   }
 
-  private addSprite(sprite: Sprite): void {
+  private addEmoteToQueue(sprite: EmoteSprite): void {
     sprite.anchor.set(0.5, 0.5)
     sprite.scale.set(0, 0)
-    this.emotes.push(sprite)
+    this.queueEmotes.push(sprite)
   }
 
-  private bufferToSprite(buffer: ArrayBuffer): Sprite {
-    const sprite = AnimatedGIF.fromBuffer(buffer, { fps: 60 })
-    return sprite
-  }
+  private async loadEmote(url: string): Promise<EmoteSprite> {
+    const emoteFromCache = emotesCache.get(url)
+    if (emoteFromCache) {
+      if (emoteFromCache instanceof AnimatedGIF) {
+        return emoteFromCache.clone()
+      }
+      return emoteFromCache
+    }
 
-  private async loadSprite(url: string): Promise<Sprite> {
     if (!url.endsWith('.gif')) {
       const sprite = Sprite.from(url)
+      emotesCache.set(url, sprite)
       return sprite
     }
 
-    const cachedEmote = emotesCache.get(url)
-    if (cachedEmote) return this.bufferToSprite(cachedEmote)
-
     const response = await fetch(url)
     const buffer = await response.arrayBuffer()
-    emotesCache.set(url, buffer)
-    const sprite = this.bufferToSprite(buffer)
-    return sprite
+    const emote = AnimatedGIF.fromBuffer(buffer, { fps: 60 })
+    emotesCache.set(url, emote)
+    return emote.clone()
   }
 
   update(): void {
     for (const child of this.view.children) {
-      child.position.y -= (DELTA_TIME * this.moveSpeed) / ROUND
-      child.scale.x += (DELTA_TIME * this.scaleSpeed) / ROUND
-      child.scale.y += (DELTA_TIME * this.scaleSpeed) / ROUND
+      child.position.y -= (DELTA_TIME * MOVE_SPEED) / ROUND
+      child.scale.x += (DELTA_TIME * SCALE_SPEED) / ROUND
+      child.scale.y += (DELTA_TIME * SCALE_SPEED) / ROUND
 
-      if (child.scale.x > 1) {
-        child.alpha -= (DELTA_TIME * this.alphaSpeed) / ROUND
+      if (child.scale.x >= 2) {
+        child.alpha -= (DELTA_TIME * ALPHA_SPEED) / ROUND
       }
 
       if (child.alpha <= 0) {
@@ -73,10 +78,10 @@ export class DudeEmoteSpitter {
     if (this.currentGapTime >= 0) {
       this.currentGapTime -= DELTA_TIME
     } else {
-      if (this.emotes.length > 0) {
-        const sprite = this.emotes.shift()
-        if (!sprite) return
-        this.view.addChild(sprite)
+      if (this.queueEmotes.length > 0) {
+        const emote = this.queueEmotes.shift()
+        if (!emote) return
+        this.view.addChild(emote)
         this.currentGapTime = ROUND
       }
     }

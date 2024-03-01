@@ -89,9 +89,9 @@ export const dudesLayers: Record<DudesLayer, { name: string; src: string }[]> =
   }
 
 export const dudesEmotes: string[] = [
-  'pepegaGun.gif',
-  'lexot.gif',
-  'hmm.webp',
-  'pepeSmack.gif',
-  'pepe.gif'
+  'hi.gif',
+  'oh.webp',
+  'buh.gif',
+  'twir.webp',
+  'juh.gif'
 ]

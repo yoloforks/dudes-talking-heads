@@ -143,14 +143,14 @@ async function spawnDude() {
 function updateDudeSprite(dude: Dude, force = false) {
   if (force) {
     const spriteData = mapDudeSpriteData(dude.name, dudeSpriteParams)
-    dude.setSpriteData(spriteData)
+    dude.updateSpriteData(spriteData)
   }
 
-  dude.setColor(DudesLayers.Body, dudeSpriteParams.bodyColor)
-  dude.setColor(DudesLayers.Eyes, dudeSpriteParams.eyesColor)
-  dude.setColor(DudesLayers.Mouth, dudeSpriteParams.mouthColor)
-  dude.setColor(DudesLayers.Hat, dudeSpriteParams.hatColor)
-  dude.setColor(DudesLayers.Cosmetics, dudeSpriteParams.cosmeticsColor)
+  dude.updateColor(DudesLayers.Body, dudeSpriteParams.bodyColor)
+  dude.updateColor(DudesLayers.Eyes, dudeSpriteParams.eyesColor)
+  dude.updateColor(DudesLayers.Mouth, dudeSpriteParams.mouthColor)
+  dude.updateColor(DudesLayers.Hat, dudeSpriteParams.hatColor)
+  dude.updateColor(DudesLayers.Cosmetics, dudeSpriteParams.cosmeticsColor)
 }
 
 function jumpAllDudes() {
@@ -164,6 +164,22 @@ function growAllDudes() {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
     dude.grow()
+  }
+}
+
+function runAllDudes() {
+  if (!dudesRef.value) return
+  for (const dude of dudesRef.value.dudes.values()) {
+    dude.updateIdleAnimationTime(performance.now())
+    dude.playAnimation('Run')
+  }
+}
+
+function idleAllDudes() {
+  if (!dudesRef.value) return
+  for (const dude of dudesRef.value.dudes.values()) {
+    dude.updateIdleAnimationTime(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)
+    dude.playAnimation('Idle')
   }
 }
 
@@ -323,6 +339,8 @@ function onPaneCreated(pane: Pane) {
   dudeFolder.addButton({ title: 'Spawn' }).on('click', spawnDude)
   dudeFolder.addButton({ title: 'Jump' }).on('click', jumpAllDudes)
   dudeFolder.addButton({ title: 'Grow' }).on('click', growAllDudes)
+  dudeFolder.addButton({ title: 'Run' }).on('click', runAllDudes)
+  dudeFolder.addButton({ title: 'Idle' }).on('click', idleAllDudes)
   dudeFolder.addButton({ title: 'Show message' }).on('click', showMessageAllDudes)
   dudeFolder.addButton({ title: 'Show emote' }).on('click', showEmotesAllDudes)
   dudeFolder.addButton({ title: 'Clear' }).on('click', clearDudes)
