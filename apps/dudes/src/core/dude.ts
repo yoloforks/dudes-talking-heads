@@ -245,8 +245,8 @@ export class Dude {
     }
 
     if (isCollidingMore || isCollidingLess) {
-      // TODO: fix
       this.updateDirection(-this.direction)
+      // this.direction = -this.direction
       this.velocity.x = -this.velocity.x
       this.view.position.x += (this.direction * DELTA_TIME * 60) / ROUND
 

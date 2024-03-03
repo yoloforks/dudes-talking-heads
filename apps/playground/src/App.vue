@@ -2,9 +2,9 @@
 import DudesOverlay, { DudesLayers } from '@twirapp/dudes'
 import { VTweakpane } from 'v-tweakpane'
 import { onMounted, reactive, ref, watch } from 'vue'
-import { assetsLoadOptions, dudesSounds, dudesEmotes, dudesLayers } from './constants.js'
+import { assetsLoadOptions, dudesSounds, dudesEmotes, dudesLayers, dudesMessages } from './constants.js'
 import { randomNum } from '@zero-dependency/utils'
-import { mapDudeSpriteData, randomRgbColor } from './utils.js'
+import { mapDudeSpriteData, randomEmoji, randomRgbColor } from './utils.js'
 
 import type { Pane } from 'tweakpane'
 import type { Dude, DudesMethods, DudesTypes } from '@twirapp/dudes/types'
@@ -68,7 +68,7 @@ const settings = reactive<{
     borderRadius: 5,
     boxColor: '#E6AC0C',
     fontFamily: 'Roboto',
-    fontSize: 12,
+    fontSize: 14,
     padding: 5,
     showTime: 5 * 1000,
     fill: '#333333'
@@ -186,7 +186,10 @@ function idleAllDudes() {
 function showMessageAllDudes() {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
-    dude.addMessage('Lorem Ipsum - это текст-"рыба", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века.')
+    const message = dudesMessages[randomNum(0, dudesMessages.length - 1)]
+      .replace('{name}', dude.name)
+    const emoji = randomEmoji('emoticons')
+    dude.addMessage(`${message} ${emoji}`)
   }
 }
 
