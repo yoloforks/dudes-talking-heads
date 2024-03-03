@@ -178,8 +178,15 @@ function runAllDudes() {
 function idleAllDudes() {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
-    dude.updateIdleAnimationTime(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)
+    dude.updateIdleAnimationTime()
     dude.playAnimation('Idle')
+  }
+}
+
+function leaveAllDudes() {
+  if (!dudesRef.value) return
+  for (const dude of dudesRef.value.dudes.values()) {
+    dude.leave()
   }
 }
 
@@ -344,6 +351,7 @@ function onPaneCreated(pane: Pane) {
   dudeFolder.addButton({ title: 'Grow' }).on('click', growAllDudes)
   dudeFolder.addButton({ title: 'Run' }).on('click', runAllDudes)
   dudeFolder.addButton({ title: 'Idle' }).on('click', idleAllDudes)
+  dudeFolder.addButton({ title: 'Leave' }).on('click', leaveAllDudes)
   dudeFolder.addButton({ title: 'Show message' }).on('click', showMessageAllDudes)
   dudeFolder.addButton({ title: 'Show emote' }).on('click', showEmotesAllDudes)
   dudeFolder.addButton({ title: 'Clear' }).on('click', clearDudes)

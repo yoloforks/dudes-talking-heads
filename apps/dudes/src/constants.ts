@@ -3,17 +3,22 @@ export const DELTA_TIME = 0.02 * ROUND
 export const SPRITE_SIZE = 32
 
 type Collider = {
-  x: number
-  y: number
-  width: number
-  height: number
+  X: number
+  Y: number
+  Width: number
+  Height: number
 }
 
-export const COLLIDER: Collider = {
-  x: 8,
-  y: 3,
-  width: 16,
-  height: 22
+export const Direction = {
+  Left: -1,
+  Right: 1
+}
+
+export const Collider: Collider = {
+  X: 8,
+  Y: 3,
+  Width: 16,
+  Height: 22
 }
 
 // message box
