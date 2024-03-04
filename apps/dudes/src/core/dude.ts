@@ -338,7 +338,7 @@ export class Dude {
 
   updateIdleAnimationTime(
     time = Number.MAX_SAFE_INTEGER,
-    maxTime = Number.MAX_SAFE_INTEGER
+    maxTime?: number
   ): void {
     this.idleAnimationTime = time
     this.maxIdleAnimationTime = maxTime ?? Math.random() * 5000

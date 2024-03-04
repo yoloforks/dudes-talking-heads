@@ -140,10 +140,10 @@ async function spawnDude() {
   updateDudeSprite(dude)
 }
 
-function updateDudeSprite(dude: Dude, force = false) {
+async function updateDudeSprite(dude: Dude, force = false) {
   if (force) {
     const spriteData = mapDudeSpriteData(dude.name, dudeSpriteParams)
-    dude.updateSpriteData(spriteData)
+    await dude.updateSpriteData(spriteData)
   }
 
   dude.updateColor(DudesLayers.Body, dudeSpriteParams.bodyColor)
@@ -178,7 +178,7 @@ function runAllDudes() {
 function idleAllDudes() {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
-    dude.updateIdleAnimationTime()
+    dude.updateIdleAnimationTime(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)
     dude.playAnimation(DudesFrameTags.Idle)
   }
 }
