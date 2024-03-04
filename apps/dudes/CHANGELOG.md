@@ -1,5 +1,11 @@
 # @twirapp/dudes
 
+## 1.0.0
+
+### Major Changes
+
+- feat: sprite builder
+
 ## 0.6.1
 
 ### Patch Changes
