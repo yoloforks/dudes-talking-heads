@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import DudesOverlay, { DudesLayers } from '@twirapp/dudes'
+import DudesOverlay, { DudesFrameTags, DudesLayers } from '@twirapp/dudes'
 import { VTweakpane } from 'v-tweakpane'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { assetsLoadOptions, dudesSounds, dudesEmotes, dudesLayers, dudesMessages } from './constants.js'
@@ -171,7 +171,7 @@ function runAllDudes() {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
     dude.updateIdleAnimationTime(performance.now())
-    dude.playAnimation('Run')
+    dude.playAnimation(DudesFrameTags.Run)
   }
 }
 
@@ -179,7 +179,7 @@ function idleAllDudes() {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
     dude.updateIdleAnimationTime()
-    dude.playAnimation('Idle')
+    dude.playAnimation(DudesFrameTags.Idle)
   }
 }
 

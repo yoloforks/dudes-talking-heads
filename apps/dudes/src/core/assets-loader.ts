@@ -6,6 +6,7 @@ import type {
 } from 'pixi.js'
 
 import { isBase64 } from '../helpers.js'
+import { DudesFrameTags } from './sprite-provider.js'
 import type { DudesTypes } from '../types.js'
 
 export interface SpriteFrameData extends ISpritesheetFrameData {
@@ -16,14 +17,9 @@ export interface SpriteData extends ISpritesheetData {
   frames: Record<string, SpriteFrameData>
 }
 
-export interface DudesAsset {
-  alias: string
-  src: string
-}
-
 export type AssetsLoaderOptions = Omit<AssetInitOptions, 'manifest'>
 
-async function loadSprite(assetData: DudesAsset) {
+async function loadSprite(spriteData: DudesTypes.SpriteLayer) {
   const frames = Object.fromEntries(
     Array.from({ length: 9 }, (_, index) => {
       const frame: SpriteFrameData = {
@@ -35,7 +31,7 @@ async function loadSprite(assetData: DudesAsset) {
         duration: index < 3 ? 300 : 100
       }
 
-      return [`${assetData.alias}_${index}`, frame]
+      return [`${spriteData.layer}_${index}`, frame]
     })
   )
 
@@ -47,47 +43,47 @@ async function loadSprite(assetData: DudesAsset) {
       scale: '1',
       frameTags: [
         {
-          name: 'Idle',
+          name: DudesFrameTags.Idle,
           from: 0,
           to: 2,
           direction: 'forward'
         },
         {
-          name: 'Jump',
+          name: DudesFrameTags.Jump,
           from: 3,
           to: 3,
           direction: 'forward'
         },
         {
-          name: 'Fall',
+          name: DudesFrameTags.Fall,
           from: 4,
           to: 4,
           direction: 'forward'
         },
         {
-          name: 'Land',
+          name: DudesFrameTags.Land,
           from: 5,
           to: 5,
           direction: 'forward'
         },
         {
-          name: 'Run',
+          name: DudesFrameTags.Run,
           from: 6,
           to: 8,
           direction: 'forward'
         }
       ],
       layers: [
-        { name: assetData.alias, opacity: 255, blendMode: 'normal' }]
+        { name: spriteData.layer, opacity: 255, blendMode: 'normal' }]
     }
   }
 
-  if (isBase64(assetData.src)) {
-    const baseTexture = BaseTexture.from(assetData.src)
+  if (isBase64(spriteData.src)) {
+    const baseTexture = BaseTexture.from(spriteData.src)
     return new Spritesheet(baseTexture, spritesheet)
   }
 
-  const texture = await Assets.load(assetData.src)
+  const texture = await Assets.load(spriteData.src)
   return new Spritesheet(texture, spritesheet)
 }
 
@@ -118,7 +114,7 @@ export class AssetsLoader {
       await sprite.parse()
 
       this.bundles[spriteData.name] ??= {}
-      this.bundles[spriteData.name][layer.alias] = sprite
+      this.bundles[spriteData.name][layer.layer] = sprite
     }
   }
 }

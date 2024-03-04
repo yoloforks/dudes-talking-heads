@@ -12,31 +12,28 @@ pnpm add @twirapp/dudes
 
 ```vue
 <script setup lang="ts">
-import DudesOverlay from '@twirapp/dudes'
-import { SoundAsset, DudesAsset, AssetsLoadOptions, DudesSettings, DudesMethods } from '@twirapp/dudes/types'
+import DudesOverlay, { DudesLayers } from '@twirapp/dudes'
 import { onMounted, ref } from 'vue'
 
-const dudeSounds: SoundAsset[] = [
+import type {
+  AssetsLoaderOptions,
+  DudesLayer,
+  SoundAsset
+} from '@twirapp/dudes/types'
+
+const dudesSounds: SoundAsset[] = [
   {
-    alias: 'jump',
+    alias: 'Jump',
     src: './sounds/jump.mp3'
   }
 ]
 
-const assetsLoadOptions: AssetsLoadOptions = {
-  // sprites/dude/dude.json is used
+const assetsLoaderOptions: AssetsLoaderOptions = {
   basePath: location.href + 'sprites/',
   defaultSearchParams: {
     ts: Date.now()
   }
 }
-
-const dudesAssets: DudesAsset[] = [
-  {
-    alias: 'dude',
-    src: 'dude/dude.json'
-  }
-]
 
 const settings = ref<DudesSettings>({
   // override default settings
@@ -47,16 +44,32 @@ const dudesRef = ref<DudesMethods | null>(null)
 onMounted(async () => {
   if (!dudesRef.value) return
   await dudesRef.value.initDudes()
-  dudesRef.value.createDude('Dude', 'dude')
+
+  const dudeName = 'Twir'
+  const dude = await dudesRef.value.createDude(dudeName, {
+    name: dudeName,
+    layers: [
+      {
+        layer: DudesLayers.Body,
+        // http://localhost:5173/sprites/body.png
+        src: 'body.png'
+      },
+      {
+        layer: DudesLayers.Eyes,
+        // http://localhost:5173/sprites/eyes.png
+        src: 'eyes.png'
+      }
+    ]
+  })
+
 })
 </script>
 
 <template>
   <dudes-overlay
     ref="dudesRef"
-    :assets-load-options="assetsLoadOptions"
-    :assets="dudesAssets"
-    :sounds="dudeSounds"
+    :assets-loader-options="assetsLoaderOptions"
+    :sounds="dudesSounds"
     :settings="settings"
   />
 </template>

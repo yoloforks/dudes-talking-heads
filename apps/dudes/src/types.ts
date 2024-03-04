@@ -1,7 +1,7 @@
-import type { AssetsLoaderOptions, DudesAsset } from './core/assets-loader.js'
+import type { AssetsLoaderOptions } from './core/assets-loader.js'
 import type { Dude } from './core/dude.js'
 import type { SoundAsset, SoundType } from './core/sounds-loader.js'
-import type { DudesLayer } from './core/sprite-provider.js'
+import type { DudesLayer, DudeSpriteFrameTag } from './core/sprite-provider.js'
 
 export type RecursivePartial<T> = {
   [P in keyof T]?: T[P] extends (infer U)[]
@@ -240,7 +240,12 @@ export namespace DudesTypes {
 
   export interface SpriteData {
     name: string
-    layers: DudesAsset[]
+    layers: SpriteLayer[]
+  }
+
+  export interface SpriteLayer {
+    layer: DudesLayer
+    src: string
   }
 }
 
@@ -253,9 +258,9 @@ export type DudesSettings = RecursivePartial<{
 
 export type {
   Dude,
-  DudesAsset,
   DudesLayer,
   SoundAsset,
   SoundType,
+  DudeSpriteFrameTag,
   AssetsLoaderOptions
 }
