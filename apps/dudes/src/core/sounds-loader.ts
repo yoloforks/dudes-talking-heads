@@ -4,7 +4,10 @@ declare global {
   }
 }
 
-export type SoundType = 'jump'
+export const Sound = {
+  Jump: 'Jump'
+} as const
+export type SoundType = keyof typeof Sound
 
 export interface SoundAsset {
   alias: SoundType

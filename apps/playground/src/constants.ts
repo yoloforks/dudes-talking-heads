@@ -6,7 +6,7 @@ import type {
 
 export const dudesSounds: SoundAsset[] = [
   {
-    alias: 'jump',
+    alias: 'Jump',
     src: './sounds/jump.mp3'
   }
 ]

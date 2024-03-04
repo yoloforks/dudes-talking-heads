@@ -16,7 +16,7 @@ import { DudeEmoteSpitter } from './dude-emote-spitter.js'
 import { DudeMessageBox } from './dude-message-box.js'
 import { DudeNameBox } from './dude-name-box.js'
 import { DudeSpriteContainer } from './dude-sprite-container.js'
-import { soundsLoader } from './sounds-loader.js'
+import { Sound, soundsLoader } from './sounds-loader.js'
 import {
   DudesFrameTags,
   DudesLayers,
@@ -115,7 +115,7 @@ export class Dude {
 
     if (!this.isLeaving) {
       this.isLeaving = true
-      this.currentOpacityTime = 1000
+      this.currentOpacityTime = ROUND
     }
   }
 
@@ -155,8 +155,8 @@ export class Dude {
     }
 
     const { enabled: soundEnabled, volume } = dudesSettings.value.dude.sounds
-    if (soundEnabled && frameTag === 'Jump') {
-      soundsLoader.play('jump', volume)
+    if (soundEnabled && frameTag === DudesFrameTags.Jump) {
+      soundsLoader.play(Sound.Jump, volume)
     }
 
     this.sprite = new DudeSpriteContainer([
