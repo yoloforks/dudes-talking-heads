@@ -15,8 +15,7 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "v-tweakpane@0.2.0": "patches/v-tweakpane@0.2.0.patch",
-      "pixi.js@7.4.0": "patches/pixi.js@7.4.0.patch"
+      "v-tweakpane@0.2.0": "patches/v-tweakpane@0.2.0.patch"
     }
   }
 }

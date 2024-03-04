@@ -1,9 +1,8 @@
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
-import dts from 'vite-plugin-dts'
 
 export default defineConfig({
-  plugins: [vue(), dts()],
+  plugins: [vue()],
   build: {
     sourcemap: true,
     minify: false,
@@ -16,13 +15,17 @@ export default defineConfig({
     rollupOptions: {
       external: [
         'vue',
-        'gsap'
+        'gsap',
+        'pixi.js',
+        '@pixi/gif'
       ],
       output: {
         exports: 'named',
         globals: {
           vue: 'Vue',
-          gsap: 'gsap'
+          gsap: 'gsap',
+          'pixi.js': 'pixi',
+          '@pixi/gif': 'pixiGIF'
         }
       }
     }
