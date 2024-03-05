@@ -43,17 +43,6 @@ export namespace DudesTypes {
      */
     scale: number
 
-    sounds: {
-      /**
-       * @default true
-       */
-      enabled: boolean
-      /**
-       * @default 0.01 // 1%
-       */
-      volume: number
-    }
-
     /**
      * @default 1000 * 60 * 5 // 5 minutes
      */
@@ -63,6 +52,17 @@ export namespace DudesTypes {
      * @default 20
      */
     growMaxScale: number
+  }
+
+  export type DudeSounds = {
+    /**
+     * @default true
+     */
+    enabled: boolean
+    /**
+     * @default 0.01 // 1%
+     */
+    volume: number
   }
 
   export type IndividualDudeStyles = Partial<{
@@ -254,6 +254,7 @@ export namespace DudesTypes {
 
 export type DudesStyles = RecursivePartial<{
   dude: DudesTypes.DudeStyles
+  sounds: DudesTypes.DudeSounds
   message: DudesTypes.MessageBoxStyles
   name: DudesTypes.NameBoxStyles
   emotes: DudesTypes.EmotesStyles

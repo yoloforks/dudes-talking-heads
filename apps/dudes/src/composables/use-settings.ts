@@ -5,6 +5,7 @@ import type { DudesStyles, DudesTypes, RecursivePartial } from '../types.js'
 
 export const dudesSettings = ref<{
   dude: DudesTypes.DudeStyles
+  sounds: DudesTypes.DudeSounds
   message: DudesTypes.MessageBoxStyles
   name: DudesTypes.NameBoxStyles
   emotes: DudesTypes.EmotesStyles
@@ -15,11 +16,11 @@ export const dudesSettings = ref<{
     growTime: 1000 * 60 * 5,
     growMaxScale: 20,
     gravity: 400,
-    scale: 4,
-    sounds: {
-      enabled: true,
-      volume: 0.01
-    }
+    scale: 4
+  },
+  sounds: {
+    enabled: true,
+    volume: 0.01
   },
   message: {
     enabled: true,

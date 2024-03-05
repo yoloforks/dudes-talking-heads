@@ -47,6 +47,7 @@ const spriteParams = reactive<DudeSpriteParams>({
 
 const settings = reactive<{
   dude: DudesTypes.DudeStyles,
+  sounds: DudesTypes.DudeSounds,
   message: DudesTypes.MessageBoxStyles,
   name: DudesTypes.NameBoxStyles,
   emotes: DudesTypes.EmotesStyles
@@ -57,11 +58,11 @@ const settings = reactive<{
     growTime: 1000 * 2,
     growMaxScale: 20,
     gravity: 400,
-    scale: 4,
-    sounds: {
-      enabled: true,
-      volume: 0.01
-    }
+    scale: 4
+  },
+  sounds: {
+    enabled: true,
+    volume: 0.01
   },
   message: {
     enabled: true,
@@ -180,7 +181,7 @@ function growAllDudes() {
 function runAllDudes() {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
-    dude.updateIdleAnimationTime(performance.now())
+    dude.updateIdleAnimationTime({ time: performance.now() })
     dude.playAnimation(DudesFrameTags.Run)
   }
 }
@@ -188,7 +189,10 @@ function runAllDudes() {
 function idleAllDudes() {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
-    dude.updateIdleAnimationTime(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)
+    dude.updateIdleAnimationTime({
+      time: Number.MAX_SAFE_INTEGER,
+      maxTime: Number.MAX_SAFE_INTEGER
+    })
     dude.playAnimation(DudesFrameTags.Idle)
   }
 }
@@ -309,10 +313,10 @@ function onPaneCreated(pane: Pane) {
 
   dudeFolder.addBlade({ view: 'separator' })
 
-  dudeFolder.addBinding(settings.dude.sounds, 'enabled', {
+  dudeFolder.addBinding(settings.sounds, 'enabled', {
     label: 'Sounds'
   })
-  dudeFolder.addBinding(settings.dude.sounds, 'volume', {
+  dudeFolder.addBinding(settings.sounds, 'volume', {
     label: 'Volume',
     min: 0.01,
     max: 1,

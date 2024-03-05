@@ -53,7 +53,7 @@ export class Dude {
   private maxLandAnimationTime = 200
 
   private idleAnimationTime?: number
-  private maxIdleAnimationTime?: number
+  private idleAnimationMaxTime?: number
 
   private isLeaving = false
   private isGrowing = false
@@ -88,7 +88,7 @@ export class Dude {
     this.view.addChild(this.emoteSpitter.view)
 
     this.updateDirection()
-    this.updateIdleAnimationTime(performance.now())
+    this.updateIdleAnimationTime({ time: performance.now() })
 
     this.playAnimation(DudesFrameTags.Idle)
   }
@@ -99,6 +99,7 @@ export class Dude {
       this.velocity.y = -300
 
       this.playAnimation(DudesFrameTags.Jump)
+      this.updateLifeTime()
       return
     }
 
@@ -111,29 +112,30 @@ export class Dude {
 
     if (!this.isLeaving) {
       this.isLeaving = true
-      this.currentOpacityTime = ROUND
+      this.updateLifeTime({
+        lifeTime: Number.MAX_SAFE_INTEGER,
+        opacityTime: ROUND
+      })
     }
   }
 
   addMessage(message: string): void {
     this.messageBox.add(message)
-
     if (this.isLeaving) return
-
-    this.currentLifeTime = dudesSettings.value.dude.maxLifeTime
-    this.currentOpacityTime = this.maxOpacityTime
-    this.view.alpha = 1
+    this.updateLifeTime()
   }
 
   addEmotes(emotes: string[]): void {
     if (!dudesSettings.value.emotes.enabled) return
     this.emoteSpitter.add(emotes)
+    this.updateLifeTime()
   }
 
   grow(): void {
     if (this.isGrowing) return
     this.growingTime = dudesSettings.value.dude.growTime
     this.isGrowing = true
+    this.updateLifeTime({ lifeTime: this.currentLifeTime + this.growingTime })
   }
 
   async playAnimation(
@@ -153,9 +155,8 @@ export class Dude {
       this.view.removeChild(this.sprite.view)
     }
 
-    const { enabled: soundEnabled, volume } = dudesSettings.value.dude.sounds
-    if (soundEnabled && frameTag === DudesFrameTags.Jump) {
-      soundsLoader.play(Sound.Jump, volume)
+    if (dudesSettings.value.sounds.enabled && frameTag === DudesFrameTags.Jump) {
+      soundsLoader.play(Sound.Jump, dudesSettings.value.sounds.volume)
     }
 
     this.sprite = new DudeSpriteContainer([
@@ -192,8 +193,8 @@ export class Dude {
 
     if (
       this.idleAnimationTime &&
-      this.maxIdleAnimationTime &&
-      now - this.idleAnimationTime > this.maxIdleAnimationTime &&
+      this.idleAnimationMaxTime &&
+      now - this.idleAnimationTime > this.idleAnimationMaxTime &&
       (this.currentFrameTag === DudesFrameTags.Run ||
         this.currentFrameTag === DudesFrameTags.Idle)
     ) {
@@ -203,7 +204,7 @@ export class Dude {
         this.playAnimation(DudesFrameTags.Idle)
       }
 
-      this.updateIdleAnimationTime(now)
+      this.updateIdleAnimationTime({ time: now })
     }
 
     this.velocity.y =
@@ -336,16 +337,26 @@ export class Dude {
   }
 
   updateIdleAnimationTime(
-    time = Number.MAX_SAFE_INTEGER,
-    maxTime?: number
+    { time, maxTime }: { time: number; maxTime?: number } = {
+      time: Number.MAX_SAFE_INTEGER
+    }
   ): void {
     this.idleAnimationTime = time
-    this.maxIdleAnimationTime = maxTime ?? Math.random() * 5000
+    this.idleAnimationMaxTime = maxTime ?? Math.random() * 5000
   }
 
   async updateSpriteData(spriteData: DudesTypes.SpriteData): Promise<void> {
     await assetsLoader.load(spriteData)
     this.config.sprite = spriteData
     this.playAnimation('Idle', true)
+  }
+
+  updateLifeTime({
+    lifeTime,
+    opacityTime
+  }: { lifeTime?: number; opacityTime?: number } = {}): void {
+    this.currentLifeTime = lifeTime ?? dudesSettings.value.dude.maxLifeTime
+    this.currentOpacityTime = opacityTime ?? this.maxOpacityTime
+    this.view.alpha = 1
   }
 }
