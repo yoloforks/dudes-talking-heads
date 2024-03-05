@@ -1,5 +1,11 @@
 # @twirapp/dudes
 
+## 1.1.1
+
+### Patch Changes
+
+- fix: types
+
 ## 1.1.0
 
 ### Minor Changes
