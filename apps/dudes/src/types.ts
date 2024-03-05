@@ -14,9 +14,9 @@ export type RecursivePartial<T> = {
 export interface DudesMethods {
   dudes: Map<string, Dude>
   initDudes: () => Promise<void>
-  getDude: (name: string) => Dude | undefined
+  getDude: (id: string) => Dude | undefined
   createDude: (config: DudesTypes.DudeConfig) => Promise<Dude>
-  removeDude: (name: string) => void
+  removeDude: (id: string) => void
   removeAllDudes: () => void
   updateSettings: (settings: RecursivePartial<DudesStyles>) => void
 }
