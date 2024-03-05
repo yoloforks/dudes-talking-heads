@@ -1,5 +1,11 @@
 # @twirapp/dudes
 
+## 1.0.2
+
+### Patch Changes
+
+- chore: refactor load/unload bundle
+
 ## 1.0.1
 
 ### Patch Changes
