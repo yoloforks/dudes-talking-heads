@@ -1,7 +1,7 @@
 import { Container } from 'pixi.js'
 import type { IPointData } from 'pixi.js'
 
-import { removeInternalDude } from '../composables/use-dudes.js'
+import { deleteDude } from '../composables/use-dudes.js'
 import { dudesSettings } from '../composables/use-settings.js'
 import {
   Collider,
@@ -27,7 +27,7 @@ import type { DudesTypes } from '../types.js'
 import type { DudesLayer, DudeSpriteFrameTag } from './sprite-provider.js'
 
 export class Dude {
-  view = new Container()
+  readonly view = new Container()
 
   private colors: Record<DudesLayer, string> = {
     Body: dudesSettings.value.dude.bodyColor,
@@ -64,26 +64,22 @@ export class Dude {
   private currentOpacityTime = this.maxOpacityTime
   private scale = dudesSettings.value.dude.scale
 
-  constructor(
-    public name: string,
-    public spriteData: DudesTypes.SpriteData,
-    private individualParams?: DudesTypes.IndividualDudeParams
-  ) {
+  constructor(public readonly config: DudesTypes.DudeConfig) {
     this.jump = this.jump.bind(this)
   }
 
   async init(): Promise<void> {
     if (this.sprite) return
 
-    await assetsLoader.load(this.spriteData)
+    await assetsLoader.load(this.config.sprite)
 
     this.view.y = -(Collider.Y + Collider.Height - SPRITE_SIZE / 2) * this.scale
     this.view.x =
       Math.random() * (window.innerWidth - SPRITE_SIZE * this.scale) +
       (SPRITE_SIZE / 2) * this.scale
 
-    this.nameBox = new DudeNameBox(this.name, this.individualParams?.name)
-    this.messageBox = new DudeMessageBox(this.individualParams?.message)
+    this.nameBox = new DudeNameBox(this.config.name, this.config.styles?.name)
+    this.messageBox = new DudeMessageBox(this.config.styles?.message)
     this.emoteSpitter = new DudeEmoteSpitter()
 
     this.view.sortableChildren = true
@@ -144,7 +140,10 @@ export class Dude {
     frameTag: DudeSpriteFrameTag,
     force = false
   ): Promise<void> {
-    const dudeSprite = spriteProvider.getSprite(this.spriteData.name, frameTag)
+    const dudeSprite = spriteProvider.getSprite(
+      this.config.sprite.name,
+      frameTag
+    )
     if (!dudeSprite) return
 
     if (this.currentFrameTag === frameTag && !force) return
@@ -296,7 +295,7 @@ export class Dude {
         this.currentOpacityTime -= DELTA_TIME
         this.view.alpha = this.currentOpacityTime / this.maxOpacityTime
       } else {
-        removeInternalDude(this)
+        deleteDude(this)
       }
     }
 
@@ -346,7 +345,7 @@ export class Dude {
 
   async updateSpriteData(spriteData: DudesTypes.SpriteData): Promise<void> {
     await assetsLoader.load(spriteData)
-    this.spriteData = spriteData
+    this.config.sprite = spriteData
     this.playAnimation('Idle', true)
   }
 }

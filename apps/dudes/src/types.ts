@@ -15,18 +15,14 @@ export interface DudesMethods {
   dudes: Map<string, Dude>
   initDudes: () => Promise<void>
   getDude: (name: string) => Dude | undefined
-  createDude: (
-    name: string,
-    spriteData: DudesTypes.SpriteData,
-    params?: DudesTypes.IndividualDudeParams
-  ) => Promise<Dude>
+  createDude: (config: DudesTypes.DudeConfig) => Promise<Dude>
   removeDude: (name: string) => void
   removeAllDudes: () => void
-  updateSettings: (settings: RecursivePartial<DudesSettings>) => void
+  updateSettings: (settings: RecursivePartial<DudesStyles>) => void
 }
 
 export namespace DudesTypes {
-  export interface DudeParams {
+  export interface DudeStyles {
     /**
      * @default 1800000 // FIXED_ROUND * 60 * 30 - 30 minutes
      */
@@ -69,12 +65,12 @@ export namespace DudesTypes {
     growMaxScale: number
   }
 
-  export type IndividualDudeParams = Partial<{
-    message: IndividualMessageBoxParams
-    name: IndividualNameBoxParams
+  export type IndividualDudeStyles = Partial<{
+    message: IndividualMessageBoxStyles
+    name: IndividualNameBoxStyles
   }>
 
-  export interface MessageBoxParams {
+  export interface MessageBoxStyles {
     /**
      * @default true
      */
@@ -116,11 +112,11 @@ export namespace DudesTypes {
     showTime: number
   }
 
-  export type IndividualMessageBoxParams = Partial<
-    Pick<MessageBoxParams, 'boxColor' | 'fill'>
+  export type IndividualMessageBoxStyles = Partial<
+    Pick<MessageBoxStyles, 'boxColor' | 'fill'>
   >
 
-  export interface NameBoxParams {
+  export interface NameBoxStyles {
     /**
      * @default true
      */
@@ -223,9 +219,9 @@ export namespace DudesTypes {
     dropShadowDistance: number
   }
 
-  export type IndividualNameBoxParams = Partial<
+  export type IndividualNameBoxStyles = Partial<
     Pick<
-      NameBoxParams,
+      NameBoxStyles,
       | 'stroke'
       | 'strokeThickness'
       | 'fill'
@@ -234,8 +230,15 @@ export namespace DudesTypes {
     >
   >
 
-  export interface EmotesParams {
+  export interface EmotesStyles {
     enabled: boolean
+  }
+
+  export interface DudeConfig {
+    id: string
+    name: string
+    sprite: SpriteData
+    styles?: IndividualDudeStyles
   }
 
   export interface SpriteData {
@@ -249,11 +252,11 @@ export namespace DudesTypes {
   }
 }
 
-export type DudesSettings = RecursivePartial<{
-  dude: DudesTypes.DudeParams
-  message: DudesTypes.MessageBoxParams
-  name: DudesTypes.NameBoxParams
-  emotes: DudesTypes.EmotesParams
+export type DudesStyles = RecursivePartial<{
+  dude: DudesTypes.DudeStyles
+  message: DudesTypes.MessageBoxStyles
+  name: DudesTypes.NameBoxStyles
+  emotes: DudesTypes.EmotesStyles
 }>
 
 export type {

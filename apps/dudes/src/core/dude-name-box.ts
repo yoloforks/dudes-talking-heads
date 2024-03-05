@@ -5,11 +5,11 @@ import { SPRITE_SIZE } from '../constants.js'
 import type { DudesTypes } from '../types.js'
 
 export class DudeNameBox {
-  view: Text
+  readonly view: Text
 
   constructor(
     name: string,
-    private params?: DudesTypes.IndividualNameBoxParams
+    private readonly styles?: DudesTypes.IndividualNameBoxStyles
   ) {
     this.view = new Text(name)
     this.view.anchor.set(0.5, 1)
@@ -20,16 +20,16 @@ export class DudeNameBox {
     this.view.visible = dudesSettings.value.name.enabled
     this.view.position.y = -((SPRITE_SIZE * scale) / 2)
 
-    const params = this.params
-      ? { ...dudesSettings.value.name, ...this.params }
+    const styles = this.styles
+      ? { ...dudesSettings.value.name, ...this.styles }
       : dudesSettings.value.name
 
-    this.updateParams(params)
+    this.updateParams(styles)
   }
 
-  private updateParams(settings: Record<string, any>): void {
+  private updateParams(styles: Record<string, any>): void {
     this.view.style = {
-      ...settings,
+      ...styles,
       align: 'center'
     }
   }

@@ -14,10 +14,10 @@ export interface SoundAsset {
   src: string
 }
 
+const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+
 class SoundsLoader {
   private sounds = new Map<string, AudioBuffer>()
-  private audioContext = new (window.AudioContext ||
-    window.webkitAudioContext)()
 
   async load(sounds: SoundAsset[]): Promise<void> {
     for (const sound of sounds) {
@@ -25,7 +25,7 @@ class SoundsLoader {
         const response = await fetch(sound.src)
         const buffer = await response.arrayBuffer()
 
-        const audioBuffer = await this.audioContext.decodeAudioData(buffer)
+        const audioBuffer = await audioContext.decodeAudioData(buffer)
         this.sounds.set(sound.alias, audioBuffer)
       } catch (err) {
         console.error(`Failed to load sound from ${sound.src}`, err)
@@ -38,12 +38,12 @@ class SoundsLoader {
       const sound = this.sounds.get(soundType)
       if (!sound) return resolve()
 
-      const bufferSource = this.audioContext.createBufferSource()
+      const bufferSource = audioContext.createBufferSource()
       bufferSource.buffer = sound
 
-      const gainNode = this.audioContext.createGain()
+      const gainNode = audioContext.createGain()
       gainNode.gain.value = volume
-      gainNode.connect(this.audioContext.destination)
+      gainNode.connect(audioContext.destination)
 
       bufferSource.connect(gainNode)
       bufferSource.start(0)

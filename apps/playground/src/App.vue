@@ -7,7 +7,7 @@ import { randomNum } from '@zero-dependency/utils'
 import { mapDudeSpriteData, randomEmoji, randomRgbColor } from './utils.js'
 
 import type { Pane } from 'tweakpane'
-import type { Dude, DudesMethods, DudesTypes } from '@twirapp/dudes/types'
+import type { Dude, DudesMethods, DudesStyles, DudesTypes } from '@twirapp/dudes/types'
 
 const initialBodyColor = randomRgbColor()
 
@@ -28,7 +28,7 @@ export interface DudeSpriteParams {
   cosmeticsColor: string
 }
 
-const dudeSpriteParams = reactive<DudeSpriteParams>({
+const spriteParams = reactive<DudeSpriteParams>({
   bodySprite: dudesLayers.Body[0].src,
   bodyColor: initialBodyColor,
 
@@ -46,10 +46,10 @@ const dudeSpriteParams = reactive<DudeSpriteParams>({
 })
 
 const settings = reactive<{
-  dude: DudesTypes.DudeParams,
-  message: DudesTypes.MessageBoxParams,
-  name: DudesTypes.NameBoxParams,
-  emotes: DudesTypes.EmotesParams
+  dude: DudesTypes.DudeStyles,
+  message: DudesTypes.MessageBoxStyles,
+  name: DudesTypes.NameBoxStyles,
+  emotes: DudesTypes.EmotesStyles
 }>({
   dude: {
     bodyColor: initialBodyColor,
@@ -104,13 +104,17 @@ onMounted(async () => {
   if (!dudesRef.value) return
   await dudesRef.value.initDudes()
 
-  const dudeName = 'Twir'
-  const dudeSprite = mapDudeSpriteData(dudeName, dudeSpriteParams)
-  const dude = await dudesRef.value.createDude(dudeName, dudeSprite)
-  updateDudeSprite(dude)
+  const name = 'Twir'
+  const sprite = mapDudeSpriteData(spriteParams)
+
+  await dudesRef.value.createDude({
+    id: name,
+    name,
+    sprite
+  })
 })
 
-watch(dudeSpriteParams, () => {
+watch(spriteParams, () => {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
     updateDudeSprite(dude as Dude, true)
@@ -120,9 +124,9 @@ watch(dudeSpriteParams, () => {
 async function spawnDude() {
   if (!dudesRef.value) return
 
-  const dudeName = `Super Dude #${randomNum(0, 100)}`
-  const dudeSprite = mapDudeSpriteData(dudeName, dudeSpriteParams)
-  const dudeParams = {
+  const name = `Super Dude #${randomNum(0, 100)}`
+  const sprite = mapDudeSpriteData(spriteParams)
+  const styles: DudesStyles = {
     message: {
       boxColor: 'lightgreen',
       fill: '#000000'
@@ -136,21 +140,27 @@ async function spawnDude() {
     }
   }
 
-  const dude = await dudesRef.value.createDude(dudeName, dudeSprite, dudeParams)
+  const dude = await dudesRef.value.createDude({
+    id: name,
+    name,
+    sprite,
+    styles
+  })
+
   updateDudeSprite(dude)
 }
 
 async function updateDudeSprite(dude: Dude, force = false) {
   if (force) {
-    const spriteData = mapDudeSpriteData(dude.name, dudeSpriteParams)
+    const spriteData = mapDudeSpriteData(spriteParams)
     await dude.updateSpriteData(spriteData)
   }
 
-  dude.updateColor(DudesLayers.Body, dudeSpriteParams.bodyColor)
-  dude.updateColor(DudesLayers.Eyes, dudeSpriteParams.eyesColor)
-  dude.updateColor(DudesLayers.Mouth, dudeSpriteParams.mouthColor)
-  dude.updateColor(DudesLayers.Hat, dudeSpriteParams.hatColor)
-  dude.updateColor(DudesLayers.Cosmetics, dudeSpriteParams.cosmeticsColor)
+  dude.updateColor(DudesLayers.Body, spriteParams.bodyColor)
+  dude.updateColor(DudesLayers.Eyes, spriteParams.eyesColor)
+  dude.updateColor(DudesLayers.Mouth, spriteParams.mouthColor)
+  dude.updateColor(DudesLayers.Hat, spriteParams.hatColor)
+  dude.updateColor(DudesLayers.Cosmetics, spriteParams.cosmeticsColor)
 }
 
 function jumpAllDudes() {
@@ -194,7 +204,7 @@ function showMessageAllDudes() {
   if (!dudesRef.value) return
   for (const dude of dudesRef.value.dudes.values()) {
     const message = dudesMessages[randomNum(0, dudesMessages.length - 1)]
-      .replace('{name}', dude.name)
+      .replace('{name}', dude.config.name)
     const emoji = randomEmoji('emoticons')
     dude.addMessage(`${message} ${emoji}`)
   }
@@ -232,12 +242,12 @@ function onPaneCreated(pane: Pane) {
   const bodySpriteOptions = dudesLayers.Body
     .map((layer) => ({ text: layer.name, value: layer.src }))
   bodySpriteOptions.unshift(hiddenOption)
-  dudeFolder.addBinding(dudeSpriteParams, 'bodySprite', {
+  dudeFolder.addBinding(spriteParams, 'bodySprite', {
     label: 'Body',
     options: bodySpriteOptions
   })
 
-  dudeFolder.addBinding(dudeSpriteParams, 'bodyColor', {
+  dudeFolder.addBinding(spriteParams, 'bodyColor', {
     label: ''
   })
 
@@ -246,12 +256,12 @@ function onPaneCreated(pane: Pane) {
   const eyesSpriteOptions = dudesLayers.Eyes
     .map((layer) => ({ text: layer.name, value: layer.src }))
   eyesSpriteOptions.unshift(hiddenOption)
-  dudeFolder.addBinding(dudeSpriteParams, 'eyesSprite', {
+  dudeFolder.addBinding(spriteParams, 'eyesSprite', {
     label: 'Eyes',
     options: eyesSpriteOptions
   })
 
-  dudeFolder.addBinding(dudeSpriteParams, 'eyesColor', {
+  dudeFolder.addBinding(spriteParams, 'eyesColor', {
     label: ''
   })
 
@@ -260,12 +270,12 @@ function onPaneCreated(pane: Pane) {
   const mouthSpriteOptions = dudesLayers.Mouth
     .map((layer) => ({ text: layer.name, value: layer.src }))
   mouthSpriteOptions.unshift(hiddenOption)
-  dudeFolder.addBinding(dudeSpriteParams, 'mouthSprite', {
+  dudeFolder.addBinding(spriteParams, 'mouthSprite', {
     label: 'Mouth',
     options: mouthSpriteOptions
   })
 
-  dudeFolder.addBinding(dudeSpriteParams, 'mouthColor', {
+  dudeFolder.addBinding(spriteParams, 'mouthColor', {
     label: ''
   })
 
@@ -274,12 +284,12 @@ function onPaneCreated(pane: Pane) {
   const hatSpriteOptions = dudesLayers.Hat
     .map((layer) => ({ text: layer.name, value: layer.src }))
   hatSpriteOptions.unshift(hiddenOption)
-  dudeFolder.addBinding(dudeSpriteParams, 'hatSprite', {
+  dudeFolder.addBinding(spriteParams, 'hatSprite', {
     label: 'Hat',
     options: hatSpriteOptions
   })
 
-  dudeFolder.addBinding(dudeSpriteParams, 'hatColor', {
+  dudeFolder.addBinding(spriteParams, 'hatColor', {
     label: ''
   })
 
@@ -288,12 +298,12 @@ function onPaneCreated(pane: Pane) {
   const cosmeticsSpriteOptions = dudesLayers.Cosmetics
     .map((layer) => ({ text: layer.name, value: layer.src }))
   cosmeticsSpriteOptions.unshift(hiddenOption)
-  dudeFolder.addBinding(dudeSpriteParams, 'cosmeticsSprite', {
+  dudeFolder.addBinding(spriteParams, 'cosmeticsSprite', {
     label: 'Cosmetics',
     options: cosmeticsSpriteOptions
   })
 
-  dudeFolder.addBinding(dudeSpriteParams, 'cosmeticsColor', {
+  dudeFolder.addBinding(spriteParams, 'cosmeticsColor', {
     label: ''
   })
 
@@ -447,7 +457,16 @@ function onPaneCreated(pane: Pane) {
 
 <template>
   <Teleport to="body">
-    <v-tweakpane :pane="{ title: 'Dudes Playground' }" @on-pane-created="onPaneCreated" />
+    <v-tweakpane
+      style="overflow-y: scroll;"
+      :pane="{ title: 'Dudes Playground' }"
+      @on-pane-created="onPaneCreated"
+    />
   </Teleport>
-  <dudes-overlay ref="dudesRef" :assets-loader-options="assetsLoadOptions" :sounds="dudesSounds" :settings="settings" />
+  <dudes-overlay
+    ref="dudesRef"
+    :assets-loader-options="assetsLoadOptions"
+    :sounds="dudesSounds"
+    :settings="settings"
+  />
 </template>

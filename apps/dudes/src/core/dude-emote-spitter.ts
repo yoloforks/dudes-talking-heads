@@ -15,7 +15,7 @@ type EmoteSprite = Sprite | AnimatedGIF
 const emotesCache = new Map<string, EmoteSprite>()
 
 export class DudeEmoteSpitter {
-  view = new Container()
+  readonly view = new Container()
 
   private queueEmotes: EmoteSprite[] = []
   private currentGapTime = 0

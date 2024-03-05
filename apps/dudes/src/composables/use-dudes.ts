@@ -9,45 +9,48 @@ import type { DudesTypes } from '../types.js'
 const dudes = new Map<string, Dude>()
 const dudesContainer = new Container()
 
-export function removeInternalDude(dude: Dude) {
-  dudes.delete(dude.name)
+export function deleteDude(dude: Dude) {
+  dudes.delete(dude.config.id)
   dudesContainer.removeChild(dude.view)
-  assetsLoader.unload(dude.spriteData.name)
+
+  const isSpriteUsed = Array.from(dudes.values()).some(
+    (v) => v.config.sprite.name === dude.config.sprite.name
+  )
+
+  if (!isSpriteUsed) {
+    assetsLoader.unload(dude.config.name)
+  }
 }
 
-export const useDudes = () => {
+export function useDudes() {
   function updateDudes(): void {
     for (const dude of dudes.values()) {
       dude.update()
     }
   }
 
-  function getDude(name: string): Dude | undefined {
-    return dudes.get(name) as Dude
+  function getDude(id: string): Dude | undefined {
+    return dudes.get(id) as Dude
   }
 
-  async function createDude(
-    name: string,
-    spriteData: DudesTypes.SpriteData,
-    params?: DudesTypes.IndividualDudeParams
-  ): Promise<Dude> {
-    removeDude(name)
-    const dude = new Dude(name, spriteData, params)
+  async function createDude(config: DudesTypes.DudeConfig): Promise<Dude> {
+    removeDude(config.id)
+    const dude = new Dude(config)
     await dude.init()
-    dudes.set(name, dude)
+    dudes.set(config.id, dude)
     dudesContainer.addChild(dude.view)
     return dude
   }
 
-  function removeDude(name: string): void {
-    const dude = dudes.get(name)
+  function removeDude(id: string): void {
+    const dude = dudes.get(id)
     if (!dude) return
-    removeInternalDude(dude)
+    deleteDude(dude)
   }
 
   function removeAllDudes(): void {
-    for (const name of dudes.keys()) {
-      removeDude(name)
+    for (const id of dudes.keys()) {
+      removeDude(id)
     }
   }
 

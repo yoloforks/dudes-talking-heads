@@ -4,7 +4,7 @@ import { DudesLayersKeys } from './sprite-provider.js'
 import type { DudesLayer } from './sprite-provider.js'
 
 export class DudeSpriteContainer {
-  view = new Container()
+  readonly view = new Container()
 
   private Body?: AnimatedSprite
   private Eyes?: AnimatedSprite

@@ -11,7 +11,7 @@ import {
 import type { DudesTypes } from '../types.js'
 
 export class DudeMessageBox {
-  view = new Container()
+  readonly view = new Container()
 
   private container = new Container()
   private box?: Graphics
@@ -23,7 +23,7 @@ export class DudeMessageBox {
   private currentShowTime = 0
   private messageQueue: string[] = []
 
-  constructor(private params?: DudesTypes.IndividualMessageBoxParams) {
+  constructor(private styles?: DudesTypes.IndividualMessageBoxStyles) {
     this.view.zIndex = 3
     this.view.addChild(this.container)
 
@@ -48,9 +48,9 @@ export class DudeMessageBox {
     this.showAnimation = timeline
   }
 
-  private mergeParams(): DudesTypes.MessageBoxParams {
-    return this.params
-      ? { ...dudesSettings.value.message, ...this.params }
+  private mergeStyles(): DudesTypes.MessageBoxStyles {
+    return this.styles
+      ? { ...dudesSettings.value.message, ...this.styles }
       : dudesSettings.value.message
   }
 
@@ -112,27 +112,25 @@ export class DudeMessageBox {
         this.currentShowTime = dudesSettings.value.message.showTime
         this.currentAnimationTime = ANIMATION_TIME
       }
-
-      return
+    } else {
+      this.hideAnimation = gsap.to(this.container, {
+        alpha: 0,
+        duration: 0.5,
+        ease: 'sine.out',
+        onComplete: () => {
+          this.hideAnimation?.kill()
+          this.showAnimation.pause()
+          this.container.removeChildren()
+        }
+      })
     }
-
-    this.hideAnimation = gsap.to(this.container, {
-      alpha: 0,
-      duration: 0.5,
-      ease: 'sine.out',
-      onComplete: () => {
-        this.hideAnimation?.kill()
-        this.showAnimation.pause()
-        this.container.removeChildren()
-      }
-    })
   }
 
   private show(message: string): void {
-    const params = this.mergeParams()
+    const styles = this.mergeStyles()
 
     this.text = new Text('', {
-      ...params,
+      ...styles,
       align: 'left',
       breakWords: true,
       wordWrap: true,
@@ -140,11 +138,11 @@ export class DudeMessageBox {
     })
 
     this.text.anchor.set(0.5, 1)
-    this.text.position.set(0, -params.padding)
+    this.text.position.set(0, -styles.padding)
     this.setText(message)
 
     this.box = new Graphics()
-    this.box.beginFill(params.boxColor)
+    this.box.beginFill(styles.boxColor)
 
     const arrowX = this.box.x + this.box.width / 2
     const arrowY = this.box.y + this.box.height
@@ -154,18 +152,18 @@ export class DudeMessageBox {
 
     const isShortMessage = message.length < 6
     const paddingLeft = isShortMessage
-      ? params.padding + ARROW_HALF_WIDTH
-      : params.padding
+      ? styles.padding + ARROW_HALF_WIDTH
+      : styles.padding
     const paddingRight = isShortMessage
-      ? params.padding + ARROW_HALF_WIDTH
-      : params.padding
+      ? styles.padding + ARROW_HALF_WIDTH
+      : styles.padding
 
     this.box.drawRoundedRect(
       this.text.x - paddingLeft - this.text.width * this.text.anchor.x,
-      this.text.y - params.padding - this.text.height * this.text.anchor.y,
+      this.text.y - styles.padding - this.text.height * this.text.anchor.y,
       this.text.width + paddingRight * 2,
-      this.text.height + params.padding * 2,
-      params.borderRadius
+      this.text.height + styles.padding * 2,
+      styles.borderRadius
     )
     this.box.endFill()
 

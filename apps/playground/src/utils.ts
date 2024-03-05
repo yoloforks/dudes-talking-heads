@@ -14,7 +14,6 @@ export function randomRgbColor(): string {
 }
 
 export function mapDudeSpriteData(
-  name: string,
   spriteParams: UnwrapNestedRefs<DudeSpriteParams>
 ) {
   const layers = {
@@ -26,7 +25,7 @@ export function mapDudeSpriteData(
   }
 
   const sprite: DudesTypes.SpriteData = {
-    name,
+    name: 'dude',
     layers: Object.entries(layers)
       .map(([layer, src]) => ({ layer: layer as DudesLayer, src }))
       .filter((layer) => layer.src)

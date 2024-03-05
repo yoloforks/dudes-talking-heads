@@ -26,7 +26,7 @@ export type DudeSpriteFrameTag = keyof typeof DudesFrameTags
 export type DudeFrameObject = Record<string, FrameObject[]>
 
 class SpriteProvider {
-  private spriteTextures = new Map<string, DudeFrameObject>()
+  private readonly spriteTextures = new Map<string, DudeFrameObject>()
 
   unloadTextures(spriteName: string): void {
     for (const layer of DudesLayersKeys) {

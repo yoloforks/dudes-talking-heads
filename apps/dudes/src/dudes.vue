@@ -6,12 +6,12 @@ import { useRaf } from './composables/use-raf.js'
 import { assetsLoader, type AssetsLoaderOptions } from './core/assets-loader.js'
 import { useDudesSettings } from './composables/use-settings.js'
 import { soundsLoader } from './core/sounds-loader.js'
-import type { DudesMethods, DudesSettings, SoundAsset } from './types.js'
+import type { DudesMethods, DudesStyles, SoundAsset } from './types.js'
 
 const props = defineProps<{
   sounds: SoundAsset[]
   assetsLoaderOptions?: AssetsLoaderOptions
-  settings?: DudesSettings
+  settings?: DudesStyles
 }>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)

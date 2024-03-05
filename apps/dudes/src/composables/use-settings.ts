@@ -1,13 +1,13 @@
 import { ref, unref } from 'vue'
 
 import { deepMerge } from '../helpers.js'
-import type { DudesSettings, DudesTypes, RecursivePartial } from '../types.js'
+import type { DudesStyles, DudesTypes, RecursivePartial } from '../types.js'
 
 export const dudesSettings = ref<{
-  dude: DudesTypes.DudeParams
-  message: DudesTypes.MessageBoxParams
-  name: DudesTypes.NameBoxParams
-  emotes: DudesTypes.EmotesParams
+  dude: DudesTypes.DudeStyles
+  message: DudesTypes.MessageBoxStyles
+  name: DudesTypes.NameBoxStyles
+  emotes: DudesTypes.EmotesStyles
 }>({
   dude: {
     bodyColor: '#969696',
@@ -57,7 +57,7 @@ export const dudesSettings = ref<{
 })
 
 export function useDudesSettings() {
-  function updateSettings(newSettings: RecursivePartial<DudesSettings>): void {
+  function updateSettings(newSettings: RecursivePartial<DudesStyles>): void {
     dudesSettings.value = deepMerge(unref(dudesSettings), newSettings)
   }
 
