@@ -16,12 +16,12 @@ import DudesOverlay, { DudesLayers } from '@twirapp/dudes'
 import { onMounted, ref } from 'vue'
 
 import type {
+  DudesStyles,
   AssetsLoaderOptions,
-  DudesLayer,
   SoundAsset
 } from '@twirapp/dudes/types'
 
-const dudesSounds: SoundAsset[] = [
+const soundAssets: SoundAsset[] = [
   {
     alias: 'Jump',
     src: './sounds/jump.mp3'
@@ -35,7 +35,7 @@ const assetsLoaderOptions: AssetsLoaderOptions = {
   }
 }
 
-const settings = ref<DudesSettings>({
+const settings = ref<DudesStyles>({
   // override default settings
 })
 
@@ -46,22 +46,25 @@ onMounted(async () => {
   await dudesRef.value.initDudes()
 
   const dudeName = 'Twir'
-  const dude = await dudesRef.value.createDude(dudeName, {
-    name: dudeName,
-    layers: [
-      {
-        layer: DudesLayers.Body,
-        // http://localhost:5173/sprites/body.png
-        src: 'body.png'
-      },
-      {
-        layer: DudesLayers.Eyes,
-        // http://localhost:5173/sprites/eyes.png
-        src: 'eyes.png'
-      }
-    ]
+  const dude = await dudesRef.value.createDude({
+    id: dudeName,
+    name,
+    sprite: {
+      name: 'dude',
+      layers: [
+        {
+          layer: DudesLayers.Body,
+          // http://localhost:5173/sprites/body.png
+          src: 'body.png'
+        },
+        {
+          layer: DudesLayers.Eyes,
+          // http://localhost:5173/sprites/eyes.png
+          src: 'eyes.png'
+        }
+      ]
+    }
   })
-
 })
 </script>
 
@@ -69,7 +72,7 @@ onMounted(async () => {
   <dudes-overlay
     ref="dudesRef"
     :assets-loader-options="assetsLoaderOptions"
-    :sounds="dudesSounds"
+    :sounds="soundAssets"
     :settings="settings"
   />
 </template>
