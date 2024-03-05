@@ -345,13 +345,8 @@ export class Dude {
   }
 
   async updateSpriteData(spriteData: DudesTypes.SpriteData): Promise<void> {
-    spriteData.name += '-' + Date.now()
     await assetsLoader.load(spriteData)
-
-    assetsLoader.unload(this.spriteData.name)
-    spriteProvider.unloadTextures(this.spriteData.name)
     this.spriteData = spriteData
-
     this.playAnimation('Idle', true)
   }
 }

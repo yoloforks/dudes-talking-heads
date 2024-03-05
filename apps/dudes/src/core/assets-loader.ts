@@ -6,7 +6,7 @@ import type {
 } from 'pixi.js'
 
 import { isBase64 } from '../helpers.js'
-import { DudesFrameTags } from './sprite-provider.js'
+import { DudesFrameTags, spriteProvider } from './sprite-provider.js'
 import type { DudesTypes } from '../types.js'
 
 export interface SpriteFrameData extends ISpritesheetFrameData {
@@ -87,8 +87,11 @@ async function loadSprite(spriteData: DudesTypes.SpriteLayer) {
   return new Spritesheet(texture, spritesheet)
 }
 
+type SpriteLayer = Record<string, Spritesheet<SpriteData>>
+type Bundles = Record<string, SpriteLayer>
+
 export class AssetsLoader {
-  private bundles: Record<string, Record<string, Spritesheet<SpriteData>>> = {}
+  private bundles: Bundles = {}
 
   getAssets(
     spriteName: string,
@@ -104,18 +107,24 @@ export class AssetsLoader {
   async unload(spriteName: string): Promise<void> {
     if (!this.bundles[spriteName]) return
     await Assets.unloadBundle(spriteName)
+    spriteProvider.unloadTextures(spriteName)
     delete this.bundles[spriteName]
   }
 
   async load(spriteData: DudesTypes.SpriteData): Promise<void> {
-    if (this.bundles[spriteData.name]) return
+    const loadedSpriteLayers: SpriteLayer = {}
+
     for (const layer of spriteData.layers) {
       const sprite = await loadSprite(layer)
       await sprite.parse()
-
-      this.bundles[spriteData.name] ??= {}
-      this.bundles[spriteData.name][layer.layer] = sprite
+      loadedSpriteLayers[layer.layer] = sprite
     }
+
+    if (this.bundles[spriteData.name]) {
+      await this.unload(spriteData.name)
+    }
+
+    this.bundles[spriteData.name] = loadedSpriteLayers
   }
 }
 
