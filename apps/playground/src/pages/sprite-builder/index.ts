@@ -1,10 +1,11 @@
 import { createApp } from 'vue'
 
-import App from './App.vue'
+import { router } from './router.js'
+import App from './sprite-builder.vue'
 
-import './style.css'
+import './index.css'
 
-createApp(App).mount('#app')
+createApp(App).use(router).mount('#app')
 
 if (import.meta.hot) {
   import.meta.hot.on('vite:beforeUpdate', () => {

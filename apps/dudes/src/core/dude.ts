@@ -155,7 +155,10 @@ export class Dude {
       this.view.removeChild(this.sprite.view)
     }
 
-    if (dudesSettings.value.sounds.enabled && frameTag === DudesFrameTags.Jump) {
+    if (
+      dudesSettings.value.sounds.enabled &&
+      frameTag === DudesFrameTags.Jump
+    ) {
       soundsLoader.play(Sound.Jump, dudesSettings.value.sounds.volume)
     }
 
