@@ -6,11 +6,11 @@ import type { DudesLayer } from './sprite-provider.js'
 export class DudeSpriteContainer {
   readonly view = new Container()
 
-  private Body?: AnimatedSprite
-  private Eyes?: AnimatedSprite
-  private Mouth?: AnimatedSprite
-  private Hat?: AnimatedSprite
-  private Cosmetics?: AnimatedSprite
+  private body?: AnimatedSprite
+  private eyes?: AnimatedSprite
+  private mouth?: AnimatedSprite
+  private hat?: AnimatedSprite
+  private cosmetics?: AnimatedSprite
 
   constructor(animatedSprites: AnimatedSprite[]) {
     animatedSprites.forEach((sprite, index) => {
@@ -33,7 +33,8 @@ export class DudeSpriteContainer {
   }
 
   setColor(layer: DudesLayer, color: string): void {
-    if (!this[layer]) return
-    this[layer]!.tint = color
+    const a = this[layer]
+    if (!a) return
+    a.tint = color
   }
 }

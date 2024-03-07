@@ -30,11 +30,11 @@ export class Dude {
   readonly view = new Container()
 
   private colors: Record<DudesLayer, string> = {
-    Body: dudesSettings.value.dude.bodyColor,
-    Eyes: '#FFF',
-    Mouth: '#FFF',
-    Hat: '#FFF',
-    Cosmetics: '#FFF'
+    body: dudesSettings.value.dude.bodyColor,
+    eyes: '#FFF',
+    mouth: '#FFF',
+    hat: '#FFF',
+    cosmetics: '#FFF'
   }
   private direction: number
   private currentFrameTag?: DudeSpriteFrameTag
@@ -90,15 +90,15 @@ export class Dude {
     this.updateDirection()
     this.updateIdleAnimationTime({ time: performance.now() })
 
-    this.playAnimation(DudesFrameTags.Idle)
+    this.playAnimation(DudesFrameTags.idle)
   }
 
   jump(): void {
-    if (this.currentFrameTag !== DudesFrameTags.Jump) {
+    if (this.currentFrameTag !== DudesFrameTags.jump) {
       this.velocity.x = this.direction * 100
       this.velocity.y = -300
 
-      this.playAnimation(DudesFrameTags.Jump)
+      this.playAnimation(DudesFrameTags.jump)
       this.updateLifeTime()
       return
     }
@@ -108,7 +108,7 @@ export class Dude {
 
   leave(): void {
     this.updateIdleAnimationTime()
-    this.playAnimation('Run')
+    this.playAnimation(DudesFrameTags.run)
 
     if (!this.isLeaving) {
       this.isLeaving = true
@@ -157,17 +157,17 @@ export class Dude {
 
     if (
       dudesSettings.value.sounds.enabled &&
-      frameTag === DudesFrameTags.Jump
+      frameTag === DudesFrameTags.jump
     ) {
       soundsLoader.play(Sound.Jump, dudesSettings.value.sounds.volume)
     }
 
     this.sprite = new DudeSpriteContainer([
-      dudeSprite[DudesLayers.Body],
-      dudeSprite[DudesLayers.Eyes],
-      dudeSprite[DudesLayers.Mouth],
-      dudeSprite[DudesLayers.Hat],
-      dudeSprite[DudesLayers.Cosmetics]
+      dudeSprite[DudesLayers.body],
+      dudeSprite[DudesLayers.eyes],
+      dudeSprite[DudesLayers.mouth],
+      dudeSprite[DudesLayers.hat],
+      dudeSprite[DudesLayers.cosmetics]
     ])
     this.sprite.view.scale.set(this.direction * this.scale, this.scale)
 
@@ -186,7 +186,7 @@ export class Dude {
       this.landAnimationTime &&
       now - this.landAnimationTime > this.maxLandAnimationTime
     ) {
-      this.playAnimation(DudesFrameTags.Idle)
+      this.playAnimation(DudesFrameTags.idle)
       this.landAnimationTime = null
     }
 
@@ -198,13 +198,13 @@ export class Dude {
       this.idleAnimationTime &&
       this.idleAnimationMaxTime &&
       now - this.idleAnimationTime > this.idleAnimationMaxTime &&
-      (this.currentFrameTag === DudesFrameTags.Run ||
-        this.currentFrameTag === DudesFrameTags.Idle)
+      (this.currentFrameTag === DudesFrameTags.run ||
+        this.currentFrameTag === DudesFrameTags.idle)
     ) {
-      if (this.currentFrameTag === DudesFrameTags.Idle) {
-        this.playAnimation(DudesFrameTags.Run)
+      if (this.currentFrameTag === DudesFrameTags.idle) {
+        this.playAnimation(DudesFrameTags.run)
       } else {
-        this.playAnimation(DudesFrameTags.Idle)
+        this.playAnimation(DudesFrameTags.idle)
       }
 
       this.updateIdleAnimationTime({ time: now })
@@ -230,8 +230,8 @@ export class Dude {
         window.innerHeight -
         (Collider.Y + Collider.Height - SPRITE_SIZE / 2) * this.scale
 
-      if (this.currentFrameTag === DudesFrameTags.Fall) {
-        this.playAnimation(DudesFrameTags.Land)
+      if (this.currentFrameTag === DudesFrameTags.fall) {
+        this.playAnimation(DudesFrameTags.land)
         this.landAnimationTime = now
       }
     }
@@ -239,7 +239,7 @@ export class Dude {
     this.view.position.set(newPosition.x, newPosition.y)
 
     if (this.velocity.y > 0) {
-      this.playAnimation(DudesFrameTags.Fall)
+      this.playAnimation(DudesFrameTags.fall)
     }
 
     const width = window.innerWidth
@@ -286,7 +286,7 @@ export class Dude {
     }
 
     if (
-      this.currentFrameTag !== DudesFrameTags.Idle ||
+      this.currentFrameTag !== DudesFrameTags.idle ||
       (this.isGrowing && this.scale < dudesSettings.value.dude.growMaxScale)
     ) {
       this.view.position.x += (this.direction * DELTA_TIME * 60) / ROUND
@@ -351,7 +351,7 @@ export class Dude {
   async updateSpriteData(spriteData: DudesTypes.SpriteData): Promise<void> {
     await assetsLoader.load(spriteData)
     this.config.sprite = spriteData
-    this.playAnimation('Idle', true)
+    this.playAnimation(DudesFrameTags.idle, true)
   }
 
   updateLifeTime({

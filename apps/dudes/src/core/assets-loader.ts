@@ -43,31 +43,31 @@ async function loadSprite(spriteData: DudesTypes.SpriteLayer) {
       scale: '1',
       frameTags: [
         {
-          name: DudesFrameTags.Idle,
+          name: DudesFrameTags.idle,
           from: 0,
           to: 2,
           direction: 'forward'
         },
         {
-          name: DudesFrameTags.Jump,
+          name: DudesFrameTags.jump,
           from: 3,
           to: 3,
           direction: 'forward'
         },
         {
-          name: DudesFrameTags.Fall,
+          name: DudesFrameTags.fall,
           from: 4,
           to: 4,
           direction: 'forward'
         },
         {
-          name: DudesFrameTags.Land,
+          name: DudesFrameTags.land,
           from: 5,
           to: 5,
           direction: 'forward'
         },
         {
-          name: DudesFrameTags.Run,
+          name: DudesFrameTags.run,
           from: 6,
           to: 8,
           direction: 'forward'
