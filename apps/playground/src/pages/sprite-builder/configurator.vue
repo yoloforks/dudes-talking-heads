@@ -1,14 +1,28 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
+import { storeToRefs } from 'pinia'
 import { useDudesIframe } from '../overlay/use-dudes-iframe'
 import ConfiguratorForm from './components/configurator-form.vue'
 import { Button } from './ui/button'
+import { watch } from 'vue'
+import { useDudesSettings } from '../overlay/use-dudes-settings.js'
 
+const { spriteLayers } = storeToRefs(useDudesSettings())
 const dudesIframe = useDudesIframe()
 const { dudesIframeRef } = storeToRefs(dudesIframe)
 
 function spawnDude() {
-  dudesIframe.sendMessage({ type: 'spawn', data: { id: 'Twir', name: 'Twir' } })
+  dudesIframe.sendMessage({
+    type: 'update-sprite',
+    data: spriteLayers.value
+  })
+
+  dudesIframe.sendMessage({
+    type: 'spawn',
+    data: {
+      id: 'Twir',
+      name: 'Twir'
+    }
+  })
 }
 
 function growDude() {
@@ -26,6 +40,11 @@ function spitEmoteDude() {
 function showMessageDude() {
   dudesIframe.sendMessage({ type: 'show-message', data: 'Hello, World!' })
 }
+
+watch(() => dudesIframe.dudesInited, (inited) => {
+  if (!inited) return
+  spawnDude()
+})
 </script>
 
 <template>

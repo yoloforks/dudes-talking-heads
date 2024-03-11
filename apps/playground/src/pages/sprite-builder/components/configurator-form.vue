@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, h, watch } from 'vue'
+import { computed, h } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
@@ -41,24 +41,7 @@ const {
   spriteLayers
 } = storeToRefs(useDudesSettings())
 
-const dudesIframe = useDudesIframe()
-
-watch(() => dudesIframe.dudesInited, (inited) => {
-  if (!inited) return
-
-  dudesIframe.sendMessage({
-    type: 'update-sprite',
-    data: spriteLayers.value
-  })
-
-  dudesIframe.sendMessage({
-    type: 'spawn',
-    data: {
-      id: 'Twir',
-      name: 'Twir'
-    }
-  })
-})
+const { sendMessage } = useDudesIframe()
 
 const formValues: Record<string, { label: string, value: string }[]> = {
   body: dudesLayers.body.map((body) => ({
@@ -137,7 +120,7 @@ const onSubmit = handleSubmit((values) => {
 })
 
 function onChangeSprite() {
-  dudesIframe.sendMessage({
+  sendMessage({
     type: 'update-sprite', data: {
       body: values.body,
       eyes: values.eyes,
@@ -150,7 +133,7 @@ function onChangeSprite() {
 
 function onChangeColor(layer: string, color: string): void {
   setValues({ [`${layer}Color`]: color })
-  dudesIframe.sendMessage({
+  sendMessage({
     type: 'update-colors', data: {
       bodyColor: values.bodyColor,
       eyesColor: values.eyesColor,
