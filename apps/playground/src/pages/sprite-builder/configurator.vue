@@ -1,55 +1,30 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { useDudesIframe } from '../overlay/use-dudes-iframe'
 import ConfiguratorForm from './components/configurator-form.vue'
-import { onMounted, ref, toRaw } from 'vue'
 import { Button } from './ui/button'
-import { DudeSpriteParams } from '../playground/playground.vue';
-import { dudesLayers } from '../playground/constants.js';
 
-const defaultSpriteData: DudeSpriteParams = {
-  body: dudesLayers.Body[0].src,
-  bodyColor: '#E6AC0C',
+const dudesIframe = useDudesIframe()
+const { dudesIframeRef } = storeToRefs(dudesIframe)
 
-  eyes: dudesLayers.Eyes[0].src,
-  eyesColor: '#FFF',
-
-  mouth: '',
-  mouthColor: '#FFF',
-
-  hat: '',
-  hatColor: '#FFF',
-
-  cosmetics: '',
-  cosmeticsColor: '#FFF'
+function spawnDude() {
+  dudesIframe.sendMessage({ type: 'spawn', data: { id: 'Twir', name: 'Twir' } })
 }
 
-const dudeSpriteData = ref<DudeSpriteParams>({ ...defaultSpriteData })
-
-const iframeRef = ref<HTMLIFrameElement>()
-
-function sendIframeMessage(type: string, data?: any): void {
-  if (!iframeRef.value) return
-  iframeRef.value.contentWindow?.postMessage(JSON.stringify({
-    type,
-    data: toRaw(data)
-  }))
+function growDude() {
+  dudesIframe.sendMessage({ type: 'grow', data: null })
 }
 
-onMounted(() => {
-  window.addEventListener('message', (event) => {
-    if (event.data === 'init') {
-      sendIframeMessage('spawn')
-    }
-  })
-})
-
-function updateSpriteData(type: 'sprite' | 'colors', sprite: DudeSpriteParams): void {
-  sendIframeMessage(`update-${type}`, sprite)
+function jumpDude() {
+  dudesIframe.sendMessage({ type: 'jump', data: null })
 }
 
-function resetSpriteData(): void {
-  dudeSpriteData.value = { ...defaultSpriteData }
-  updateSpriteData('sprite', dudeSpriteData.value)
-  updateSpriteData('colors', dudeSpriteData.value)
+function spitEmoteDude() {
+  dudesIframe.sendMessage({ type: 'spit-emote', data: 'oh.webp' })
+}
+
+function showMessageDude() {
+  dudesIframe.sendMessage({ type: 'show-message', data: 'Hello, World!' })
 }
 </script>
 
@@ -66,27 +41,22 @@ function resetSpriteData(): void {
   <div class="grid grid-flow-col grid-rows-1 gap-4">
     <div class="flex flex-col gap-2">
       <iframe
-        ref="iframeRef"
+        ref="dudesIframeRef"
         class="h-full w-full border border-input rounded bg-muted"
         src="overlay.html"
       />
 
       <div class="flex gap-2">
-        <Button size="sm" variant="outline" @click="sendIframeMessage('spawn')">Respawn</Button>
-        <Button size="sm" variant="outline" @click="sendIframeMessage('grow')">Grow</Button>
-        <Button size="sm" variant="outline" @click="sendIframeMessage('jump')">Jump</Button>
-        <Button size="sm" variant="outline" @click="sendIframeMessage('emote')">Emote</Button>
-        <Button size="sm" variant="outline" @click="sendIframeMessage('message')">Message</Button>
+        <Button size="sm" variant="outline" @click="spawnDude">Respawn</Button>
+        <Button size="sm" variant="outline" @click="growDude">Grow</Button>
+        <Button size="sm" variant="outline" @click="jumpDude">Jump</Button>
+        <Button size="sm" variant="outline" @click="spitEmoteDude">Emote</Button>
+        <Button size="sm" variant="outline" @click="showMessageDude">Message</Button>
       </div>
     </div>
 
     <div>
-      <configurator-form
-        :initial-values="dudeSpriteData"
-        @update-sprite="(data) => updateSpriteData('sprite', data)"
-        @update-colors="(data) => updateSpriteData('colors', data)"
-        @on-reset="resetSpriteData"
-      />
+      <configurator-form />
     </div>
   </div>
 </template>

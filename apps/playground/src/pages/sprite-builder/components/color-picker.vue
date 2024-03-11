@@ -27,6 +27,7 @@ function openColorPicker() {
     }"
     variant="outline"
     @click="openColorPicker"
+    type="button"
   >
   <div class="relative h-full w-full">
     <span class="absolute z-10 h-full w-full rounded color-indicator"></span>

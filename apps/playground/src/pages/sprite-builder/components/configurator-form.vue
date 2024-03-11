@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h } from 'vue'
+import { computed, h, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
@@ -31,37 +31,53 @@ import {
 import { toast } from '../ui/toast'
 
 import ColorPicker from './color-picker.vue'
-import { dudesLayers } from '@/pages/playground/constants.js'
-import { DudeSpriteParams } from '@/pages/playground/playground.vue'
+import { useDudesSettings } from '@/pages/overlay/use-dudes-settings'
+import { storeToRefs } from 'pinia'
+import { dudesLayers } from '@/pages/overlay/constants'
+import { useDudesIframe } from '@/pages/overlay/use-dudes-iframe'
 
-const props = defineProps<{
-  initialValues: DudeSpriteParams
-}>()
+const {
+  spriteColors,
+  spriteLayers
+} = storeToRefs(useDudesSettings())
 
-const emits = defineEmits<{
-  (event: 'update-sprite', spriteData: DudeSpriteParams): void
-  (event: 'update-colors', spriteData: DudeSpriteParams): void
-  (event: 'on-reset'): void
-}>()
+const dudesIframe = useDudesIframe()
+
+watch(() => dudesIframe.dudesInited, (inited) => {
+  if (!inited) return
+
+  dudesIframe.sendMessage({
+    type: 'update-sprite',
+    data: spriteLayers.value
+  })
+
+  dudesIframe.sendMessage({
+    type: 'spawn',
+    data: {
+      id: 'Twir',
+      name: 'Twir'
+    }
+  })
+})
 
 const formValues: Record<string, { label: string, value: string }[]> = {
-  body: dudesLayers.Body.map((body) => ({
+  body: dudesLayers.body.map((body) => ({
     label: body.name,
     value: body.src
   })),
-  eyes: dudesLayers.Eyes.map((eyes) => ({
+  eyes: dudesLayers.eyes.map((eyes) => ({
     label: eyes.name,
     value: eyes.src
   })),
-  mouth: dudesLayers.Mouth.map((mouth) => ({
+  mouth: dudesLayers.mouth.map((mouth) => ({
     label: mouth.name,
     value: mouth.src
   })),
-  hat: dudesLayers.Hat.map((hat) => ({
+  hat: dudesLayers.hat.map((hat) => ({
     label: hat.name,
     value: hat.src
   })),
-  cosmetics: dudesLayers.Cosmetics.map((cosmetic) => ({
+  cosmetics: dudesLayers.cosmetics.map((cosmetic) => ({
     label: cosmetic.name,
     value: cosmetic.src
   }))
@@ -91,45 +107,73 @@ const formSchema = toTypedSchema(z.object({
   cosmeticsColor: z.string()
 }))
 
-const { handleSubmit, setValues, values } = useForm({
-  initialValues: props.initialValues,
+const initialFormValues = computed(() => {
+  return {
+    body: spriteLayers.value.body,
+    bodyColor: spriteColors.value.bodyColor,
+    eyes: spriteLayers.value.eyes,
+    eyesColor: spriteColors.value.eyesColor,
+    mouth: spriteLayers.value.mouth,
+    mouthColor: spriteColors.value.mouthColor,
+    hat: spriteLayers.value.hat,
+    hatColor: spriteColors.value.hatColor,
+    cosmetics: spriteLayers.value.cosmetics,
+    cosmeticsColor: spriteColors.value.cosmeticsColor
+  }
+})
+
+const { handleSubmit, setValues, values } = useForm<typeof initialFormValues.value>({
+  initialValues: initialFormValues.value,
   validationSchema: formSchema
 })
 
 const onSubmit = handleSubmit((values) => {
-  // TODO: does not work
   toast({
     title: 'You submitted the following values:',
     description: h('pre', {
-      class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4'
+      class: 'mt-2'
     }, h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))),
   })
 })
 
 function onChangeSprite() {
-  emits('update-sprite', values as DudeSpriteParams)
+  dudesIframe.sendMessage({
+    type: 'update-sprite', data: {
+      body: values.body,
+      eyes: values.eyes,
+      mouth: values.mouth,
+      hat: values.hat,
+      cosmetics: values.cosmetics,
+    }
+  })
 }
 
 function onChangeColor(layer: string, color: string): void {
   setValues({ [`${layer}Color`]: color })
-  emits('update-colors', values as DudeSpriteParams)
+  dudesIframe.sendMessage({
+    type: 'update-colors', data: {
+      bodyColor: values.bodyColor,
+      eyesColor: values.eyesColor,
+      mouthColor: values.mouthColor,
+      hatColor: values.hatColor,
+      cosmeticsColor: values.cosmeticsColor
+    }
+  })
 }
 </script>
 
 <template>
-  <form class="space-y-6" @submit="onSubmit" @reset="emits('on-reset')">
+  <form class="space-y-6" @submit="onSubmit">
     <FormField name="body" @update:model-value="onChangeSprite">
       <FormItem class="flex flex-col">
         <FormLabel>Body</FormLabel>
         <Popover>
           <PopoverTrigger as-child>
             <FormControl>
-              <Button
-                variant="outline"
-                role="combobox"
+              <Button variant="outline" role="combobox"
                 :class="cn('justify-between', !values.body && 'text-muted-foreground')">
                 {{ values.body ? formValues.body.find((body) => body.value === values.body)?.label
-                  : 'Select body...'}}
+    : 'Select body...' }}
                 <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </FormControl>
@@ -140,14 +184,9 @@ function onChangeColor(layer: string, color: string): void {
               <CommandEmpty>Nothing found.</CommandEmpty>
               <CommandList>
                 <CommandGroup>
-                  <CommandItem
-                    v-for="body in formValues.body"
-                    :key="body.value"
-                    :value="body.label"
-                    @select="setValues({ body: body.value })"
-                  >
-                    <Check
-                      :class="cn('mr-2 h-4 w-4', body.value === values.body ? 'opacity-100' : 'opacity-0')" />
+                  <CommandItem v-for="body in formValues.body" :key="body.value" :value="body.label"
+                    @select="setValues({ body: body.value })">
+                    <Check :class="cn('mr-2 h-4 w-4', body.value === values.body ? 'opacity-100' : 'opacity-0')" />
                     {{ body.label }}
                   </CommandItem>
                 </CommandGroup>
@@ -162,10 +201,7 @@ function onChangeColor(layer: string, color: string): void {
       </FormItem>
     </FormField>
 
-    <color-picker
-      :initial-value="values.bodyColor"
-      @update-color="(color) => onChangeColor('body', color)"
-    />
+    <color-picker :initial-value="values.bodyColor" @update-color="(color) => onChangeColor('body', color)" />
 
     <FormField name="eyes" @update:model-value="onChangeSprite">
       <FormItem class="flex flex-col">
@@ -173,12 +209,10 @@ function onChangeColor(layer: string, color: string): void {
         <Popover>
           <PopoverTrigger as-child>
             <FormControl>
-              <Button
-                variant="outline"
-                role="combobox"
+              <Button variant="outline" role="combobox"
                 :class="cn('justify-between', !values.eyes && 'text-muted-foreground')">
                 {{ values.eyes ? formValues.eyes.find((eye) => eye.value === values.eyes)?.label
-                  : 'Select eyes...'}}
+    : 'Select eyes...' }}
                 <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </FormControl>
@@ -189,14 +223,9 @@ function onChangeColor(layer: string, color: string): void {
               <CommandEmpty>Nothing found.</CommandEmpty>
               <CommandList>
                 <CommandGroup>
-                  <CommandItem
-                    v-for="eye in formValues.eyes"
-                    :key="eye.value"
-                    :value="eye.label"
-                    @select="setValues({ eyes: eye.value })"
-                  >
-                    <Check
-                      :class="cn('mr-2 h-4 w-4', eye.value === values.eyes ? 'opacity-100' : 'opacity-0')" />
+                  <CommandItem v-for="eye in formValues.eyes" :key="eye.value" :value="eye.label"
+                    @select="setValues({ eyes: eye.value })">
+                    <Check :class="cn('mr-2 h-4 w-4', eye.value === values.eyes ? 'opacity-100' : 'opacity-0')" />
                     {{ eye.label }}
                   </CommandItem>
                 </CommandGroup>
@@ -211,10 +240,7 @@ function onChangeColor(layer: string, color: string): void {
       </FormItem>
     </FormField>
 
-    <color-picker
-      :initial-value="values.eyesColor"
-      @update-color="(color) => onChangeColor('eyes', color)"
-    />
+    <color-picker :initial-value="values.eyesColor" @update-color="(color) => onChangeColor('eyes', color)" />
 
     <FormField name="mouth" @update:model-value="onChangeSprite">
       <FormItem class="flex flex-col">
@@ -222,12 +248,10 @@ function onChangeColor(layer: string, color: string): void {
         <Popover>
           <PopoverTrigger as-child>
             <FormControl>
-              <Button
-                variant="outline"
-                role="combobox"
+              <Button variant="outline" role="combobox"
                 :class="cn('justify-between', !values.mouth && 'text-muted-foreground')">
                 {{ values.mouth ? formValues.mouth.find((mouth) => mouth.value === values.mouth)?.label
-                  : 'Select mouth...'}}
+    : 'Select mouth...' }}
                 <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </FormControl>
@@ -238,14 +262,9 @@ function onChangeColor(layer: string, color: string): void {
               <CommandEmpty>Nothing found.</CommandEmpty>
               <CommandList>
                 <CommandGroup>
-                  <CommandItem
-                    v-for="mouth in formValues.mouth"
-                    :key="mouth.value"
-                    :value="mouth.label"
-                    @select="setValues({ mouth: mouth.value })"
-                  >
-                    <Check
-                      :class="cn('mr-2 h-4 w-4', mouth.value === values.mouth ? 'opacity-100' : 'opacity-0')" />
+                  <CommandItem v-for="mouth in formValues.mouth" :key="mouth.value" :value="mouth.label"
+                    @select="setValues({ mouth: mouth.value })">
+                    <Check :class="cn('mr-2 h-4 w-4', mouth.value === values.mouth ? 'opacity-100' : 'opacity-0')" />
                     {{ mouth.label }}
                   </CommandItem>
                 </CommandGroup>
@@ -260,10 +279,7 @@ function onChangeColor(layer: string, color: string): void {
       </FormItem>
     </FormField>
 
-    <color-picker
-      :initial-value="values.mouthColor"
-      @update-color="(color) => onChangeColor('mouth', color)"
-    />
+    <color-picker :initial-value="values.mouthColor" @update-color="(color) => onChangeColor('mouth', color)" />
 
     <FormField name="hat" @update:model-value="onChangeSprite">
       <FormItem class="flex flex-col">
@@ -271,12 +287,10 @@ function onChangeColor(layer: string, color: string): void {
         <Popover>
           <PopoverTrigger as-child>
             <FormControl>
-              <Button
-                variant="outline"
-                role="combobox"
+              <Button variant="outline" role="combobox"
                 :class="cn('justify-between', !values.hat && 'text-muted-foreground')">
                 {{ values.hat ? formValues.hat.find((hat) => hat.value === values.hat)?.label
-                  : 'Select hat...'}}
+    : 'Select hat...' }}
                 <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </FormControl>
@@ -287,14 +301,9 @@ function onChangeColor(layer: string, color: string): void {
               <CommandEmpty>Nothing found.</CommandEmpty>
               <CommandList>
                 <CommandGroup>
-                  <CommandItem
-                    v-for="hat in formValues.hat"
-                    :key="hat.value"
-                    :value="hat.label"
-                    @select="setValues({ hat: hat.value })"
-                  >
-                    <Check
-                      :class="cn('mr-2 h-4 w-4', hat.value === values.hat ? 'opacity-100' : 'opacity-0')" />
+                  <CommandItem v-for="hat in formValues.hat" :key="hat.value" :value="hat.label"
+                    @select="setValues({ hat: hat.value })">
+                    <Check :class="cn('mr-2 h-4 w-4', hat.value === values.hat ? 'opacity-100' : 'opacity-0')" />
                     {{ hat.label }}
                   </CommandItem>
                 </CommandGroup>
@@ -309,10 +318,7 @@ function onChangeColor(layer: string, color: string): void {
       </FormItem>
     </FormField>
 
-    <color-picker
-      :initial-value="values.hatColor"
-      @update-color="(color) => onChangeColor('hat', color)"
-    />
+    <color-picker :initial-value="values.hatColor" @update-color="(color) => onChangeColor('hat', color)" />
 
     <FormField name="cosmetics" @update:model-value="onChangeSprite">
       <FormItem class="flex flex-col">
@@ -320,12 +326,11 @@ function onChangeColor(layer: string, color: string): void {
         <Popover>
           <PopoverTrigger as-child>
             <FormControl>
-              <Button
-                variant="outline"
-                role="combobox"
+              <Button variant="outline" role="combobox"
                 :class="cn('justify-between', !values.cosmetics && 'text-muted-foreground')">
-                {{ values.cosmetics ? formValues.cosmetics.find((cosmetic) => cosmetic.value === values.cosmetics)?.label
-                  : 'Select cosmetics...'}}
+                {{ values.cosmetics ? formValues.cosmetics.find((cosmetic) => cosmetic.value ===
+    values.cosmetics)?.label
+    : 'Select cosmetics...' }}
                 <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </FormControl>
@@ -336,12 +341,8 @@ function onChangeColor(layer: string, color: string): void {
               <CommandEmpty>Nothing found.</CommandEmpty>
               <CommandList>
                 <CommandGroup>
-                  <CommandItem
-                    v-for="cosmetic in formValues.cosmetics"
-                    :key="cosmetic.value"
-                    :value="cosmetic.label"
-                    @select="setValues({ cosmetics: cosmetic.value })"
-                  >
+                  <CommandItem v-for="cosmetic in formValues.cosmetics" :key="cosmetic.value" :value="cosmetic.label"
+                    @select="setValues({ cosmetics: cosmetic.value })">
                     <Check
                       :class="cn('mr-2 h-4 w-4', cosmetic.value === values.cosmetics ? 'opacity-100' : 'opacity-0')" />
                     {{ cosmetic.label }}
@@ -358,10 +359,7 @@ function onChangeColor(layer: string, color: string): void {
       </FormItem>
     </FormField>
 
-    <color-picker
-      :initial-value="values.cosmeticsColor"
-      @update-color="(color) => onChangeColor('cosmetics', color)"
-    />
+    <color-picker :initial-value="values.cosmeticsColor" @update-color="(color) => onChangeColor('cosmetics', color)" />
 
     <div class="flex justify-end gap-2">
       <Button size="sm" variant="outline" type="reset">

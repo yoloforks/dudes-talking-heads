@@ -1,234 +1,99 @@
 <script setup lang="ts">
-import DudesOverlay, { DudesFrameTags, DudesLayers } from '@twirapp/dudes'
 import { VTweakpane } from 'v-tweakpane'
-import { onMounted, reactive, ref, watch } from 'vue'
-import { assetsLoadOptions, dudesSounds, dudesEmotes, dudesLayers, dudesMessages } from './constants.js'
+import { watch } from 'vue'
 import { randomNum } from '@zero-dependency/utils'
-import { createDudeSprite, randomEmoji, randomRgbColor } from '@/utils.js'
+import { useDudesSettings } from '../overlay/use-dudes-settings.js'
+import { storeToRefs } from 'pinia'
+import { useDudesIframe } from '../overlay/use-dudes-iframe.js'
+import { dudesLayers } from '../overlay/constants.js'
+import { dudesEmotes, dudesMessages } from './constants.js'
+import { randomEmoji } from '@/utils.js'
 
 import type { Pane } from 'tweakpane'
-import type { Dude, DudesMethods, DudesStyles, DudesTypes } from '@twirapp/dudes/types'
 
-const initialBodyColor = randomRgbColor()
+const {
+  dudesSettings,
+  spriteColors,
+  spriteLayers
+} = storeToRefs(useDudesSettings())
 
-export interface DudeSpriteParams {
-  body: string
-  bodyColor: string
+const dudesIframe = useDudesIframe()
+const { dudesIframeRef, dudesInited } = storeToRefs(dudesIframe)
 
-  eyes: string
-  eyesColor: string
+watch(dudesSettings, (settings) => {
+  dudesIframe.sendMessage({
+    type: 'update-settings',
+    data: settings
+  })
+}, { deep: true })
 
-  mouth: string
-  mouthColor: string
+watch(spriteLayers, (layers) => {
+  dudesIframe.sendMessage({
+    type: 'update-sprite',
+    data: layers
+  })
+}, { deep: true })
 
-  hat: string
-  hatColor: string
+watch(spriteColors, (colors) => {
+  dudesIframe.sendMessage({
+    type: 'update-colors',
+    data: colors
+  })
+}, { deep: true })
 
-  cosmetics: string
-  cosmeticsColor: string
-}
 
-const spriteParams = reactive<DudeSpriteParams>({
-  body: dudesLayers.Body[0].src,
-  bodyColor: initialBodyColor,
+watch(dudesInited, (inited) => {
+  if (!inited) return
 
-  eyes: dudesLayers.Eyes[0].src,
-  eyesColor: '#FFF',
+  dudesIframe.sendMessage({
+    type: 'update-sprite',
+    data: spriteLayers.value
+  })
 
-  mouth: '',
-  mouthColor: '#FFF',
-
-  hat: '',
-  hatColor: '#FFF',
-
-  cosmetics: '',
-  cosmeticsColor: '#FFF'
-})
-
-const settings = reactive<{
-  dude: DudesTypes.DudeStyles,
-  sounds: DudesTypes.DudeSounds,
-  message: DudesTypes.MessageBoxStyles,
-  name: DudesTypes.NameBoxStyles,
-  emotes: DudesTypes.EmotesStyles
-}>({
-  dude: {
-    bodyColor: initialBodyColor,
-    maxLifeTime: 1000 * 60 * 30,
-    growTime: 1000 * 2,
-    growMaxScale: 20,
-    gravity: 400,
-    scale: 4
-  },
-  sounds: {
-    enabled: true,
-    volume: 0.01
-  },
-  message: {
-    enabled: true,
-    borderRadius: 5,
-    boxColor: '#E6AC0C',
-    fontFamily: 'Roboto',
-    fontSize: 14,
-    padding: 5,
-    showTime: 5 * 1000,
-    fill: '#333333'
-  },
-  name: {
-    enabled: true,
-    fontFamily: 'Roboto',
-    fontSize: 18,
-    fill: '#FFFFFF',
-    lineJoin: 'round',
-    strokeThickness: 4,
-    stroke: '#333333',
-    fillGradientStops: [0],
-    fillGradientType: 0,
-    fontStyle: 'normal',
-    fontVariant: 'normal',
-    fontWeight: 400,
-    dropShadow: false,
-    dropShadowAlpha: 1,
-    dropShadowAngle: 0,
-    dropShadowBlur: 0.1,
-    dropShadowDistance: 10,
-    dropShadowColor: '#3AC7D9'
-  },
-  emotes: {
-    enabled: true
-  }
-})
-
-const dudesRef = ref<DudesMethods | null>(null)
-
-onMounted(async () => {
-  if (!dudesRef.value) return
-  await dudesRef.value.initDudes()
-
-  const name = 'Twir'
-  const sprite = createDudeSprite(spriteParams)
-
-  await dudesRef.value.createDude({
-    id: name,
-    name,
-    sprite
+  dudesIframe.sendMessage({
+    type: 'spawn',
+    data: { id: 'Twir', name: 'Twir' }
   })
 })
 
-watch(spriteParams, () => {
-  if (!dudesRef.value) return
-  for (const dude of dudesRef.value.dudes.values()) {
-    updateDudeSprite(dude as Dude, true)
-  }
-})
-
-async function spawnDude() {
-  if (!dudesRef.value) return
-
-  const name = `Super Dude #${randomNum(0, 100)}`
-  const sprite = createDudeSprite(spriteParams)
-  const styles: DudesStyles = {
-    message: {
-      boxColor: 'lightgreen',
-      fill: '#000000'
-    },
-    name: {
-      fill: ['rgb(131, 58, 180)', 'rgb(253, 29, 29)', 'rgb(252, 176, 69)'],
-      fillGradientType: 1,
-      fillGradientStops: [0.3, 0.6, 1],
-      stroke: '#ffffff',
-      strokeThickness: 4
-    }
-  }
-
-  const dude = await dudesRef.value.createDude({
-    id: name,
-    name,
-    sprite,
-    styles
-  })
-
-  updateDudeSprite(dude)
+function spawnDude() {
+  const name = `Dude #${randomNum(0, 1000)}`
+  dudesIframe.sendMessage({ type: 'spawn', data: { id: name, name } })
 }
 
-async function updateDudeSprite(dude: Dude, force = false) {
-  if (force) {
-    const spriteData = createDudeSprite(spriteParams)
-    await dude.updateSpriteData(spriteData)
-  }
-
-  dude.updateColor(DudesLayers.Body, spriteParams.bodyColor)
-  dude.updateColor(DudesLayers.Eyes, spriteParams.eyesColor)
-  dude.updateColor(DudesLayers.Mouth, spriteParams.mouthColor)
-  dude.updateColor(DudesLayers.Hat, spriteParams.hatColor)
-  dude.updateColor(DudesLayers.Cosmetics, spriteParams.cosmeticsColor)
+function jumpDudes() {
+  dudesIframe.sendMessage({ type: 'jump', data: null })
 }
 
-function jumpAllDudes() {
-  if (!dudesRef.value) return
-  for (const dude of dudesRef.value.dudes.values()) {
-    dude.jump()
-  }
+function growDudes() {
+  dudesIframe.sendMessage({ type: 'grow', data: null })
 }
 
-function growAllDudes() {
-  if (!dudesRef.value) return
-  for (const dude of dudesRef.value.dudes.values()) {
-    dude.grow()
-  }
+function runDudes() {
+  dudesIframe.sendMessage({ type: 'run', data: null })
 }
 
-function runAllDudes() {
-  if (!dudesRef.value) return
-  for (const dude of dudesRef.value.dudes.values()) {
-    dude.updateIdleAnimationTime({ time: performance.now() })
-    dude.playAnimation(DudesFrameTags.Run)
-  }
+function idleDudes() {
+  dudesIframe.sendMessage({ type: 'idle', data: null })
 }
 
-function idleAllDudes() {
-  if (!dudesRef.value) return
-  for (const dude of dudesRef.value.dudes.values()) {
-    dude.updateIdleAnimationTime({
-      time: Number.MAX_SAFE_INTEGER,
-      maxTime: Number.MAX_SAFE_INTEGER
-    })
-    dude.playAnimation(DudesFrameTags.Idle)
-  }
-}
-
-function leaveAllDudes() {
-  if (!dudesRef.value) return
-  for (const dude of dudesRef.value.dudes.values()) {
-    dude.leave()
-  }
-}
-
-function showMessageAllDudes() {
-  if (!dudesRef.value) return
-  for (const dude of dudesRef.value.dudes.values()) {
-    const message = dudesMessages[randomNum(0, dudesMessages.length - 1)]
-      .replace('{name}', dude.config.name)
-    const emoji = randomEmoji('emoticons')
-    dude.addMessage(`${message} ${emoji}`)
-  }
-}
-
-function showEmotesAllDudes() {
-  if (!dudesRef.value) return
-  for (const dude of dudesRef.value.dudes.values()) {
-    showEmotes(dude as Dude)
-  }
-}
-
-function showEmotes(dude: Dude) {
-  const emoteName = dudesEmotes[randomNum(0, dudesEmotes.length - 1)]
-  dude.addEmotes([`emotes/${emoteName}`])
+function leaveDudes() {
+  dudesIframe.sendMessage({ type: 'leave', data: null })
 }
 
 function clearDudes() {
-  if (!dudesRef.value) return
-  dudesRef.value.removeAllDudes()
+  dudesIframe.sendMessage({ type: 'clear', data: null })
+}
+
+function showMessageDudes() {
+  const message = dudesMessages[randomNum(0, dudesMessages.length - 1)]
+  const emoji = randomEmoji('emoticons')
+  dudesIframe.sendMessage({ type: 'show-message', data: `${message} ${emoji}` })
+}
+
+function spitEmoteDudes() {
+  const emoteName = dudesEmotes[randomNum(0, dudesEmotes.length - 1)]
+  dudesIframe.sendMessage({ type: 'spit-emote', data: emoteName })
 }
 
 function onPaneCreated(pane: Pane) {
@@ -243,80 +108,81 @@ function onPaneCreated(pane: Pane) {
   const dudeFolder = pane.addFolder({ title: 'Dude' })
 
   const hiddenOption = { text: 'Hidden', value: '' }
-  const bodySpriteOptions = dudesLayers.Body
+  const bodySpriteOptions = dudesLayers.body
     .map((layer) => ({ text: layer.name, value: layer.src }))
+
   bodySpriteOptions.unshift(hiddenOption)
-  dudeFolder.addBinding(spriteParams, 'body', {
+  dudeFolder.addBinding(spriteLayers.value, 'body', {
     label: 'Body',
     options: bodySpriteOptions
   })
 
-  dudeFolder.addBinding(spriteParams, 'bodyColor', {
+  dudeFolder.addBinding(spriteColors.value, 'bodyColor', {
     label: ''
   })
 
   dudeFolder.addBlade({ view: 'separator' })
 
-  const eyesSpriteOptions = dudesLayers.Eyes
+  const eyesSpriteOptions = dudesLayers.eyes
     .map((layer) => ({ text: layer.name, value: layer.src }))
   eyesSpriteOptions.unshift(hiddenOption)
-  dudeFolder.addBinding(spriteParams, 'eyes', {
+  dudeFolder.addBinding(spriteLayers.value, 'eyes', {
     label: 'Eyes',
     options: eyesSpriteOptions
   })
 
-  dudeFolder.addBinding(spriteParams, 'eyesColor', {
+  dudeFolder.addBinding(spriteColors.value, 'eyesColor', {
     label: ''
   })
 
   dudeFolder.addBlade({ view: 'separator' })
 
-  const mouthSpriteOptions = dudesLayers.Mouth
+  const mouthSpriteOptions = dudesLayers.mouth
     .map((layer) => ({ text: layer.name, value: layer.src }))
   mouthSpriteOptions.unshift(hiddenOption)
-  dudeFolder.addBinding(spriteParams, 'mouth', {
+  dudeFolder.addBinding(spriteLayers.value, 'mouth', {
     label: 'Mouth',
     options: mouthSpriteOptions
   })
 
-  dudeFolder.addBinding(spriteParams, 'mouthColor', {
+  dudeFolder.addBinding(spriteColors.value, 'mouthColor', {
     label: ''
   })
 
   dudeFolder.addBlade({ view: 'separator' })
 
-  const hatSpriteOptions = dudesLayers.Hat
+  const hatSpriteOptions = dudesLayers.hat
     .map((layer) => ({ text: layer.name, value: layer.src }))
   hatSpriteOptions.unshift(hiddenOption)
-  dudeFolder.addBinding(spriteParams, 'hat', {
+  dudeFolder.addBinding(spriteLayers.value, 'hat', {
     label: 'Hat',
     options: hatSpriteOptions
   })
 
-  dudeFolder.addBinding(spriteParams, 'hatColor', {
+  dudeFolder.addBinding(spriteColors.value, 'hatColor', {
     label: ''
   })
 
   dudeFolder.addBlade({ view: 'separator' })
 
-  const cosmeticsSpriteOptions = dudesLayers.Cosmetics
+  const cosmeticsSpriteOptions = dudesLayers.cosmetics
     .map((layer) => ({ text: layer.name, value: layer.src }))
   cosmeticsSpriteOptions.unshift(hiddenOption)
-  dudeFolder.addBinding(spriteParams, 'cosmetics', {
+  dudeFolder.addBinding(spriteLayers.value, 'cosmetics', {
     label: 'Cosmetics',
     options: cosmeticsSpriteOptions
   })
 
-  dudeFolder.addBinding(spriteParams, 'cosmeticsColor', {
+  dudeFolder.addBinding(spriteColors.value, 'cosmeticsColor', {
     label: ''
   })
 
   dudeFolder.addBlade({ view: 'separator' })
 
-  dudeFolder.addBinding(settings.sounds, 'enabled', {
+  dudeFolder.addBinding(dudesSettings.value.sounds, 'enabled', {
     label: 'Sounds'
   })
-  dudeFolder.addBinding(settings.sounds, 'volume', {
+  dudeFolder.addBinding(dudesSettings.value.sounds, 'volume', {
     label: 'Volume',
     min: 0.01,
     max: 1,
@@ -325,13 +191,13 @@ function onPaneCreated(pane: Pane) {
 
   dudeFolder.addBlade({ view: 'separator' })
 
-  dudeFolder.addBinding(settings.dude, 'growTime', {
+  dudeFolder.addBinding(dudesSettings.value.dude, 'growTime', {
     label: 'Grow time',
     min: 1000 * 1,
     max: 1000 * 60 * 60,
     step: 1000
   })
-  dudeFolder.addBinding(settings.dude, 'growMaxScale', {
+  dudeFolder.addBinding(dudesSettings.value.dude, 'growMaxScale', {
     label: 'Grow max scale',
     min: 4,
     max: 32,
@@ -340,18 +206,18 @@ function onPaneCreated(pane: Pane) {
 
   dudeFolder.addBlade({ view: 'separator' })
 
-  dudeFolder.addBinding(settings.dude, 'gravity', {
+  dudeFolder.addBinding(dudesSettings.value.dude, 'gravity', {
     label: 'Gravity',
     min: 10,
     max: 10000,
     step: 1
   })
-  dudeFolder.addBinding(settings.dude, 'maxLifeTime', {
+  dudeFolder.addBinding(dudesSettings.value.dude, 'maxLifeTime', {
     label: 'Max life time on screen',
     min: 1000 * 1,
     max: 1000 * 60 * 60
   })
-  dudeFolder.addBinding(settings.dude, 'scale', {
+  dudeFolder.addBinding(dudesSettings.value.dude, 'scale', {
     label: 'Scale',
     min: 1,
     max: 24,
@@ -361,101 +227,101 @@ function onPaneCreated(pane: Pane) {
   dudeFolder.addBlade({ view: 'separator' })
 
   dudeFolder.addButton({ title: 'Spawn' }).on('click', spawnDude)
-  dudeFolder.addButton({ title: 'Jump' }).on('click', jumpAllDudes)
-  dudeFolder.addButton({ title: 'Grow' }).on('click', growAllDudes)
-  dudeFolder.addButton({ title: 'Run' }).on('click', runAllDudes)
-  dudeFolder.addButton({ title: 'Idle' }).on('click', idleAllDudes)
-  dudeFolder.addButton({ title: 'Leave' }).on('click', leaveAllDudes)
-  dudeFolder.addButton({ title: 'Show message' }).on('click', showMessageAllDudes)
-  dudeFolder.addButton({ title: 'Show emote' }).on('click', showEmotesAllDudes)
+  dudeFolder.addButton({ title: 'Jump' }).on('click', jumpDudes)
+  dudeFolder.addButton({ title: 'Grow' }).on('click', growDudes)
+  dudeFolder.addButton({ title: 'Run' }).on('click', runDudes)
+  dudeFolder.addButton({ title: 'Idle' }).on('click', idleDudes)
+  dudeFolder.addButton({ title: 'Leave' }).on('click', leaveDudes)
+  dudeFolder.addButton({ title: 'Show message' }).on('click', showMessageDudes)
+  dudeFolder.addButton({ title: 'Show emote' }).on('click', spitEmoteDudes)
   dudeFolder.addButton({ title: 'Clear' }).on('click', clearDudes)
 
   const messageBoxFolder = pane.addFolder({ title: 'Message', expanded: false })
-  messageBoxFolder.addBinding(settings.message, 'enabled')
-  messageBoxFolder.addBinding(settings.message, 'fill')
-  messageBoxFolder.addBinding(settings.message, 'boxColor')
-  messageBoxFolder.addBinding(settings.message, 'fontFamily', {
+  messageBoxFolder.addBinding(dudesSettings.value.message, 'enabled')
+  messageBoxFolder.addBinding(dudesSettings.value.message, 'fill')
+  messageBoxFolder.addBinding(dudesSettings.value.message, 'boxColor')
+  messageBoxFolder.addBinding(dudesSettings.value.message, 'fontFamily', {
     options: fonts
   })
-  messageBoxFolder.addBinding(settings.message, 'fontSize', {
+  messageBoxFolder.addBinding(dudesSettings.value.message, 'fontSize', {
     min: 10,
     max: 64,
     step: 1
   })
-  messageBoxFolder.addBinding(settings.message, 'borderRadius', {
+  messageBoxFolder.addBinding(dudesSettings.value.message, 'borderRadius', {
     min: 0,
     max: 64,
     step: 1
   })
-  messageBoxFolder.addBinding(settings.message, 'padding', {
+  messageBoxFolder.addBinding(dudesSettings.value.message, 'padding', {
     min: 0,
     max: 64,
     step: 1
   })
-  messageBoxFolder.addBinding(settings.message, 'showTime', {
+  messageBoxFolder.addBinding(dudesSettings.value.message, 'showTime', {
     min: 1000,
     max: 1000 * 10
   })
 
   const nameBoxFolder = pane.addFolder({ title: 'Name', expanded: false })
-  nameBoxFolder.addBinding(settings.name, 'enabled')
-  nameBoxFolder.addBinding(settings.name, 'fill')
-  nameBoxFolder.addBinding(settings.name, 'fontFamily', {
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'enabled')
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'fill')
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'fontFamily', {
     options: fonts
   })
-  nameBoxFolder.addBinding(settings.name, 'fontSize', {
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'fontSize', {
     min: 10,
     max: 64,
     step: 1
   })
-  nameBoxFolder.addBinding(settings.name, 'fontStyle', {
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'fontStyle', {
     options: {
       normal: 'normal',
       italic: 'italic'
     }
   })
-  nameBoxFolder.addBinding(settings.name, 'fontVariant', {
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'fontVariant', {
     options: {
       normal: 'normal',
       'small-caps': 'small-caps'
     }
   })
-  nameBoxFolder.addBinding(settings.name, 'fontWeight', {
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'fontWeight', {
     options: [100, 200, 300, 400, 500, 600, 700, 800, 900].map((weight) => ({
       text: `${weight}`,
       value: weight
     }))
   })
-  nameBoxFolder.addBinding(settings.name, 'stroke')
-  nameBoxFolder.addBinding(settings.name, 'strokeThickness', {
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'stroke')
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'strokeThickness', {
     min: 0,
     max: 10,
     step: 1
   })
-  nameBoxFolder.addBinding(settings.name, 'dropShadow')
-  nameBoxFolder.addBinding(settings.name, 'dropShadowColor')
-  nameBoxFolder.addBinding(settings.name, 'dropShadowDistance', {
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'dropShadow')
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'dropShadowColor')
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'dropShadowDistance', {
     min: 0,
     max: 32,
     step: 0.1
   })
-  nameBoxFolder.addBinding(settings.name, 'dropShadowAlpha', {
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'dropShadowAlpha', {
     min: 0,
     max: 1,
     step: 0.01
   })
-  nameBoxFolder.addBinding(settings.name, 'dropShadowBlur', {
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'dropShadowBlur', {
     min: 0,
     max: 1,
     step: 0.01
   })
-  nameBoxFolder.addBinding(settings.name, 'dropShadowAngle', {
+  nameBoxFolder.addBinding(dudesSettings.value.name, 'dropShadowAngle', {
     min: 0,
     max: Math.PI * 2
   })
 
   const emoteFolder = pane.addFolder({ title: 'Emote', expanded: false })
-  emoteFolder.addBinding(settings.emotes, 'enabled')
+  emoteFolder.addBinding(dudesSettings.value.emotes, 'enabled')
 }
 </script>
 
@@ -467,10 +333,10 @@ function onPaneCreated(pane: Pane) {
       @on-pane-created="onPaneCreated"
     />
   </Teleport>
-  <dudes-overlay
-    ref="dudesRef"
-    :assets-loader-options="assetsLoadOptions"
-    :sounds="dudesSounds"
-    :settings="settings"
+  <iframe
+    ref="dudesIframeRef"
+    class="w-full h-full"
+    src="overlay.html"
+    frameborder="false"
   />
 </template>

@@ -2,6 +2,7 @@
 import { RouterView } from 'vue-router'
 import SidebarNav from './components/sidebar-nav.vue'
 import { Separator } from './ui/separator'
+import Toaster from './ui/toast/Toaster.vue'
 </script>
 
 <template>
@@ -14,10 +15,10 @@ import { Separator } from './ui/separator'
         TODO: description
       </p>
     </div>
-    <Separator class="my-6" />
+    <separator class="my-6" />
     <div class="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
       <aside class="-mx-4 lg:w-1/5">
-        <SidebarNav />
+        <sidebar-nav />
       </aside>
       <div class="flex-1 w-full">
         <div class="space-y-6">
@@ -28,4 +29,5 @@ import { Separator } from './ui/separator'
       </div>
     </div>
   </div>
+  <toaster />
 </template>
