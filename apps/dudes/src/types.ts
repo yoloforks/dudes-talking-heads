@@ -18,7 +18,6 @@ export interface DudesMethods {
   createDude: (config: DudesTypes.DudeConfig) => Promise<Dude>
   removeDude: (id: string) => void
   removeAllDudes: () => void
-  updateSettings: (settings: RecursivePartial<DudesStyles>) => void
 }
 
 export namespace DudesTypes {
