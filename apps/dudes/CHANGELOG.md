@@ -1,5 +1,12 @@
 # @twirapp/dudes
 
+## 1.1.2
+
+### Patch Changes
+
+- chore: lowercase layers and frametags names
+  chore: removed method `updateSettings`
+
 ## 1.1.1
 
 ### Patch Changes
