@@ -1,10 +1,11 @@
+import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
-import App from './App.vue'
+import App from './overlay.vue'
 
-import './style.css'
+import './index.css'
 
-createApp(App).mount('#app')
+createApp(App).use(createPinia()).mount('#app')
 
 if (import.meta.hot) {
   import.meta.hot.on('vite:beforeUpdate', () => {

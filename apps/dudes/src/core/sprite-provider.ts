@@ -4,21 +4,21 @@ import type { FrameObject } from 'pixi.js'
 import { assetsLoader } from './assets-loader.js'
 
 export const DudesLayers = {
-  Body: 'Body',
-  Eyes: 'Eyes',
-  Mouth: 'Mouth',
-  Hat: 'Hat',
-  Cosmetics: 'Cosmetics'
+  body: 'body',
+  eyes: 'eyes',
+  mouth: 'mouth',
+  hat: 'hat',
+  cosmetics: 'cosmetics'
 } as const
 export const DudesLayersKeys = Object.keys(DudesLayers)
 export type DudesLayer = keyof typeof DudesLayers
 
 export const DudesFrameTags = {
-  Idle: 'Idle',
-  Jump: 'Jump',
-  Fall: 'Fall',
-  Land: 'Land',
-  Run: 'Run'
+  idle: 'idle',
+  jump: 'jump',
+  fall: 'fall',
+  land: 'land',
+  run: 'run'
 } as const
 export const DudeFrameTagsKeys = Object.keys(DudesFrameTags)
 export type DudeSpriteFrameTag = keyof typeof DudesFrameTags

@@ -1,9 +1,11 @@
-import { DudesLayers } from '@twirapp/dudes'
 import { randomNum, rgbToHex } from '@zero-dependency/utils'
-import type { DudesLayer, DudesTypes } from '@twirapp/dudes/types'
-import type { UnwrapNestedRefs } from 'vue'
+import { clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+import type { ClassValue } from 'clsx'
 
-import type { DudeSpriteParams } from './App.vue'
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 export function randomRgbColor(): string {
   return rgbToHex({
@@ -11,27 +13,6 @@ export function randomRgbColor(): string {
     g: randomNum(0, 255),
     b: randomNum(0, 255)
   })
-}
-
-export function mapDudeSpriteData(
-  spriteParams: UnwrapNestedRefs<DudeSpriteParams>
-) {
-  const layers = {
-    [DudesLayers.Body]: spriteParams.bodySprite,
-    [DudesLayers.Eyes]: spriteParams.eyesSprite,
-    [DudesLayers.Mouth]: spriteParams.mouthSprite,
-    [DudesLayers.Hat]: spriteParams.hatSprite,
-    [DudesLayers.Cosmetics]: spriteParams.cosmeticsSprite
-  }
-
-  const sprite: DudesTypes.SpriteData = {
-    name: 'dude',
-    layers: Object.entries(layers)
-      .map(([layer, src]) => ({ layer: layer as DudesLayer, src }))
-      .filter((layer) => layer.src)
-  }
-
-  return sprite
 }
 
 const CHAR_RANGE = {

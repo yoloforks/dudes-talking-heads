@@ -11,8 +11,12 @@ export const dudesSounds: SoundAsset[] = [
   }
 ]
 
-export const assetsLoadOptions: AssetsLoaderOptions = {
-  basePath: location.href + 'sprites/',
+export const baseUrl = import.meta.env.DEV
+  ? location.origin
+  : 'https://twirapp.github.com/dudes'
+
+export const assetsLoaderOptions: AssetsLoaderOptions = {
+  basePath: baseUrl + '/sprites/',
   defaultSearchParams: {
     ts: Date.now()
   }
@@ -20,7 +24,7 @@ export const assetsLoadOptions: AssetsLoaderOptions = {
 
 export const dudesLayers: Record<DudesLayer, { name: string; src: string }[]> =
   {
-    Body: [
+    body: [
       {
         name: 'Dude',
         src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAAgCAYAAACy9KU0AAAAAXNSR0IArs4c6QAAAVVJREFUeJzt3EFuwyAQBVCoehnfuCfLpoehC9ep1UYuWDhD7PckVjb+I0CjbEhKAAAAAAAAAEAnueHdcuC3qVO7B0etfXR+pOjzf8r82iJLKW35OeeW71fV0Pj+S2xAS37tHhyw9iPkR4o+/6fNf68Jv91uTeEppVRKSTnnUlNE3eeaF6BX9hD5LXvQee2HyN85r8vZCz7/p86vaUDRTr0B/Ku5+S+s//jeoguADbua/33y3Lj2/nriCTQgIIwGBITRgIAwGhAQRgMCwmhAQBgNCAijAQFhNCAgjAYEhHmV2/BXz0/p+1rCNE0R2VH51ZkH1xK9/xfP//hMaT4MZZHmOzb38efZPKeL5U5PS/7eC4wj5q9LqRxHicgve/WqJXr/y8+dtofjUV1H5W+twXrU5rd2qPVXf8/detbL1fOvKvLvONZG3f9nZjvnAAAAAAAAADCmLynTrb5yQ6D8AAAAAElFTkSuQmCC'
@@ -34,7 +38,7 @@ export const dudesLayers: Record<DudesLayer, { name: string; src: string }[]> =
         src: 'body/devil.png'
       }
     ],
-    Eyes: [
+    eyes: [
       {
         name: 'Dude',
         src: 'eyes/dude.png'
@@ -48,7 +52,7 @@ export const dudesLayers: Record<DudesLayer, { name: string; src: string }[]> =
         src: 'eyes/smart-guy-glasses.png'
       }
     ],
-    Mouth: [
+    mouth: [
       {
         name: 'Cat',
         src: 'mouth/cat.png'
@@ -58,7 +62,7 @@ export const dudesLayers: Record<DudesLayer, { name: string; src: string }[]> =
         src: 'mouth/mexican-moustache.png'
       }
     ],
-    Hat: [
+    hat: [
       {
         name: 'Santa hat',
         src: 'hat/santa.png'
@@ -72,7 +76,7 @@ export const dudesLayers: Record<DudesLayer, { name: string; src: string }[]> =
         src: 'hat/girl-ribbon.png'
       }
     ],
-    Cosmetics: [
+    cosmetics: [
       {
         name: 'Gun',
         src: 'cosmetics/gun.png'
@@ -87,17 +91,3 @@ export const dudesLayers: Record<DudesLayer, { name: string; src: string }[]> =
       }
     ]
   }
-
-export const dudesEmotes: string[] = [
-  'hi.gif',
-  'oh.webp',
-  'buh.gif',
-  'twir.webp',
-  'juh.gif'
-]
-
-export const dudesMessages: string[] = [
-  'Hello, my name is {name}!',
-  'Good morning!',
-  'I love you!'
-]

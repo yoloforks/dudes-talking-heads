@@ -60,8 +60,7 @@ defineExpose<DudesMethods>({
   getDude,
   createDude,
   removeDude,
-  removeAllDudes,
-  updateSettings
+  removeAllDudes
 })
 </script>
 

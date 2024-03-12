@@ -1,5 +1,5 @@
 import { AnimatedGIF } from '@pixi/gif'
-import { Container, Sprite } from 'pixi.js'
+import { Container, Sprite, Texture } from 'pixi.js'
 
 import {
   ALPHA_SPEED,
@@ -44,13 +44,13 @@ export class DudeEmoteSpitter {
       if (emoteFromCache instanceof AnimatedGIF) {
         return emoteFromCache.clone()
       }
-      return emoteFromCache
+      return new Sprite(Texture.from(emoteFromCache.texture.baseTexture))
     }
 
     if (!url.endsWith('.gif')) {
       const sprite = Sprite.from(url)
       emotesCache.set(url, sprite)
-      return sprite
+      return new Sprite(Texture.from(sprite.texture.baseTexture))
     }
 
     const response = await fetch(url)
